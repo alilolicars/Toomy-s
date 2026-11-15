@@ -1,0 +1,1137 @@
+@font-face {
+  font-family: "Talina";
+  src: url("../fonts/Talina.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+/* =========================================
+   1. DESIGN TOKENS & VARIABLES
+   ========================================= */
+:root {
+  /* Core Palette - Deep Charcoal + Appetite-Driven Warm Accents */
+  --bg-base: #0d0b0a;
+  --bg-surface: #181412;
+  --bg-overlay: rgba(13, 11, 10, 0.96);
+
+  /* Brand Accent Colors (Swap these two if Toomy's uses specific hex codes) */
+  --accent-primary: #e63926;      /* Crispy Flame Red */
+  --accent-secondary: #ffb703;    /* Golden Fried Amber */
+  --accent-glow: rgba(230, 57, 38, 0.35);
+
+  /* Typography Colors */
+  --text-primary: #f8f5f0;
+  --text-secondary: rgba(248, 245, 240, 0.78);
+  --text-muted: rgba(248, 245, 240, 0.5);
+
+  /* Borders & Glass */
+  --border-subtle: rgba(248, 245, 240, 0.14);
+  --glass-bg: rgba(20, 17, 15, 0.55);
+
+  /* Fonts */
+  --font-display: "Archivo Black", sans-serif;
+  --font-body: "Plus Jakarta Sans", sans-serif;
+
+  /* Spacing & Motion */
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =========================================
+   2. RESET & BASE STYLES
+   ========================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: var(--bg-base);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* =========================================
+   0. SPLASH CURTAIN & INTRO CHOREOGRAPHY
+   ========================================= */
+.intro-curtain {
+  position: absolute;
+  inset: 0;
+  background-color: var(--accent-primary); /* Toomy's bold brand red */
+  z-index: 10; /* Above .hero-backdrop (0), BELOW .hero-center (50) */
+  transform: translateX(0);
+  transition: transform 0.95s cubic-bezier(0.77, 0, 0.175, 1);
+  will-change: transform;
+  pointer-events: all;
+}
+
+/* Slides cleanly to the left to reveal the hero scene */
+.intro-curtain.is-sliding {
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+
+/* Keep header, slogan, CTA & dock hidden without toggling overflow (prevents layout snap) */
+body.is-intro-active .site-header,
+body.is-intro-active .hero-slogan,
+body.is-intro-active .hero-actions,
+body.is-intro-active .category-dock {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px);
+}
+
+/* Smooth fade-in once the red curtain starts sliding away */
+.site-header,
+.hero-slogan,
+.hero-actions,
+.category-dock {
+  transition:
+    opacity 0.65s var(--ease-out-expo),
+    transform 0.65s var(--ease-out-expo),
+    visibility 0.65s;
+}
+
+/* Punchy entrance animation for the hero logo on top of the red screen */
+@keyframes logoSplashPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.78) translateY(16px);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.04) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* =========================================
+   3. TOP HEADER (Top-Left Logo + Top-Right + MENU)
+   ========================================= */
+/* Align header side padding with the 3vw full-width sections */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1.35rem 3vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+  pointer-events: none;
+  transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+.brand-mini,
+.menu-toggle {
+  pointer-events: auto;
+}
+
+.brand-mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s var(--ease-out-expo);
+}
+
+.brand-mini:hover {
+  transform: scale(1.06);
+}
+
+.brand-mini img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+}
+
+.brand-mini-fallback {
+  display: none; /* Shown automatically via onerror if logo-small.png is missing */
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+  background: var(--accent-primary);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+}
+
+/* "+ MENU" Button matching reference top-right */
+.menu-toggle {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.menu-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.menu-toggle-icon {
+  font-size: 1.15rem;
+  font-weight: 400;
+  line-height: 1;
+  transition: transform 0.35s var(--ease-out-expo);
+}
+
+.menu-toggle[aria-expanded="true"] .menu-toggle-icon {
+  transform: rotate(45deg); /* Turns '+' into 'x' when open */
+}
+
+/* When drawer is open, hide main header's top-left mini logo so AR | EN switcher takes its place */
+body.is-menu-open .brand-mini {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Invert top-right ✕ CLOSE button to dark ink against the stone-gray drawer */
+body.is-menu-open .menu-toggle {
+  color: #0a0a0a;
+}
+
+body.is-menu-open .menu-toggle:hover {
+  background-color: rgba(10, 10, 10, 0.08);
+}
+
+/* When scrolled onto light cream sections, turn + MENU dark so it stays visible */
+body.is-scrolled-light:not(.is-menu-open) .menu-toggle {
+  color: #1c1613;
+}
+
+body.is-scrolled-light:not(.is-menu-open) .menu-toggle:hover {
+  background-color: rgba(28, 22, 19, 0.08);
+}
+
+/* =========================================
+   4. FULL-SCREEN DRAWER MENU (OPTION 4: SMOKED PAPRIKA + CREAM)
+   ========================================= */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: #9e2a22;
+  color: #f8f5f0;
+  z-index: 90;
+  transform: translateY(-100%);
+  transition: transform 0.65s cubic-bezier(0.76, 0, 0.24, 1);
+  will-change: transform;
+  pointer-events: none;
+}
+
+.nav-overlay.is-open {
+  transform: translateY(0%);
+  pointer-events: auto;
+}
+
+.nav-overlay-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+}
+
+.nav-stagger {
+  opacity: 0;
+  filter: blur(15px);
+  transform: translateY(10px);
+}
+
+.nav-overlay.is-open .nav-stagger {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateY(0);
+  transition:
+    opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(0.36s + (var(--stagger-index, 0) * 55ms));
+}
+
+.nav-overlay.is-closing .nav-stagger {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateY(0);
+  transition: none;
+}
+
+.nav-top-bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 var(--gutter);
+}
+
+.lang-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+}
+
+.lang-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0.15rem 0.25rem;
+  font-weight: 400;
+  color: rgba(248, 245, 240, 0.45);
+  transition: color 0.25s ease, font-weight 0.2s ease;
+}
+
+.lang-btn.is-active {
+  font-weight: 700;
+  color: #f8f5f0;
+}
+
+.lang-divider {
+  color: rgba(248, 245, 240, 0.45);
+  font-weight: 400;
+}
+
+.nav-center-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-center-logo img {
+  height: clamp(44px, 6vw, 68px);
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1) drop-shadow(0 4px 14px rgba(0, 0, 0, 0.2));
+}
+
+.nav-top-spacer { width: 40px; }
+
+.nav-rows {
+  list-style: none;
+  width: 100%;
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-row {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.nav-row::before,
+.nav-row:last-child::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    to right,
+    rgba(248, 245, 240, 0.35) 0px,
+    rgba(248, 245, 240, 0.35) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  z-index: 3;
+  pointer-events: none;
+}
+.nav-row::before { top: 0; }
+.nav-row:last-child::after { bottom: 0; }
+
+.nav-row-curtain {
+  position: absolute;
+  inset: 0;
+  background-color: #0a0a0a;
+  transform: scaleY(0);
+  transform-origin: top center;
+  transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.nav-row.is-hovered .nav-row-curtain {
+  transform: scaleY(1);
+}
+
+.nav-row-link {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  padding: clamp(0.35rem, 1.1vh, 0.85rem) var(--gutter);
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(2.8rem, 6.2vw, 5.4rem);
+  font-weight: 500;
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #f8f5f0;
+  transition: color 0.28s ease;
+}
+
+.nav-row-link.pos-home { padding-left: var(--gutter); }
+.nav-row-link.pos-menu { padding-left: clamp(4rem, 18vw, 22rem); }
+.nav-row-link.pos-about { padding-left: clamp(8rem, 56vw, 62rem); }
+.nav-row-link.pos-contact { justify-content: center; }
+
+.nav-row-label {
+  display: inline-block;
+  transform: scaleX(0.84);
+  transform-origin: left center;
+}
+.nav-row-link.pos-contact .nav-row-label { transform-origin: center center; }
+
+.nav-row-count {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(0.75rem, 1.1vw, 1rem);
+  font-weight: 600;
+  margin-left: -0.35rem;
+  margin-top: 0.25rem;
+  color: inherit;
+}
+
+.nav-row.is-hovered .nav-row-link {
+  color: #ffffff;
+}
+
+.nav-bottom-bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 var(--gutter);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f8f5f0;
+}
+
+.nav-legal-link { justify-self: start; transition: opacity 0.25s ease; }
+.nav-legal-link:last-child { justify-self: end; }
+.nav-legal-link:hover { opacity: 0.55; }
+
+.nav-socials {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.15rem;
+}
+
+.social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #f8f5f0;
+  transition: transform 0.25s var(--ease-out-expo), opacity 0.25s ease;
+}
+.social-icon:hover { transform: translateY(-2px); opacity: 0.6; }
+
+/* =========================================
+   5. HERO SECTION & ATMOSPHERIC BACKDROP
+   ========================================= */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 5.5rem;
+  padding-bottom: 1.75rem;
+  overflow: hidden;
+}
+
+/* Layered dark background with subtle ambient warmth */
+.hero-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(230, 57, 38, 0.16) 0%, transparent 58%),
+    radial-gradient(circle at 80% 20%, rgba(255, 183, 3, 0.08) 0%, transparent 45%),
+    linear-gradient(180deg, #16110e 0%, #0d0b0a 100%);
+}
+
+.hero-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.42;
+  filter: contrast(1.08) saturate(1.1);
+}
+
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(13, 11, 10, 0.25) 0%,
+    rgba(13, 11, 10, 0.85) 100%
+  );
+}
+
+/* Subtle film grain texture */
+.hero-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* =========================================
+   6. HERO CENTERPIECE (Logo + Slogan + CTA)
+   ========================================= */
+.hero-center {
+  position: relative;
+  z-index: 50;
+  flex: 1;
+  padding: clamp(3.5rem, 11vh, 7.5rem) var(--gutter) 0; /* Pushes logo + slogan lower */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.hero-logo-wrap {
+  margin-bottom: 0.45rem; /* Tight ~7px gap right under the logo */
+  animation: logoSplashPop 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.hero-logo-img {
+  max-height: clamp(130px, 26vw, 260px);
+  width: auto;
+  filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.55));
+}
+
+/* Oversized Bold Wordmark (Matches reference center scale) */
+.hero-wordmark {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 13.5vw, 10.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+  text-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  user-select: none;
+}
+
+.hero-slogan {
+  max-width: 560px;
+  font-family: "Talina", var(--font-body);
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  color: rgba(248, 245, 240, 0.92);
+  margin-bottom: 0; /* Removed fixed margin so auto-centering handles the gap */
+  animation: fadeSlideUp 0.8s var(--ease-out-expo) 0.12s both;
+}
+
+.hero-actions {
+  margin: auto 0; /* Centers the button exactly halfway between slogan and carousel */
+  animation: fadeSlideUp 0.8s var(--ease-out-expo) 0.22s both;
+}
+
+.btn-order {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 2.3rem;
+  background-color: transparent;
+  color: #ffffff;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  border: 1.5px solid #ffffff;
+  overflow: hidden;
+  z-index: 1;
+  transition:
+    color 0.35s var(--ease-out-expo),
+    transform 0.3s var(--ease-out-expo),
+    box-shadow 0.35s ease;
+}
+
+/* Smooth sliding white fill layer */
+.btn-order::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #ffffff 0%, #f3efe9 100%);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.38s var(--ease-out-expo);
+  z-index: -1;
+}
+
+.btn-order:hover {
+  color: var(--bg-base); /* Dark text on white fill */
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(255, 255, 255, 0.22);
+}
+
+.btn-order:hover::before {
+  transform: scaleX(1);
+}
+
+.btn-order:active {
+  transform: translateY(0);
+}
+
+/* =========================================
+   7. BOTTOM SLIDING CATEGORY DOCK
+   ========================================= */
+.category-dock {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 6px 0; /* Exact tight gap between dashed lines and thumbnails */
+  animation: fadeSlideUp 0.85s var(--ease-out-expo) 0.32s both;
+}
+
+/* Edge-to-Edge Fine Dashed Lines (Matches Reference) */
+.category-dock::before,
+.category-dock::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.55) 0px,
+    rgba(255, 255, 255, 0.55) 4px, /* Crisp 4px dash */
+    transparent 4px,
+    transparent 7px /* 3px gap between dashes */
+  );
+  pointer-events: none;
+}
+
+.category-dock::before {
+  top: 0;
+}
+
+.category-dock::after {
+  bottom: 0;
+}
+
+.category-track {
+  display: flex;
+  align-items: center;
+  gap: 2rem; /* Open spacing between items like reference */
+  overflow-x: auto;
+  scroll-behavior: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  padding: 0 var(--gutter);
+  cursor: grab;
+}
+
+.category-track::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.category-track.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+}
+
+/* Clean Borderless Item (Thumb + Stacked Text directly between lines) */
+.category-card {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  transition: transform 0.3s var(--ease-out-expo), opacity 0.25s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-2px);
+}
+
+.category-thumb {
+  width: 96px;
+  height: 54px;
+  border-radius: 2px; /* Sharp rectangular corners matching reference */
+  overflow: hidden;
+  background: #1a1412;
+  flex-shrink: 0;
+}
+
+.category-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.45s var(--ease-out-expo);
+}
+
+.category-card:hover .category-thumb img {
+  transform: scale(1.06);
+}
+
+.category-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: left;
+}
+
+.category-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.category-sub {
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  white-space: nowrap;
+}
+
+/* =========================================
+   8. ENTRANCE KEYFRAMES & RESPONSIVE TWEAKS
+   ========================================= */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    padding: 1.15rem 1.25rem;
+  }
+
+  .hero-slogan {
+    font-size: 0.92rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-order {
+    padding: 0.85rem 2rem;
+    font-size: 0.88rem;
+  }
+
+  .category-thumb {
+    width: 72px;
+    height: 48px;
+  }
+}
+
+/* =========================================
+   9. MENU STARS SECTION (POLISHED EDITORIAL SLIDER)
+   ========================================= */
+.menu-stars-section {
+  background-color: #faf0e2;
+  background-image: radial-gradient(
+    circle at 50% 0%,
+    rgba(230, 57, 38, 0.04) 0%,
+    transparent 65%
+  );
+  color: #1c1613;
+  font-family: "Talina";
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.menu-stars-container {
+  width: 100%;
+  max-width: none;
+  margin: 0 auto;
+  padding: clamp(82px, 10vh, 102px) 3vw clamp(24px, 3.5vh, 42px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+}
+
+/* --- Section Header --- */
+.menu-stars-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1.5rem;
+  margin-bottom: clamp(16px, 2.2vh, 26px);
+  padding: 0 4px;
+}
+
+.menu-stars-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.menu-stars-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.eyebrow-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #d8232a;
+  box-shadow: 0 0 0 4px rgba(216, 35, 42, 0.14); /* Subtle pulse ring */
+  flex-shrink: 0;
+}
+
+.eyebrow-text {
+  color: #d8232a;
+  font-size: 12.5px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.menu-stars-heading {
+  color: #1c1613;
+  font-family: "Talina";
+  font-size: clamp(40px, 4vw, 60px);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+/* Minimal Text Link + Directional Sliding Underline */
+.menu-stars-action {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Talina", var(--font-body);
+  color: #1c1613;
+  background: transparent;
+  border: none;
+  padding: 0 0 6px 0;
+  font-size: clamp(15px, 1.05vw, 17px);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+/* Sliding bottom line: enters from left, exits toward the right arrow */
+.menu-stars-action::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  background-color: #1c1613;
+  transform: scaleX(0);
+  transform-origin: right center; /* Retracts toward the arrow on mouse-leave */
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.menu-stars-action:hover::after {
+  transform: scaleX(1);
+  transform-origin: left center; /* Draws in from the left on mouse-enter */
+}
+
+.menu-stars-action .action-arrow {
+  display: inline-block;
+  line-height: 1;
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.menu-stars-action:hover .action-arrow {
+  transform: translateX(4px);
+}
+
+/* --- Recessed Tray + 3.65-Column Peek Track --- */
+.menu-stars-track {
+  display: grid;
+  grid-auto-flow: column;
+  /* 3.65 columns shows 3 full cards + a generous peek of the 4th/5th card to invite dragging */
+  grid-auto-columns: calc((100% - (22px * 3)) / 3.65);
+  gap: 22px;
+  overflow-x: auto;
+  scroll-behavior: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  cursor: grab;
+  user-select: none;
+  align-items: stretch;
+
+  /* Refined Warm Sand Tray */
+  background: linear-gradient(180deg, #ede0cc 0%, #e5d5bc 100%);
+  border: 1px solid rgba(28, 22, 19, 0.09);
+  border-radius: 34px;
+  padding: clamp(18px, 2vw, 26px);
+  box-shadow:
+    inset 0 2px 6px rgba(28, 22, 19, 0.06),
+    0 12px 32px rgba(28, 22, 19, 0.05);
+}
+
+.menu-stars-track::-webkit-scrollbar {
+  display: none;
+}
+
+.menu-stars-track.is-dragging {
+  cursor: grabbing;
+}
+
+/* --- Card Anatomy with Warm Spotlight Gradient --- */
+.star-card {
+  position: relative;
+  /* Subtle warm radial glow in the upper-middle so red food trays pop off the red card */
+  background:
+    radial-gradient(circle at 50% 34%, rgba(255, 183, 3, 0.18) 0%, rgba(230, 57, 38, 0.12) 38%, transparent 68%),
+    linear-gradient(165deg, #ab3027 0%, #8f231b 100%);
+  color: #f8f5f0;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: clamp(20px, 1.8vw, 26px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-height: clamp(420px, 54vh, 530px);
+  box-shadow:
+    0 14px 28px rgba(28, 22, 19, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition:
+    transform 0.35s var(--ease-out-expo),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.star-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 255, 255, 0.24);
+  box-shadow:
+    0 22px 42px rgba(28, 22, 19, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* 1. Top Badge Pill */
+.star-badge {
+  align-self: flex-start;
+  background-color: #231b16;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 6px 15px;
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+.star-badge.is-empty {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* 2. Product Visual */
+.star-visual {
+  width: 100%;
+  height: clamp(180px, 22vh, 245px);
+  margin: 8px 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.star-visual img {
+  width: 100%;
+  height: 100%;
+  max-height: clamp(180px, 22vh, 245px);
+  object-fit: contain;
+  border-radius: 16px;
+  filter: drop-shadow(0 18px 24px rgba(15, 8, 6, 0.42));
+  transition: transform 0.45s var(--ease-out-expo);
+  pointer-events: none;
+}
+
+.star-card:hover .star-visual img {
+  transform: scale(1.07) translateY(-3px);
+}
+
+/* 3. Text Content Block */
+.star-content {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: auto;
+}
+
+.star-title {
+  color: #f8f5f0;
+  font-size: clamp(20px, 1.45vw, 24px);
+  font-weight: 400;
+  line-height: 1.2;
+  text-align: center;
+  letter-spacing: -0.015em;
+  white-space: nowrap; /* Keeps all 6 product titles on a single crisp line */
+}
+
+.star-desc {
+  color: rgba(248, 245, 240, 0.84);
+  font-size: clamp(13px, 0.9vw, 14.5px);
+  line-height: 1.48;
+  font-weight: 500;
+  margin-top: 8px;
+  max-width: 94%;
+  text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.star-note {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 3px 11px;
+  border-radius: 999px;
+  background-color: rgba(35, 27, 22, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffb703; /* Warm golden amber accent for "SIZE DIFFERS" */
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* 4. Card Footer Row (With subtle top divider line) */
+.star-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(248, 245, 240, 0.12);
+}
+
+.star-price {
+  color: #f8f5f0;
+  font-size: clamp(18px, 1.3vw, 22px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.star-add-btn {
+  background-color: #f8f5f0;
+  color: #1c1613;
+  border: none;
+  border-radius: 999px;
+  padding: 9px 20px;
+  font-family: "Talina";
+  font-size: 13.5px;
+  font-weight: 400;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s var(--ease-out-expo),
+    box-shadow 0.25s ease;
+}
+
+.star-add-btn:hover {
+  background-color: #ffb703; /* Golden amber hover pop */
+  color: #1c1613;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.24);
+}
+
+.star-add-btn:active {
+  transform: translateY(0);
+}
+
+/* --- Responsive Breakpoints --- */
+@media (max-width: 1200px) {
+  .menu-stars-track {
+    grid-auto-columns: calc((100% - (20px * 2)) / 2.75);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 860px) {
+  .menu-stars-container {
+    padding: 84px 20px 32px;
+  }
+  .menu-stars-track {
+    grid-auto-columns: calc((100% - 16px) / 1.85);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 560px) {
+  .menu-stars-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .menu-stars-track {
+    grid-auto-columns: 86%;
+  }
+}

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toomy's — Bold Street Food & Crispy Cravings</title>
+
+  <!-- Distinctive Display + Clean Sans Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cormorant+Garamond:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="is-intro-active">
+
+  <!-- 1. TOP NAVIGATION BAR (Top-Left Mini Logo + Top-Right + MENU Button) -->
+  <header class="site-header">
+    <a href="#home" class="brand-mini" aria-label="Toomy's Home">
+      <img src="assets/logo-small.png" alt="Toomy's Icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
+      <span class="brand-mini-fallback">T'</span>
+    </a>
+
+    <button
+      class="menu-toggle"
+      id="menuToggle"
+      aria-expanded="false"
+      aria-controls="navOverlay"
+    >
+      <span class="menu-toggle-icon">+</span>
+      <span class="menu-toggle-text">MENU</span>
+    </button>
+  </header>
+
+  <!-- 2. FULL-SCREEN SLIDE-OUT MENU OVERLAY -->
+  <nav class="nav-overlay" id="navOverlay" aria-hidden="true">
+    <div class="nav-overlay-inner">
+
+      <!-- TOP BAR: Language Switcher (Left) + White Logo (Center) -->
+      <!-- Note: The "+ MENU / ✕ CLOSE" button from .site-header sits at z-index: 100 in the top-right -->
+      <div class="nav-top-bar nav-stagger" style="--stagger-index: 0;">
+        <div class="lang-switcher" role="group" aria-label="Language Switcher">
+          <button type="button" class="lang-btn" data-lang="ar">AR</button>
+          <span class="lang-divider">|</span>
+          <button type="button" class="lang-btn is-active" data-lang="en">EN</button>
+        </div>
+
+        <a href="#home" class="nav-center-logo" aria-label="Toomy's Home">
+          <img
+            src="assets/logo-small.png"
+            alt="Toomy's"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+          />
+          <span class="nav-logo-fallback" style="display: none;">Toomy's</span>
+        </a>
+
+        <!-- Spacer balances the left language switcher so the logo stays dead-center -->
+        <div class="nav-top-spacer" aria-hidden="true"></div>
+      </div>
+
+      <!-- CENTER: 4 Full-Width Dashed Rows with Direction-Aware Curtain Hover -->
+      <ul class="nav-rows">
+        <li class="nav-row nav-stagger" style="--stagger-index: 1;">
+          <span class="nav-row-curtain" aria-hidden="true"></span>
+          <a href="#home" class="nav-row-link pos-home">
+            <span class="nav-row-label">HOME</span>
+          </a>
+        </li>
+
+        <li class="nav-row nav-stagger" style="--stagger-index: 2;">
+          <span class="nav-row-curtain" aria-hidden="true"></span>
+          <a href="#menu" class="nav-row-link pos-menu">
+            <span class="nav-row-label">MENU</span>
+            <sup class="nav-row-count">(24)</sup>
+          </a>
+        </li>
+
+        <li class="nav-row nav-stagger" style="--stagger-index: 3;">
+          <span class="nav-row-curtain" aria-hidden="true"></span>
+          <a href="#about" class="nav-row-link pos-about">
+            <span class="nav-row-label">ABOUT US</span>
+          </a>
+        </li>
+
+        <li class="nav-row nav-stagger" style="--stagger-index: 4;">
+          <span class="nav-row-curtain" aria-hidden="true"></span>
+          <a href="#contact" class="nav-row-link pos-contact">
+            <span class="nav-row-label">CONTACT US</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- FOOTER: Privacy Policy (Left) + Social Icons (Center) + Terms (Right) -->
+      <div class="nav-bottom-bar nav-stagger" style="--stagger-index: 5;">
+        <a href="#privacy" class="nav-legal-link">PRIVACY POLICY</a>
+
+        <div class="nav-socials">
+          <a
+            href="https://www.facebook.com/toomyseg"
+            target="_blank"
+            rel="noopener"
+            class="social-icon"
+            aria-label="Toomy's Facebook"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z"/>
+            </svg>
+          </a>
+          <a
+            href="https://www.instagram.com/"
+            target="_blank"
+            rel="noopener"
+            class="social-icon"
+            aria-label="Toomy's Instagram"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </a>
+        </div>
+
+        <a href="#terms" class="nav-legal-link">TERMS &amp; CONDITIONS</a>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- 3. FULL-VIEWPORT HERO SECTION -->
+  <main class="hero" id="home">
+    <!-- Background Image + Dark Vignette & Grain Layers -->
+    <div class="hero-backdrop" aria-hidden="true">
+      <img src="assets/hero-bg.jpg" alt="" class="hero-bg-img" onerror="this.style.display='none';" />
+      <div class="hero-vignette"></div>
+      <div class="hero-grain"></div>
+    </div>
+
+    <!-- 0. INTRO RED CURTAIN (Placed inside .hero so .hero-center z-index: 50 sits above it) -->
+    <div class="intro-curtain" id="introCurtain" aria-hidden="true"></div>
+
+    <!-- Centerpiece: Main Logo, Slogan & Order Now CTA -->
+    <section class="hero-center">
+      <div class="hero-logo-wrap">
+        <!-- Shows your logo image if available, otherwise renders the oversized bold wordmark -->
+        <img
+          src="assets/logo-main.png"
+          alt="Toomy's Logo"
+          class="hero-logo-img"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+        />
+        <h1 class="hero-wordmark" style="display: none;">TOOMY'S</h1>
+      </div>
+
+      <p class="hero-slogan">
+        Don't Waste The Good Taste! — Asyut’s Ultimate Burger & Pizza Spot.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#menu" class="btn-order">Order Now</a>
+      </div>
+    </section>
+
+    <!-- Bottom Sliding Category Strip (Matches Reference Bottom Thumbnail Row) -->
+    <section class="category-dock" aria-label="Food Categories to Try">
+      <div class="category-track" id="categoryTrack">
+        <a href="#menu" class="category-card" data-category="chicken">
+          <div class="category-thumb">
+            <img src="assets/categories/fried.jpg" alt="Fried Chicken Sandwich" />
+          </div>
+          <div class="category-meta">
+            <span class="category-title">Fried Chicken Sandwich</span>
+            <span class="category-sub">EXTRA CRISPY &amp; JUICY</span>
+          </div>
+        </a>
+
+        <a href="#menu" class="category-card" data-category="burger">
+          <div class="category-thumb">
+            <img src="assets/categories/burger.jpg" alt="Smash Burger Sandwich" />
+          </div>
+          <div class="category-meta">
+            <span class="category-title">SMASH BURGER</span>
+            <span class="category-sub">SMOKY &amp; LOADED</span>
+          </div>
+        </a>
+
+        <a href="#menu" class="category-card" data-category="crispy">
+          <div class="category-thumb">
+            <img src="assets/categories/crispy.jpg" alt="Crispy Roll" />
+          </div>
+          <div class="category-meta">
+            <span class="category-title">CRISPY ROLL</span>
+            <span class="category-sub">STACKED &amp; MELTED</span>
+          </div>
+        </a>
+
+        <a href="#menu" class="category-card" data-category="pizza">
+          <div class="category-thumb">
+            <img src="assets/categories/pizza.jpg" alt="Pizza" />
+          </div>
+          <div class="category-meta">
+            <span class="category-title">LOADED PIZZA</span>
+            <span class="category-sub">CHEESE &amp; SPICE</span>
+          </div>
+        </a>
+
+        <a href="#menu" class="category-card" data-category="basmati">
+          <div class="category-thumb">
+            <img src="assets/categories/basmati.jpg" alt="Basmati" />
+          </div>
+          <div class="category-meta">
+            <span class="category-title">BASMATI &amp; PROTEIN</span>
+            <span class="category-sub">THE HOUSE SIGNATURE</span>
+          </div>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- 4. SECOND SECTION: MENU STARS (BEST SELLERS SLIDER) -->
+  <section class="menu-stars-section" id="menu" dir="ltr" lang="en">
+    <div class="menu-stars-container">
+      
+      <!-- Section Header (LTR) -->
+      <header class="menu-stars-header">
+        <div class="menu-stars-title-block">
+          <div class="menu-stars-eyebrow">
+            <span class="eyebrow-dot" aria-hidden="true"></span>
+            <span class="eyebrow-text">MOST ORDERED</span>
+          </div>
+          <h2 class="menu-stars-heading">Menu Stars</h2>
+        </div>
+
+        <a href="#full-menu" class="menu-stars-action">
+          See Full Menu <span class="action-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </header>
+
+      <!-- 6-Card Grab-and-Scroll Track (4 columns visible in container at once) -->
+      <div class="menu-stars-track" id="menuStarsTrack">
+
+        <!-- Card 1: Toomy Burger -->
+        <article class="star-card">
+          <span class="star-badge">The Original</span>
+          <div class="star-visual">
+            <img src="assets/products/toomy-burger.png" alt="Toomy Burger" draggable="false" onerror="this.src='assets/categories/burger.jpg';" />
+          </div>
+          <div class="star-content">
+            <h3 class="star-title">Toomy Burger</h3>
+            <p class="star-desc" title="Smashed beef patty, crispy onion rings, mozzarella sticks, a beef bacon layer, warm cheddar sauce, finished with Toomy’s Secret Sauce on a buttery brioche bun.">
+              Smashed beef patty, crispy onion rings, mozzarella sticks, a beef bacon layer, warm cheddar sauce, finished with Toomy’s Secret Sauce on a buttery brioche bun.
+            </p>
+          </div>
+          <footer class="star-footer">
+            <span class="star-price">185 EGP</span>
+            <button type="button" class="star-add-btn">+ Add</button>
+          </footer>
+        </article>
+
+        <!-- Card 2: Chicken Popcorn Pizza -->
+        <article class="star-card">
+          <span class="star-badge">American Style</span>
+          <div class="star-visual">
+            <img src="assets/products/pizza-popcorn-buffalo.png" alt="Chicken Popcorn Pizza" draggable="false" onerror="this.src='assets/categories/pizza.jpg';" />
+          </div>
+          <div class="star-content">
+            <h3 class="star-title">Chicken Popcorn Pizza</h3>
+            <p class="star-desc" title="Toomy’s signature tomato sauce, golden fried popcorn chicken, and a rich drizzle of your favorite sauce.">
+              Toomy’s signature tomato sauce, golden fried popcorn chicken, and a rich drizzle of your favorite sauce.
+            </p>
+          </div>
+          <footer class="star-footer">
+            <span class="star-price">210 EGP</span>
+            <button type="button" class="star-add-btn">+ Add</button>
+          </footer>
+        </article>
+
+        <!-- Card 3: Tenders Meal -->
+        <article class="star-card">
+          <span class="star-badge">Maximum Crunch</span>
+          <div class="star-visual">
+            <img src="assets/products/tenders-meal.png" alt="Tenders Meal" draggable="false" onerror="this.src='assets/categories/fried.jpg';" />
+          </div>
+          <div class="star-content">
+            <h3 class="star-title">Tenders Meal</h3>
+            <p class="star-desc" title="Crispy tenders, golden fries, toasted brioche buns, and your favorite sauces.">
+              Crispy tenders, golden fries, toasted brioche buns, and your favorite sauces.
+            </p>
+            <span class="star-note">Size Differs</span>
+          </div>
+          <footer class="star-footer">
+            <span class="star-price">175 EGP</span>
+            <button type="button" class="star-add-btn">+ Add</button>
+          </footer>
+        </article>
+
+        <!-- Card 4: Hot Dog Crispy Roll -->
+        <article class="star-card">
+          <span class="star-badge">Built Crispy.</span>
+          <div class="star-visual">
+            <img src="assets/products/crispy-roll.png" alt="Hot Dog Crispy Roll" draggable="false" onerror="this.src='assets/categories/crispy.jpg';" />
+          </div>
+          <div class="star-content">
+            <h3 class="star-title">Hot Dog Crispy Roll</h3>
+            <p class="star-desc" title="Hot dog bites, melted mozzarella, cheddar sauce, and fresh veggies in a crunchy golden roll.">
+              Hot dog bites, melted mozzarella, cheddar sauce, and fresh veggies in a crunchy golden roll.
+            </p>
+          </div>
+          <footer class="star-footer">
+            <span class="star-price">145 EGP</span>
+            <button type="button" class="star-add-btn">+ Add</button>
+          </footer>
+        </article>
+
+        <!-- Card 5: Truck Chicken (Empty Top-Left Pill preserved for vertical alignment) -->
+        <article class="star-card">
+          <span class="star-badge is-empty" aria-hidden="true">&nbsp;</span>
+          <div class="star-visual">
+            <img src="assets/products/truck-chicken.png" alt="Truck Chicken" draggable="false" onerror="this.src='assets/categories/fried.jpg';" />
+          </div>
+          <div class="star-content">
+            <h3 class="star-title">Truck Chicken</h3>
+            <p class="star-desc" title="Crispy fried chicken, cheddar sauce, Toomy’s signature sauce, lettuce, and pickles on a soft brioche bun.">
+              Crispy fried chicken, cheddar sauce, Toomy’s signature sauce, lettuce, and pickles on a soft brioche bun.
+            </p>
+          </div>
+          <footer class="star-footer">
+            <span class="star-price">165 EGP</span>
+            <button type="button" class="star-add-btn">+ Add</button>
+          </footer>
+        </article>
+
+        <!-- Card 6: Basmati Chicken -->
+        <article class="star-card">
+          <span class="star-badge">Made Better</span>
+          <div class="star-visual">
+            <img src="assets/products/basmati-chicken.png" alt="Basmati Chicken" draggable="false" onerror="this.src='assets/categories/basmati.jpg';" />
+          </div>
+          <div class="star-content">
+            <h3 class="star-title">Basmati Chicken</h3>
+            <p class="star-desc" title="Golden Basmati Rice, Topped with Crispy Chicken Bites, with 2 of Your Favorite Sauces.">
+              Golden Basmati Rice, Topped with Crispy Chicken Bites, with 2 of Your Favorite Sauces.
+            </p>
+          </div>
+          <footer class="star-footer">
+            <span class="star-price">160 EGP</span>
+            <button type="button" class="star-add-btn">+ Add</button>
+          </footer>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
