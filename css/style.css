@@ -1796,21 +1796,6 @@ body.is-menu-open .about-top-tint {
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 
-/* Protect "+ MENU" readability when the bright pizza crust spins underneath */
-.newsletter-page-body:not(.is-menu-open) .menu-toggle {
-  background-color: rgba(28, 7, 5, 0.46);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(250, 245, 235, 0.18);
-  padding: 0.52rem 1rem;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
-}
-
-.newsletter-page-body:not(.is-menu-open) .menu-toggle:hover {
-  background-color: rgba(28, 7, 5, 0.68);
-  border-color: rgba(250, 245, 235, 0.34);
-}
-
 .sr-only {
   position: absolute;
   width: 1px;
@@ -1835,37 +1820,45 @@ body.is-menu-open .about-top-tint {
   background-position: center center;
   background-repeat: no-repeat;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
   overflow: hidden;
 }
 
-/* Subtle top edge gradient so header elements always have clean contrast */
-.newsletter-page::before {
-  content: "";
-  position: absolute;
+/* Top Protective Dark Crimson Bar (Identical to About Us Page) */
+.newsletter-top-tint {
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 110px;
-  background: linear-gradient(180deg, rgba(24, 4, 3, 0.42) 0%, transparent 100%);
-  z-index: 3;
+  height: 78px;
+  background: rgba(42, 4, 2, 0.48);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-bottom: 1px solid rgba(247, 242, 235, 0.08);
+  z-index: 90; /* Sits directly behind .site-header (z-index: 100) */
   pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+body.is-over-footer .newsletter-top-tint,
+body.is-menu-open .newsletter-top-tint {
+  opacity: 0;
 }
 
 .newsletter-stage {
   position: relative;
   z-index: 4;
   width: 100%;
-  min-height: 100vh;
-  min-height: 100svh;
+  flex: 1;
   display: flex;
-  align-items: center;
+  align-items: stretch;
 }
 
-/* 2. Left Zone (~53% width): Tilted Ticket-Style Newsletter Card */
+/* 2. Left Zone (~52% width): Tilted Ticket-Style Newsletter Card */
 .newsletter-left-zone {
-  width: 53%;
-  padding: 88px 1.5rem 40px 5vw;
+  width: 52%;
+  padding: 96px 1.5rem 36px 5vw;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -1874,7 +1867,7 @@ body.is-menu-open .about-top-tint {
 .newsletter-ticket {
   position: relative;
   width: 100%;
-  max-width: 590px;
+  max-width: 595px;
   background-color: #faf5eb;
   background-image: radial-gradient(
     circle at 85% 15%,
@@ -1915,11 +1908,11 @@ body.is-menu-open .about-top-tint {
     inset 0 0 0 1px rgba(36, 18, 14, 0.1);
 }
 
-/* Top-Left Circular Stamp Column */
+/* Enlarged Top-Left Circular Stamp Column */
 .ticket-stamp-col {
   position: absolute;
-  top: 28px;
-  left: 28px;
+  top: 24px;
+  left: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1930,14 +1923,14 @@ body.is-menu-open .about-top-tint {
 
 .ticket-stamp {
   position: relative;
-  width: 94px;
-  height: 94px;
+  width: 112px;
+  height: 112px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, #ffd04d 0%, #f2b729 75%);
   box-shadow:
-    inset 0 0 0 3px #f2b729,
-    inset 0 0 0 4.5px rgba(255, 255, 255, 0.8),
-    0 8px 18px rgba(36, 18, 14, 0.14);
+    inset 0 0 0 3.5px #f2b729,
+    inset 0 0 0 5.5px rgba(255, 255, 255, 0.8),
+    0 8px 18px rgba(36, 18, 14, 0.15);
   transform: rotate(-8deg);
   display: flex;
   flex-direction: column;
@@ -1945,7 +1938,7 @@ body.is-menu-open .about-top-tint {
   justify-content: center;
   text-align: center;
   font-family: "Montserrat", var(--font-body);
-  font-size: 12.5px;
+  font-size: 14.5px;
   font-weight: 800;
   line-height: 1.12;
   letter-spacing: 0.03em;
@@ -1976,9 +1969,9 @@ body.is-menu-open .about-top-tint {
   transform: rotate(-2deg);
 }
 
-/* Upper Ticket Copy Area (Balanced 65% Proportion) */
+/* Upper Ticket Copy Area (Clears the Larger Stamp Cleanly) */
 .ticket-upper-copy {
-  padding: 34px 34px 30px 136px;
+  padding: 34px 34px 30px 152px;
   text-align: right;
   display: flex;
   flex-direction: column;
@@ -2009,7 +2002,7 @@ body.is-menu-open .about-top-tint {
 
 .ticket-headline {
   font-family: "Montserrat", var(--font-body);
-  font-size: clamp(1.65rem, 2.35vw, 2.2rem);
+  font-size: clamp(1.65rem, 2.3vw, 2.15rem);
   font-weight: 900;
   line-height: 1.04;
   letter-spacing: -0.02em;
@@ -2034,7 +2027,7 @@ body.is-menu-open .about-top-tint {
   border-bottom: 2px dotted rgba(36, 18, 14, 0.32);
 }
 
-/* Lower Ticket Stub (35% Proportion): Centered White Pill Form */
+/* Lower Ticket Stub: Centered White Pill Form */
 .ticket-lower-stub {
   padding: 24px 34px 24px;
   display: flex;
@@ -2144,22 +2137,20 @@ body.is-menu-open .about-top-tint {
   color: #246b35;
 }
 
-/* 3. Right Zone: Tucked Tightly Between Card & Pizza Curve */
+/* 3. Right Zone (~48% width): Larger Order Callout Slightly Overlapping Pizza */
 .newsletter-right-zone {
-  width: 47%;
-  min-height: 100vh;
-  min-height: 100svh;
+  width: 48%;
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
-  padding-left: clamp(0.25rem, 1vw, 1.25rem);
+  padding-left: clamp(2.25rem, 4.8vw, 5.25rem);
 }
 
 .newsletter-callout {
   position: relative;
-  z-index: 5;
+  z-index: 6; /* Sits cleanly above .pizza-anchor (z-index: 2) where it overlaps */
   align-self: flex-end;
-  margin-bottom: 6vh;
+  margin-bottom: 5vh;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -2167,41 +2158,44 @@ body.is-menu-open .about-top-tint {
 
 .callout-eyebrow {
   font-family: "Montserrat", var(--font-body);
-  font-size: 17px;
+  font-size: clamp(20px, 1.55vw, 24px);
   font-weight: 900;
   letter-spacing: 0.04em;
   line-height: 1.1;
   color: #f2b729;
   text-transform: uppercase;
-  margin-bottom: 4px;
+  text-shadow: 0 3px 12px rgba(18, 3, 2, 0.7);
+  margin-bottom: 5px;
 }
 
 .callout-headline {
   font-family: "Montserrat", var(--font-body);
-  font-size: 21px;
+  font-size: clamp(24px, 2vw, 31px);
   font-weight: 900;
-  line-height: 1.12;
+  line-height: 1.1;
   letter-spacing: -0.01em;
   color: #faf5eb;
   text-transform: uppercase;
-  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.38);
+  text-shadow:
+    0 4px 18px rgba(18, 3, 2, 0.78),
+    0 1px 4px rgba(0, 0, 0, 0.65);
 }
 
 .callout-cta-btn {
-  margin-top: 14px;
+  margin-top: 16px;
   background-color: #faf5eb;
   color: #24120e;
   font-family: "Montserrat", var(--font-body);
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 11px 20px;
+  padding: 13px 24px;
   border-radius: 9999px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 12px 28px rgba(18, 3, 2, 0.42);
   transition:
     transform 0.25s var(--ease-out-expo),
     background-color 0.25s ease,
@@ -2211,14 +2205,57 @@ body.is-menu-open .about-top-tint {
 .callout-cta-btn:hover {
   background-color: #f2b729;
   transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.36);
+  box-shadow: 0 16px 32px rgba(18, 3, 2, 0.48);
 }
 
-/* Two-Layer Slow-Spinning Pizza Anchor (~70% Visible, 30% Cropped at Right Edge) */
+/* Bottom Protective Utility Bar (Matches About Us Page) */
+.newsletter-bottom-utility {
+  position: relative;
+  z-index: 6; /* Sits above .pizza-anchor so bottom-right copyright stays crisp */
+  width: 100%;
+  min-height: 56px;
+  background: rgba(32, 3, 2, 0.52);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-top: 1px solid rgba(247, 242, 235, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 6vw;
+  gap: 1rem;
+}
+
+.newsletter-utility-socials {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.newsletter-utility-social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #f7f2eb;
+  transition: transform 0.25s var(--ease-out-expo), color 0.25s ease;
+}
+
+.newsletter-utility-social-link:hover {
+  color: #f2b729;
+  transform: scale(1.12);
+}
+
+.newsletter-utility-copyright {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(247, 242, 235, 0.85);
+}
+
+/* Two-Layer Slow-Spinning Pizza Anchor (~72% Visible at Right Edge) */
 .pizza-anchor {
   position: absolute;
   right: 0;
-  top: 52%;
+  top: 50%;
   transform: translate(28%, -50%);
   width: clamp(560px, 54vw, 820px);
   aspect-ratio: 1 / 1;
@@ -2226,7 +2263,6 @@ body.is-menu-open .about-top-tint {
   z-index: 2;
 }
 
-/* Warm golden-crimson rim glow behind the pizza board */
 .pizza-anchor::before {
   content: "";
   position: absolute;
@@ -2266,14 +2302,13 @@ body.is-menu-open .about-top-tint {
   .newsletter-stage {
     flex-direction: column;
     justify-content: center;
-    padding: 104px 5vw 48px;
+    padding: 104px 5vw 40px;
     gap: 2.5rem;
   }
 
   .newsletter-left-zone,
   .newsletter-right-zone {
     width: 100%;
-    min-height: auto;
     padding: 0;
   }
 
@@ -2287,7 +2322,7 @@ body.is-menu-open .about-top-tint {
 
   .pizza-anchor {
     top: auto;
-    bottom: -140px;
+    bottom: -100px;
     transform: translate(45%, 0);
     width: clamp(380px, 58vw, 540px);
   }
@@ -2310,9 +2345,9 @@ body.is-menu-open .about-top-tint {
   }
 
   .ticket-stamp {
-    width: 78px;
-    height: 78px;
-    font-size: 11px;
+    width: 84px;
+    height: 84px;
+    font-size: 11.5px;
   }
 
   .ticket-upper-copy {
@@ -2332,8 +2367,15 @@ body.is-menu-open .about-top-tint {
     font-size: 12px;
   }
 
+  .newsletter-bottom-utility {
+    flex-direction: column;
+    justify-content: center;
+    padding: 12px 6vw;
+    gap: 8px;
+  }
+
   .pizza-anchor {
     opacity: 0.35;
-    bottom: -180px;
+    bottom: -160px;
   }
 }
