@@ -1,29 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    /* =========================================
-     0. INTRO SPLASH CURTAIN SEQUENCE
-     ========================================= */
-  const introCurtain = document.getElementById("introCurtain");
-
-  if (introCurtain) {
-    // 1. Wait 1.05s while the logo pops onto the red screen, then slide red left
-    setTimeout(() => {
-      introCurtain.classList.add("is-sliding");
-    }, 1050);
-
-    // 2. Midway through the slide (1.45s), reveal slogan, button, header & carousel
-    setTimeout(() => {
-      document.body.classList.remove("is-intro-active");
-    }, 1450);
-
-    // 3. Remove curtain from DOM after slide finishes so it never blocks clicks
-    introCurtain.addEventListener(
-      "transitionend",
-      () => {
-        introCurtain.remove();
-      },
-      { once: true }
-    );
-  }
+    
   /* =========================================
      1. FULL-SCREEN MENU DRAWER + DIRECTION-AWARE ROWS
      ========================================= */
@@ -121,100 +97,114 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* =========================================
-     2. CATEGORY CAROUSEL: SEAMLESS LOOP & DRAG
+    /* =========================================
+     2. HERO INFINITE CATEGORY MARQUEE (GPU-SMOOTH)
      ========================================= */
-  const track = document.getElementById("categoryTrack");
+  const categoryTrack = document.getElementById("categoryTrack");
 
-  if (track) {
-    // Clone cards once so the strip loops endlessly even on wide screens
-    const originalCards = Array.from(track.children);
-    originalCards.forEach((card) => {
-      const clone = card.cloneNode(true);
-      clone.setAttribute("aria-hidden", "true");
-      track.appendChild(clone);
-    });
+  if (categoryTrack) {
+    const originalItems = Array.from(categoryTrack.children);
+    const originalCount = originalItems.length;
 
-    let isDown = false;
-    let hasDragged = false;
-    let isPaused = false;
-    let startX = 0;
-    let scrollLeft = 0;
-    let exactScroll = 0;
-    const speed = 1; // Whole pixel step prevents sub-pixel rounding freeze on Windows
+    if (originalCount > 0) {
+      const belt = document.createElement("div");
+      belt.className = "category-belt";
 
-    function animateMarquee() {
-      if (!isPaused && !isDown) {
-        exactScroll += speed;
-        if (exactScroll >= track.scrollWidth / 2) {
-          exactScroll = 0;
-        }
-        track.scrollLeft = exactScroll;
-      } else {
-        exactScroll = track.scrollLeft;
+      // Clone 3 seamless sets so the belt never runs out of runway on wide viewports
+      for (let copy = 0; copy < 3; copy++) {
+        originalItems.forEach((item) => {
+          const node = copy === 0 ? item : item.cloneNode(true);
+          if (copy > 0) {
+            node.setAttribute("aria-hidden", "true");
+          }
+          belt.appendChild(node);
+        });
       }
+
+      categoryTrack.innerHTML = "";
+      categoryTrack.appendChild(belt);
+
+      let setWidth = 0;
+      let offset = 0;
+      let isDragging = false;
+      let dragStartX = 0;
+      let dragStartOffset = 0;
+      let lastTime = performance.now();
+      const speedPxPerSec = 58;
+
+      function measureSetWidth() {
+        const firstSetStart = belt.children[0];
+        const secondSetStart = belt.children[originalCount];
+        if (firstSetStart && secondSetStart) {
+          const measured = secondSetStart.offsetLeft - firstSetStart.offsetLeft;
+          if (measured > 0) {
+            setWidth = measured;
+            offset = ((offset % setWidth) + setWidth) % setWidth;
+          }
+        }
+      }
+
+      measureSetWidth();
+      window.addEventListener("load", measureSetWidth);
+      window.addEventListener("resize", measureSetWidth, { passive: true });
+
+      if ("ResizeObserver" in window) {
+        const ro = new ResizeObserver(measureSetWidth);
+        ro.observe(belt);
+      }
+
+      // Mouse grab-to-drag
+      categoryTrack.addEventListener("mousedown", (e) => {
+        isDragging = true;
+        categoryTrack.classList.add("is-dragging");
+        dragStartX = e.clientX;
+        dragStartOffset = offset;
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!isDragging || !setWidth) return;
+        const deltaX = e.clientX - dragStartX;
+        offset = (((dragStartOffset - deltaX) % setWidth) + setWidth) % setWidth;
+      });
+
+      window.addEventListener("mouseup", () => {
+        if (!isDragging) return;
+        isDragging = false;
+        categoryTrack.classList.remove("is-dragging");
+        lastTime = performance.now();
+      });
+
+      // Mouse wheel horizontal scrubbing
+      categoryTrack.addEventListener(
+        "wheel",
+        (e) => {
+          if (!setWidth) return;
+          const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+          if (delta !== 0) {
+            e.preventDefault();
+            offset = (((offset + delta * 0.6) % setWidth) + setWidth) % setWidth;
+          }
+        },
+        { passive: false }
+      );
+
+      function animateMarquee(now) {
+        const dt = Math.min((now - lastTime) / 1000, 0.05);
+        lastTime = now;
+
+        if (!isDragging && setWidth > 0) {
+          offset += speedPxPerSec * dt;
+          if (offset >= setWidth) {
+            offset -= setWidth;
+          }
+        }
+
+        belt.style.transform = `translate3d(${-offset}px, 0, 0)`;
+        requestAnimationFrame(animateMarquee);
+      }
+
       requestAnimationFrame(animateMarquee);
     }
-
-    requestAnimationFrame(animateMarquee);
-
-    // Desktop click-and-drag scrolling
-    track.addEventListener("mousedown", (e) => {
-      e.preventDefault();
-      isDown = true;
-      hasDragged = false;
-      track.classList.add("is-dragging");
-      startX = e.pageX - track.offsetLeft;
-      scrollLeft = track.scrollLeft;
-    });
-
-    window.addEventListener("mouseup", () => {
-      if (!isDown) return;
-      isDown = false;
-      track.classList.remove("is-dragging");
-    });
-
-    track.addEventListener("mousemove", (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const x = e.pageX - track.offsetLeft;
-      const walk = (x - startX) * 1.4;
-      if (Math.abs(walk) > 6) {
-        hasDragged = true;
-      }
-      track.scrollLeft = scrollLeft - walk;
-    });
-
-    // Prevent link click if user was dragging
-    track.querySelectorAll(".category-card").forEach((card) => {
-      card.addEventListener("dragstart", (e) => e.preventDefault());
-      card.addEventListener("click", (e) => {
-        if (hasDragged) {
-          e.preventDefault();
-          return;
-        }
-        const chosenCategory = card.dataset.category || "all";
-        sessionStorage.setItem("toomys_selected_category", chosenCategory);
-      });
-    });
-
-    // Vertical mouse wheel -> horizontal glide
-    track.addEventListener(
-      "wheel",
-      (e) => {
-        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-          e.preventDefault();
-          track.scrollLeft += e.deltaY;
-        }
-      },
-      { passive: false }
-    );
-
-    // Pause on hover or touch
-    track.addEventListener("mouseenter", () => (isPaused = true));
-    track.addEventListener("mouseleave", () => (isPaused = false));
-    track.addEventListener("touchstart", () => (isPaused = true), { passive: true });
-    track.addEventListener("touchend", () => (isPaused = false));
   }
   /* =========================================
      3. MENU STARS: GRAB-AND-DRAG CARD SLIDER
@@ -279,6 +269,90 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.toggle("is-scrolled-light", isOverLight);
   }
 
+  const footerSection = document.getElementById("contact");
+
+  function updateHeaderContrast() {
+    if (menuStarsSection) {
+      const rect = menuStarsSection.getBoundingClientRect();
+      const isOverLight = rect.top <= 60 && rect.bottom >= 60;
+      document.body.classList.toggle("is-scrolled-light", isOverLight);
+    }
+    if (footerSection) {
+      const footerRect = footerSection.getBoundingClientRect();
+      document.body.classList.toggle("is-over-footer", footerRect.top <= 80);
+    }
+  }
+
   window.addEventListener("scroll", updateHeaderContrast, { passive: true });
   updateHeaderContrast();
+
+  /* =========================================
+     5. FOOTER: DYNAMIC YEAR, BURGER REVEAL & MENU ROUTING
+     ========================================= */
+  // 1. Dynamic Year
+  const footerYear = document.getElementById("footerYear");
+  if (footerYear) {
+    footerYear.textContent = String(new Date().getFullYear());
+  }
+
+  // 2. Scroll-Reveal / Parallax on the Bottom Burger Graphic
+  const footerBurger = document.getElementById("footerBurger");
+  if (footerBurger && "IntersectionObserver" in window) {
+    const burgerObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          footerBurger.classList.toggle("is-revealed", entry.isIntersecting);
+        });
+      },
+      { threshold: 0.15 }
+    );
+    burgerObserver.observe(footerBurger);
+  } else if (footerBurger) {
+    footerBurger.classList.add("is-revealed");
+  }
+
+  // 3. Smooth Scroll & Card Center/Highlight when clicking Footer "OUR MENU" Links
+  const footerCategoryLinks = document.querySelectorAll("[data-filter-category]");
+  const categoryKeywordMap = {
+    burger: "burger",
+    pizza: "pizza",
+    tenders: "tenders",
+    sides: "roll", // Scrolls to Hot Dog Crispy Roll / Basmati side items
+  };
+
+  footerCategoryLinks.forEach((link) => {
+    link.addEventListener("click", (e) => {
+      const cat = link.getAttribute("data-filter-category");
+      const menuSection = document.getElementById("menu");
+      const trackEl = document.getElementById("menuStarsTrack");
+      if (!menuSection || !trackEl || !cat) return;
+
+      e.preventDefault();
+      menuSection.scrollIntoView({ behavior: "smooth" });
+
+      const keyword = categoryKeywordMap[cat] || cat;
+      const cards = Array.from(trackEl.querySelectorAll(".star-card"));
+      const targetCard = cards.find((card) =>
+        card.querySelector(".star-title")?.textContent.toLowerCase().includes(keyword)
+      );
+
+      if (targetCard) {
+        setTimeout(() => {
+          const scrollTarget =
+            targetCard.offsetLeft -
+            trackEl.offsetLeft -
+            (trackEl.clientWidth - targetCard.clientWidth) / 2;
+
+          trackEl.scrollTo({
+            left: Math.max(0, scrollTarget),
+            behavior: "smooth",
+          });
+
+          cards.forEach((c) => c.classList.remove("is-highlighted"));
+          targetCard.classList.add("is-highlighted");
+          setTimeout(() => targetCard.classList.remove("is-highlighted"), 1400);
+        }, 450);
+      }
+    });
+  });
 });
