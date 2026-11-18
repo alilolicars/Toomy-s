@@ -124,7 +124,7 @@ body.is-menu-open .brand-mini {
 }
 
 .brand-mini-fallback {
-  display: none; /* Shown automatically via onerror if logo-small.png is missing */
+  display: none; /* Shown automatically via onerror if logo-small.webp is missing */
   font-family: var(--font-display);
   font-size: 1.5rem;
   letter-spacing: -0.04em;
@@ -1541,7 +1541,7 @@ body.is-scrolled-light:not(.is-menu-open) .menu-toggle:hover {
   min-height: 100vh;
   min-height: 100svh;
   background-color: #6b0906;
-  background-image: url("../assets/about-us.jpg");
+  background-image: url("../assets/about-us.webp");
   background-size: cover;
   background-position: right center;
   background-repeat: no-repeat;
@@ -1815,7 +1815,7 @@ body.is-menu-open .about-top-tint {
   min-height: 100vh;
   min-height: 100svh;
   background-color: #8e1710;
-  background-image: url("../assets/contact-us.jpg");
+  background-image: url("../assets/contact-us.webp");
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
