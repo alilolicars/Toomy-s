@@ -466,11 +466,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Keep all Menu Stars card buttons synced with live cart quantities
+    // Keep both Home (.star-card) and Menu (.menu-card) buttons synced with live cart quantities
     function syncMenuCardButtons(changedTitle = null) {
-      document.querySelectorAll(".star-card").forEach((card) => {
-        const title = card.querySelector(".star-title")?.textContent.trim();
-        const btn = card.querySelector(".star-add-btn");
+      document.querySelectorAll(".star-card, .menu-card").forEach((card) => {
+        const title = card.querySelector(".star-title, .menu-card-title")?.textContent.trim();
+        const btn = card.querySelector(".star-add-btn, .menu-card-cta");
         if (!title || !btn) return;
 
         const match = cartItems.find((item) => item.title === title);
@@ -560,7 +560,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (localMenu) {
         localMenu.scrollIntoView({ behavior: "smooth" });
       } else {
-        window.location.href = "index.html#menu";
+        window.location.href = "menu.html";
       }
     }
 
@@ -594,7 +594,7 @@ document.addEventListener("DOMContentLoaded", () => {
         cartDrawerBody.innerHTML = `
           <div class="cart-empty-state">
             <img
-              src="assets/logo-main.png"
+              src="assets/logo-main.webp"
               alt="Toomy's"
               class="cart-empty-logo"
               draggable="false"
@@ -764,17 +764,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Unified Card CTA & Inline Stepper Handler ("+ ADD" -> "Added ✓" -> "- 1 +")
     document.addEventListener("click", (e) => {
-      const addBtn = e.target.closest(".star-add-btn");
+      const addBtn = e.target.closest(".star-add-btn, .menu-card-cta");
       if (!addBtn) return;
 
-      const card = addBtn.closest(".star-card");
+      const card = addBtn.closest(".star-card, .menu-card");
       if (!card) return;
 
-      const title = card.querySelector(".star-title")?.textContent.trim() || "Toomy's Special";
-      const priceText = card.querySelector(".star-price")?.textContent || "0";
+      const title =
+        card.querySelector(".star-title, .menu-card-title")?.textContent.trim() ||
+        "Toomy's Special";
+      const priceText =
+        card.querySelector(".star-price, .menu-card-price")?.textContent || "0";
       const price = parseFloat(priceText.replace(/[^0-9.]/g, "")) || 0;
-      const image = card.querySelector(".star-visual img")?.getAttribute("src") || "assets/logo-small.png";
-      const note = card.querySelector(".star-note")?.textContent.trim();
+      const image =
+        card.querySelector(".star-visual img, .menu-card-img")?.getAttribute("src") ||
+        "assets/logo-small.png";
+      const note = card.querySelector(".star-note, .menu-card-sub")?.textContent.trim();
       const sub = note ? note : "Regular";
 
       // Check if user clicked "-" or "+" inside the inline stepper
@@ -826,5 +831,484 @@ document.addEventListener("DOMContentLoaded", () => {
     initMenuCardButtons();
     syncMenuCardButtons();
     renderCart(false);
+  }
+
+  /* =========================================
+     14. FULL MENU PAGE (FILTERING, STICKY HEADER & QUICK VIEW)
+     ========================================= */
+  const menuProductGrid = document.getElementById("menuProductGrid");
+  const menuFilterBar = document.getElementById("menuFilterBar");
+  const menuFilterWrap = document.getElementById("menuFilterWrap");
+  const menuFilterIndicator = document.getElementById("menuFilterIndicator");
+  const siteHeaderEl = document.getElementById("siteHeader");
+
+  if (menuProductGrid && menuFilterBar) {
+    const MENU_CATALOG = [
+      // BURGERS (5)
+      {
+        id: "toomy-burger",
+        category: "burgers",
+        theme: "theme-red",
+        badge: "The Original",
+        title: "Toomy Burger",
+        subtitle: "SIGNATURE DOUBLE SMASH",
+        desc: "Double smashed beef patties, crispy onion rings, melted mozzarella sticks, beef bacon, and Toomy's smoky house sauce.",
+        price: 185,
+        image: "assets/products/toomy-burger.webp"
+      },
+      {
+        id: "juicy-jack-burger",
+        category: "burgers",
+        theme: "theme-yellow",
+        badge: "For True Hungry",
+        title: "Juicy Jack Burger",
+        subtitle: "JUICY & SPICY",
+        desc: "Three seared Angus smash patties layered with aged cheddar, caramelized onions, pickles, and seasoned golden fries.",
+        price: 235,
+        image: "assets/products/juicy-jack.png"
+      },
+      {
+        id: "pepperonzi-burger",
+        category: "burgers",
+        theme: "theme-cream",
+        badge: "Just Right",
+        title: "Pizza-Style Smash",
+        subtitle: "ALL-AMERICAN MELT",
+        desc: "Juicy smashed beef patty topped with double American cheddar, crisp lettuce, ripe tomatoes, and tangy diner sauce.",
+        price: 145,
+        image: "assets/products/pepperonzi.png"
+      },
+      {
+        id: "mushroom-swiss-smash",
+        category: "burgers",
+        theme: "theme-red",
+        badge: "Rich & Creamy",
+        title: "Mushroom Swiss Smash",
+        subtitle: "TRUFFLE CREAM GLAZE",
+        desc: "Smashed beef seared to perfection under roasted button mushrooms, melted Swiss cheese, and creamy peppercorn aioli.",
+        price: 195,
+        image: "assets/products/truck.png"
+      },
+      {
+        id: "jalapeno-fire-burger",
+        category: "burgers",
+        theme: "theme-yellow",
+        badge: "Spicy Kick",
+        title: "Jalapeno Fire Burger",
+        subtitle: "HABANERO CHEDDAR",
+        desc: "Flame-seared smash patty stacked with pickled jalapenos, crispy onions, spicy cheese sauce, and chipotle mayo.",
+        price: 175,
+        image: "assets/products/burger-boom.png"
+      },
+
+      // CHICKEN (4)
+      {
+        id: "truck-chicken-sandwich",
+        category: "chicken",
+        theme: "theme-cream",
+        badge: "Crowd Favorite",
+        title: "Truck Chicken Crunch",
+        subtitle: "EXTRA CRISPY FILLET",
+        desc: "Hand-breaded crunchy chicken breast glazed with honey mustard, coleslaw, melted cheddar, and toasted brioche.",
+        price: 160,
+        image: "assets/products/truck-chicken.webp"
+      },
+      {
+        id: "buffalo-chicken-sandwich",
+        category: "chicken",
+        theme: "theme-red",
+        badge: "Hot & Tangy",
+        title: "Buffalo Chicken",
+        subtitle: "SPICY GLAZED BREAST",
+        desc: "Crispy fried chicken fillet tossed in bold Buffalo sauce, cooled with house buttermilk ranch and crunchy pickles.",
+        price: 165,
+        image: "assets/products/buffalo.png"
+      },
+      {
+        id: "ranch-chicken-sandwich",
+        category: "chicken",
+        theme: "theme-yellow",
+        badge: "Sweet & Smoky",
+        title: "Ranch Chicken",
+        subtitle: "BUTTERMILK RANCH GLAZE",
+        desc: "Golden fried chicken breast brushed with sweet hickory BBQ sauce, crispy turkey bacon, and smoked gouda.",
+        price: 170,
+        image: "assets/products/ranch.png"
+      },
+      {
+        id: "chicken-boom-sandwich",
+        category: "chicken",
+        theme: "theme-cream",
+        badge: "Full Feast",
+        title: "Loaded Chicken Box",
+        subtitle: "2 PIECES + SIDES",
+        desc: "Two golden-fried crispy chicken pieces served with seasoned fries, creamy garlic dip, coleslaw, and a warm bun.",
+        price: 190,
+        image: "assets/products/chicken-boom.png"
+      },
+
+      // TENDERS (3)
+      {
+        id: "tenders-meal",
+        category: "tenders",
+        theme: "theme-red",
+        badge: "Best Seller",
+        title: "Tenders Meal",
+        subtitle: "SIZE DIFFERS • 4 / 6 PCS",
+        desc: "Crispy hand-battered chicken tenders, golden fries, toasted brioche buns, and your choice of two signature dips.",
+        price: 175,
+        image: "assets/products/tenders-meal.webp"
+      },
+      {
+        id: "nashville-hot-tenders",
+        category: "tenders",
+        theme: "theme-yellow",
+        badge: "Extra Heat",
+        title: "Nashville Hot Tenders",
+        subtitle: "CAYENNE SPICE DUST",
+        desc: "Crunchy chicken tenders basted in fiery Nashville chili oil, served over Texas toast with dill pickles and ranch.",
+        price: 185,
+        image: "assets/products/tenders-meal.webp"
+      },
+      {
+        id: "honey-mustard-tenders",
+        category: "tenders",
+        theme: "theme-cream",
+        badge: "Just Right",
+        title: "Golden Tenders Trio",
+        subtitle: "3 STRIPS + FRIES",
+        desc: "Three juicy all-white-meat crispy tenders paired with crinkle-cut fries and our house honey mustard sauce.",
+        price: 135,
+        image: "assets/products/tenders-meal.webp"
+      },
+
+      // PIZZA (3)
+      {
+        id: "chicken-popcorn-pizza",
+        category: "pizza",
+        theme: "theme-red",
+        badge: "House Star",
+        title: "Chicken Popcorn Pizza",
+        subtitle: "BUFFALO & RANCH DRIZZLE",
+        desc: "Toomy's signature tomato sauce, stretchy mozzarella, golden fried popcorn chicken, and a rich Buffalo-ranch drizzle.",
+        price: 210,
+        image: "assets/products/pizza-popcorn-buffalo.webp"
+      },
+      {
+        id: "sea-ranch-pizza",
+        category: "pizza",
+        theme: "theme-yellow",
+        badge: "Wood-Fired Style",
+        title: "Sea Ranch Pizza",
+        subtitle: "BUTTERMILK RANCH & SHRIMP",
+        desc: "Tangy BBQ base loaded with crispy chicken chunks, red onions, smoked mozzarella, and fresh cilantro.",
+        price: 205,
+        image: "assets/products/pizza-searanch.png"
+      },
+      {
+        id: "steak-pizza",
+        category: "pizza",
+        theme: "theme-cream",
+        badge: "Cheese Pull",
+        title: "Steak Melt Pizza",
+        subtitle: "JUICY STEAK & MOZZARELLA",
+        desc: "Rich blend of mozzarella, aged cheddar, gouda, and parmesan baked on a hand-stretched golden crust.",
+        price: 185,
+        image: "assets/products/pizza-steak.png"
+      },
+      // BASMATI (2)
+      {
+        id: "basmati-crispy-bowl",
+        category: "basmati",
+        theme: "theme-yellow",
+        badge: "The House Signature",
+        title: "Basmati Crispy Bowl",
+        subtitle: "SPICED GOLDEN RICE",
+        desc: "Fragrant yellow basmati rice topped with sliced crispy chicken tenders, garlic sauce, and toasted almonds.",
+        price: 155,
+        image: "assets/products/basmati-chicken.webp"
+      },
+      {
+        id: "smoky-beef-basmati-bowl",
+        category: "basmati",
+        theme: "theme-cream",
+        badge: "Hearty Bowl",
+        title: "Smoky Beef Basmati Bowl",
+        subtitle: "CHARGRILLED STRIPS",
+        desc: "Aromatic seasoned basmati rice loaded with seared beef strips, roasted peppers, and smoky tahini-garlic drizzle.",
+        price: 170,
+        image: "assets/products/basmati-steak.png"
+      },
+
+      // CRISPY (1)
+      {
+        id: "hot-dog-crispy-roll",
+        category: "crispy",
+        theme: "theme-cream",
+        badge: "Roll Up",
+        title: "Hot Dog Crispy Roll",
+        subtitle: "STACKED & MELTED",
+        desc: "Crispy tortilla wrap packed with grilled hot dog bites, melted mozzarella, cheddar sauce, and fresh veggies.",
+        price: 145,
+        image: "assets/products/crispy-roll.webp"
+      }
+    ];
+
+    const VALID_CATS = ["all", "burgers", "chicken", "tenders", "pizza", "basmati", "crispy"];
+
+    // Update tab counts dynamically
+    VALID_CATS.forEach((cat) => {
+      const countEl = menuFilterBar.querySelector(`[data-count-for="${cat}"]`);
+      if (countEl) {
+        const count =
+          cat === "all"
+            ? MENU_CATALOG.length
+            : MENU_CATALOG.filter((item) => item.category === cat).length;
+        countEl.textContent = count;
+      }
+    });
+
+    // Position the sliding red indicator pill behind the active tab
+    function moveFilterIndicator(activeTab) {
+      if (!menuFilterIndicator || !activeTab) return;
+      const left = activeTab.offsetLeft;
+      const width = activeTab.offsetWidth;
+      menuFilterIndicator.style.width = `${width}px`;
+      menuFilterIndicator.style.transform = `translate3d(${left}px, 0, 0)`;
+    }
+
+    // Render cards for the selected category with staggered entrance
+    function renderMenuCards(category, animate = true) {
+      const filtered =
+        category === "all"
+          ? MENU_CATALOG
+          : MENU_CATALOG.filter((item) => item.category === category);
+
+      const buildMarkup = () => {
+        menuProductGrid.innerHTML = filtered
+          .map(
+            (item, idx) => `
+          <article
+            class="menu-card ${item.theme}"
+            data-id="${item.id}"
+            data-category="${item.category}"
+            style="--card-stagger: ${idx};"
+          >
+            <div class="menu-card-media">
+              <span class="menu-card-badge">${item.badge}</span>
+
+              <button
+                type="button"
+                class="menu-qv-btn"
+                data-qv-id="${item.id}"
+                aria-label="Quick View ${item.title}"
+              >
+                <span class="menu-qv-icon" aria-hidden="true">&#10530;</span>
+                <span class="menu-qv-label">Quick View</span>
+              </button>
+
+              <img
+                src="${item.image}"
+                alt="${item.title}"
+                class="menu-card-img"
+                loading="lazy"
+                draggable="false"
+              />
+            </div>
+
+            <div class="menu-card-body">
+              <span class="menu-card-sub">${item.subtitle}</span>
+              <h2 class="menu-card-title">${item.title}</h2>
+              <p class="menu-card-desc">${item.desc}</p>
+            </div>
+
+            <div class="menu-card-footer">
+              <span class="menu-card-price">${item.price} EGP</span>
+
+              <button type="button" class="menu-card-cta">
+                <span class="star-btn-view star-btn-view-default">+ Add</span>
+                <span class="star-btn-view star-btn-view-added" aria-hidden="true">Added &#10003;</span>
+                <span class="star-btn-view star-btn-view-stepper">
+                  <span class="card-step-btn" data-card-step="dec" role="button" tabindex="0" aria-label="Decrease quantity">&minus;</span>
+                  <span class="card-step-qty">1</span>
+                  <span class="card-step-btn" data-card-step="inc" role="button" tabindex="0" aria-label="Increase quantity">+</span>
+                </span>
+              </button>
+            </div>
+          </article>
+        `
+          )
+          .join("");
+
+        // Sync live cart quantities onto newly rendered card buttons
+        if (typeof syncMenuCardButtons === "function") {
+          syncMenuCardButtons();
+        }
+      };
+
+      if (!animate) {
+        buildMarkup();
+        return;
+      }
+
+      // Fade & scale out current cards (~150ms), then stagger new cards in (~280ms)
+      menuProductGrid.classList.add("is-filtering-out");
+      clearTimeout(menuProductGrid._filterTimer);
+      menuProductGrid._filterTimer = setTimeout(() => {
+        buildMarkup();
+        menuProductGrid.classList.remove("is-filtering-out");
+      }, 150);
+    }
+
+    // Set active category tab + update URL query (?cat=...) without reload
+    function setActiveCategory(cat, { updateUrl = true, animate = true } = {}) {
+      const normalized = VALID_CATS.includes(cat) ? cat : "all";
+      const tabs = menuFilterBar.querySelectorAll(".menu-filter-tab");
+      let activeTab = null;
+
+      tabs.forEach((tab) => {
+        const isMatch = tab.dataset.cat === normalized;
+        tab.classList.toggle("is-active", isMatch);
+        tab.setAttribute("aria-pressed", isMatch ? "true" : "false");
+        if (isMatch) activeTab = tab;
+      });
+
+      moveFilterIndicator(activeTab);
+      renderMenuCards(normalized, animate);
+
+      if (updateUrl && window.history && window.history.replaceState) {
+        const url = new URL(window.location.href);
+        if (normalized === "all") {
+          url.searchParams.delete("cat");
+        } else {
+          url.searchParams.set("cat", normalized);
+        }
+        window.history.replaceState({ cat: normalized }, "", url.toString());
+      }
+    }
+
+    // Tab click delegation
+    menuFilterBar.addEventListener("click", (e) => {
+      const tab = e.target.closest(".menu-filter-tab");
+      if (!tab || tab.classList.contains("is-active")) return;
+      setActiveCategory(tab.dataset.cat, { updateUrl: true, animate: true });
+    });
+
+    // Keep sliding indicator aligned on window resize / font load
+    window.addEventListener("resize", () => {
+      const activeTab = menuFilterBar.querySelector(".menu-filter-tab.is-active");
+      moveFilterIndicator(activeTab);
+    });
+
+    // Initial category from URL (?cat=burgers, etc.)
+    const initialCat =
+      new URLSearchParams(window.location.search).get("cat")?.toLowerCase() || "all";
+    setActiveCategory(initialCat, { updateUrl: false, animate: false });
+    requestAnimationFrame(() => {
+      const activeTab = menuFilterBar.querySelector(".menu-filter-tab.is-active");
+      moveFilterIndicator(activeTab);
+    });
+
+    // Scroll-Linked Top Nav Auto-Hide & Sticky Filter Pill Elevation
+    let lastScrollY = window.scrollY;
+    window.addEventListener(
+      "scroll",
+      () => {
+        const currentY = window.scrollY;
+        const delta = currentY - lastScrollY;
+
+        if (menuFilterWrap) {
+          const wrapTop = menuFilterWrap.getBoundingClientRect().top;
+          menuFilterWrap.classList.toggle("is-stuck", wrapTop <= 90);
+        }
+
+        if (siteHeaderEl && !document.body.classList.contains("is-menu-open")) {
+          if (currentY > 140 && delta > 6) {
+            siteHeaderEl.classList.add("is-header-hidden");
+            if (menuFilterWrap) menuFilterWrap.classList.add("is-top-pinned");
+          } else if (delta < -6 || currentY <= 100) {
+            siteHeaderEl.classList.remove("is-header-hidden");
+            if (menuFilterWrap) menuFilterWrap.classList.remove("is-top-pinned");
+          }
+        }
+
+        lastScrollY = currentY;
+      },
+      { passive: true }
+    );
+
+    // Quick-View Modal Controller
+    const qvBackdrop = document.getElementById("qvBackdrop");
+    const qvModal = document.getElementById("qvModal");
+    const qvCloseBtn = document.getElementById("qvCloseBtn");
+    const qvVisualPane = document.getElementById("qvVisualPane");
+    const qvBadge = document.getElementById("qvBadge");
+    const qvImage = document.getElementById("qvImage");
+    const qvSubtitle = document.getElementById("qvSubtitle");
+    const qvTitle = document.getElementById("qvTitle");
+    const qvDesc = document.getElementById("qvDesc");
+    const qvPrice = document.getElementById("qvPrice");
+    const qvAddBtn = document.getElementById("qvAddBtn");
+    let activeQvItem = null;
+
+    function openQuickView(item) {
+      if (!item || !qvModal) return;
+      activeQvItem = item;
+      qvVisualPane.className = `qv-visual-pane ${item.theme}`;
+      qvBadge.textContent = item.badge;
+      qvImage.src = item.image;
+      qvImage.alt = item.title;
+      qvSubtitle.textContent = item.subtitle;
+      qvTitle.textContent = item.title;
+      qvDesc.textContent = item.desc;
+      qvPrice.textContent = `${item.price} EGP`;
+
+      qvBackdrop.classList.add("is-open");
+      qvModal.classList.add("is-open");
+      qvModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeQuickView() {
+      if (!qvModal) return;
+      qvBackdrop.classList.remove("is-open");
+      qvModal.classList.remove("is-open");
+      qvModal.setAttribute("aria-hidden", "true");
+      if (
+        !document.body.classList.contains("is-menu-open") &&
+        !document.getElementById("cartDrawer")?.classList.contains("is-open")
+      ) {
+        document.body.style.overflow = "";
+      }
+    }
+
+    menuProductGrid.addEventListener("click", (e) => {
+      const qvBtn = e.target.closest("[data-qv-id]");
+      if (!qvBtn) return;
+      const item = MENU_CATALOG.find((entry) => entry.id === qvBtn.dataset.qvId);
+      if (item) openQuickView(item);
+    });
+
+    if (qvCloseBtn) qvCloseBtn.addEventListener("click", closeQuickView);
+    if (qvBackdrop) qvBackdrop.addEventListener("click", closeQuickView);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && qvModal?.classList.contains("is-open")) {
+        closeQuickView();
+      }
+    });
+
+    if (qvAddBtn) {
+      qvAddBtn.addEventListener("click", () => {
+        if (!activeQvItem) return;
+        const matchingCard = menuProductGrid.querySelector(
+          `.menu-card[data-id="${activeQvItem.id}"] .menu-card-cta`
+        );
+        if (matchingCard) {
+          matchingCard.click();
+        }
+        closeQuickView();
+      });
+    }
   }
 });
