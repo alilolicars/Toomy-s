@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — Toomy's | Asyut's Ultimate Burger &amp; Pizza Spot</title>
+
+  <!-- Google Fonts: Fredoka, Plus Jakarta Sans, Rubik, Cormorant Garamond & Archivo Black -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cormorant+Garamond:wght@400;500;600&family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Rubik:wght@700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="checkout-page-body">
+
+  <!-- 1. FIXED TOP HEADER (SHARED ACROSS ALL PAGES) -->
+  <header class="site-header" id="siteHeader">
+    <a href="index.html#home" class="brand-mini" aria-label="Toomy's Home">
+      <img
+        src="assets/logo-small.webp"
+        alt="Toomy's"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';"
+      />
+      <span class="brand-mini-fallback" style="display: none;">Toomy's</span>
+    </a>
+
+    <div class="header-actions">
+      <button
+        class="cart-toggle"
+        id="cartToggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="cartDrawer"
+        aria-label="Open Cart"
+      >
+        <span class="cart-toggle-label">CART</span>
+        <span class="cart-toggle-badge" id="cartCountBadge">0</span>
+      </button>
+
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="navOverlay"
+      >
+        <span class="menu-toggle-icon">+</span>
+        <span class="menu-toggle-label">MENU</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 2. FULL-SCREEN DRAWER MENU -->
+  <div class="nav-overlay" id="navOverlay" aria-hidden="true">
+    <div class="nav-overlay-inner">
+      <div class="nav-top-bar nav-stagger" style="--stagger-index: 0;">
+        <div class="lang-switcher" role="group" aria-label="Language Switcher">
+          <button type="button" class="lang-btn" data-lang="ar">AR</button>
+          <span class="lang-divider" aria-hidden="true">|</span>
+          <button type="button" class="lang-btn is-active" data-lang="en">EN</button>
+        </div>
+
+        <a href="index.html#home" class="nav-center-logo" aria-label="Toomy's Home">
+          <img
+            src="assets/logo-main.webp"
+            alt="Toomy's"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+          />
+          <span class="drawer-logo-fallback" style="display: none;">Toomy's</span>
+        </a>
+
+        <div class="nav-top-spacer" aria-hidden="true"></div>
+      </div>
+
+      <ul class="nav-rows" aria-label="Primary Navigation">
+        <li class="nav-row nav-stagger" style="--stagger-index: 1;">
+          <div class="nav-row-curtain" aria-hidden="true"></div>
+          <a href="index.html#home" class="nav-row-link pos-home">
+            <span class="nav-row-label">HOME</span>
+          </a>
+        </li>
+
+        <li class="nav-row nav-stagger" style="--stagger-index: 2;">
+          <div class="nav-row-curtain" aria-hidden="true"></div>
+          <a href="menu.html" class="nav-row-link pos-menu">
+            <span class="nav-row-label">MENU</span>
+            <sup class="nav-row-count">(24)</sup>
+          </a>
+        </li>
+
+        <li class="nav-row nav-stagger" style="--stagger-index: 3;">
+          <div class="nav-row-curtain" aria-hidden="true"></div>
+          <a href="about.html" class="nav-row-link pos-about">
+            <span class="nav-row-label">ABOUT US</span>
+          </a>
+        </li>
+
+        <li class="nav-row nav-stagger" style="--stagger-index: 4;">
+          <div class="nav-row-curtain" aria-hidden="true"></div>
+          <a href="newsletter.html" class="nav-row-link pos-contact">
+            <span class="nav-row-label">CONTACT US</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="nav-bottom-bar nav-stagger" style="--stagger-index: 5;">
+        <a href="#privacy" class="nav-legal-link">PRIVACY POLICY</a>
+
+        <div class="nav-socials">
+          <a
+            href="https://www.facebook.com/toomyseg"
+            target="_blank"
+            rel="noopener"
+            class="social-icon"
+            aria-label="Facebook"
+          >
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor">
+              <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z"/>
+            </svg>
+          </a>
+          <a
+            href="https://www.instagram.com/"
+            target="_blank"
+            rel="noopener"
+            class="social-icon"
+            aria-label="Instagram"
+          >
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </a>
+        </div>
+
+        <a href="#terms" class="nav-legal-link">TERMS &amp; CONDITIONS</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. CHECKOUT MAIN CANVAS (#F5EFE6) -->
+  <main class="checkout-main" id="checkoutTop">
+    <div class="checkout-shell" id="checkoutShell">
+
+      <!-- A. Hero Header -->
+      <header class="checkout-hero">
+        <div class="checkout-eyebrow">
+          <span class="checkout-eyebrow-dot" aria-hidden="true"></span>
+          <span>Almost Done</span>
+        </div>
+        <h1 class="checkout-title">CHECKOUT</h1>
+      </header>
+
+      <!-- B. Asymmetric 2-Column Grid (Left ~62% Steps & Form | Right ~38% Sticky Summary) -->
+      <div class="checkout-grid">
+
+        <!-- LEFT COLUMN: 3 Stacked Step Cards + Primary Submit CTA -->
+        <form class="checkout-steps-col" id="checkoutForm" novalidate>
+
+          <!-- Card 1: Fulfillment Method -->
+          <section class="checkout-card" aria-labelledby="step1Title">
+            <div class="checkout-card-header">
+              <span class="step-badge" aria-hidden="true">1</span>
+              <h2 class="checkout-card-title" id="step1Title">How do you want it?</h2>
+            </div>
+
+            <div class="fulfillment-toggle" id="fulfillmentToggle" role="tablist" aria-label="Fulfillment Method">
+              <span class="fulfillment-pill-slider" id="fulfillmentSlider" aria-hidden="true"></span>
+
+              <button
+                type="button"
+                class="fulfillment-tab is-active"
+                data-method="delivery"
+                role="tab"
+                aria-selected="true"
+              >
+                Delivery
+              </button>
+
+              <button
+                type="button"
+                class="fulfillment-tab"
+                data-method="pickup"
+                role="tab"
+                aria-selected="false"
+              >
+                Branch Pickup
+              </button>
+            </div>
+          </section>
+
+          <!-- Card 2: Customer Details -->
+          <section class="checkout-card" aria-labelledby="step2Title">
+            <div class="checkout-card-header">
+              <span class="step-badge" aria-hidden="true">2</span>
+              <h2 class="checkout-card-title" id="step2Title">Your Details</h2>
+            </div>
+
+            <div class="checkout-fields-stack">
+              <div class="checkout-field-group">
+                <label for="checkoutName" class="checkout-label">Name</label>
+                <input
+                  type="text"
+                  id="checkoutName"
+                  name="customerName"
+                  class="checkout-input"
+                  value="Ali Rady Ibrahim"
+                  placeholder="Enter your full name"
+                  autocomplete="name"
+                  required
+                />
+              </div>
+
+              <div class="checkout-field-group">
+                <label for="checkoutPhone" class="checkout-label">Phone</label>
+                <input
+                  type="tel"
+                  id="checkoutPhone"
+                  name="customerPhone"
+                  class="checkout-input checkout-input-num"
+                  value="0110000000"
+                  placeholder="01XXXXXXXXX"
+                  autocomplete="tel"
+                  required
+                />
+              </div>
+
+              <!-- Delivery Address (Smoothly collapses when Branch Pickup is active) -->
+              <div class="checkout-address-wrap" id="checkoutAddressWrap">
+                <div class="checkout-address-inner">
+                  <div class="checkout-field-group">
+                    <label for="checkoutAddress" class="checkout-label">Delivery Address</label>
+                    <input
+                      type="text"
+                      id="checkoutAddress"
+                      name="customerAddress"
+                      class="checkout-input"
+                      value="Abrag El Nasr, Street 12, Asyut"
+                      placeholder="Street, building, floor, apartment"
+                      autocomplete="street-address"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="checkout-field-group">
+                <label for="checkoutNotes" class="checkout-label">
+                  <span>Notes</span>
+                  <span class="checkout-optional-tag">Optional</span>
+                </label>
+                <textarea
+                  id="checkoutNotes"
+                  name="customerNotes"
+                  class="checkout-textarea"
+                  placeholder="No pickles? Extra napkins?"
+                ></textarea>
+              </div>
+            </div>
+
+            <p class="checkout-form-error" id="checkoutFormError" role="alert"></p>
+          </section>
+
+          <!-- Card 3: Payment Method -->
+          <section class="checkout-card" aria-labelledby="step3Title">
+            <div class="checkout-card-header">
+              <span class="step-badge" aria-hidden="true">3</span>
+              <h2 class="checkout-card-title" id="step3Title">Payment</h2>
+            </div>
+
+            <div class="payment-selected-box">
+              <span class="payment-cash-badge">Cash</span>
+              <span class="payment-desc-text" id="paymentMethodDesc">
+                Pay cash on delivery
+              </span>
+            </div>
+          </section>
+
+          <!-- Primary Submit CTA -->
+          <button type="submit" class="checkout-submit-btn" id="checkoutSubmitBtn">
+            <span class="checkout-submit-label">Confirm Order</span>
+            <span class="checkout-submit-pill" id="checkoutSubmitTotal">0 EGP</span>
+          </button>
+
+        </form>
+
+        <!-- RIGHT COLUMN: Sticky Order Summary Card -->
+        <aside class="checkout-summary-col" aria-labelledby="summaryHeading">
+          <div class="checkout-summary-card">
+            <h2 class="checkout-summary-title" id="summaryHeading">Your Order</h2>
+
+            <div class="checkout-items-wrap" id="checkoutItemsContainer"></div>
+
+            <div class="checkout-totals-footer" id="checkoutTotalsFooter">
+              <div class="checkout-summary-line">
+                <span>Subtotal</span>
+                <span class="checkout-num" id="checkoutSubtotalVal">0 EGP</span>
+              </div>
+
+              <div class="checkout-summary-line">
+                <span id="checkoutFeeLabel">Delivery</span>
+                <span class="checkout-num" id="checkoutFeeVal">25 EGP</span>
+              </div>
+
+              <div class="checkout-totals-divider" aria-hidden="true"></div>
+
+              <div class="checkout-grand-total-row">
+                <span class="checkout-grand-label">Total</span>
+                <span class="checkout-grand-val" id="checkoutGrandTotalVal">0 EGP</span>
+              </div>
+
+              <a href="menu.html" class="checkout-add-more-link">
+                <span>Add more food</span>
+                <span class="add-more-arrow" aria-hidden="true">&#8594;</span>
+              </a>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+    <!-- Empty Tray State (Replaces .checkout-shell when cart is emptied) -->
+    <section
+      class="checkout-empty-view"
+      id="checkoutEmptyView"
+      aria-labelledby="checkoutEmptyHeadline"
+      hidden
+    >
+      <img
+        src="assets/Toomy's noBG/empty-tray.png"
+        alt="Empty Toomy's food tray"
+        class="checkout-empty-tray-img"
+        draggable="false"
+        onerror="this.onerror=null; this.src='assets/Toomy\'s noBG/toomy-footer.png';"
+      />
+
+      <!-- Unified Dot Eyebrow -->
+      <p class="checkout-empty-eyebrow">
+        <span class="checkout-empty-eyebrow-dot" aria-hidden="true"></span>
+        <span>Your Tray is Empty</span>
+      </p>
+
+      <h1 class="checkout-empty-headline" id="checkoutEmptyHeadline">
+        Nothing to confirm yet.
+      </h1>
+
+      <p class="checkout-empty-subcopy">
+        Add something tasty first &mdash; we're waiting for you.
+      </p>
+
+      <!-- Strengthened Primary CTA Pill -->
+      <a href="menu.html" class="checkout-empty-cta">
+        <span class="checkout-empty-cta-label">Browse Menu</span>
+        <span class="checkout-empty-cta-circle" aria-hidden="true">
+          <svg
+            class="checkout-empty-cta-arrow"
+            viewBox="0 0 24 24"
+            width="16"
+            height="16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </span>
+      </a>
+
+      <!-- 1-Click Recovery Flow: Craving Something Fast? -->
+      <div class="checkout-recovery-block" aria-label="Popular Picks Quick Add">
+        <p class="checkout-recovery-label">Craving Something Fast? &bull; Popular Picks</p>
+
+        <div class="checkout-recovery-grid">
+          <div class="checkout-recovery-card">
+            <div class="checkout-recovery-thumb">
+              <img src="assets/products/toomy-burger.webp" alt="Toomy Burger" draggable="false" />
+            </div>
+            <div class="checkout-recovery-meta">
+              <h2 class="checkout-recovery-title">Toomy Burger</h2>
+              <span class="checkout-recovery-price">185 EGP</span>
+            </div>
+            <button
+              type="button"
+              class="checkout-recovery-add-btn"
+              data-quick-add="toomy-burger"
+              aria-label="Add Toomy Burger to order"
+            >
+              + Add
+            </button>
+          </div>
+
+          <div class="checkout-recovery-card">
+            <div class="checkout-recovery-thumb">
+              <img src="assets/products/toomy-burger.webp" alt="Juicy Jack" draggable="false" />
+            </div>
+            <div class="checkout-recovery-meta">
+              <h2 class="checkout-recovery-title">Triple Smash</h2>
+              <span class="checkout-recovery-price">235 EGP</span>
+            </div>
+            <button
+              type="button"
+              class="checkout-recovery-add-btn"
+              data-quick-add="triple-smash-meal"
+              aria-label="Add Triple Smash Meal to order"
+            >
+              + Add
+            </button>
+          </div>
+
+          <div class="checkout-recovery-card">
+            <div class="checkout-recovery-thumb">
+              <img src="assets/products/pizza-popcorn-buffalo.webp" alt="Chicken Popcorn Pizza" draggable="false" />
+            </div>
+            <div class="checkout-recovery-meta">
+              <h2 class="checkout-recovery-title">Popcorn Pizza</h2>
+              <span class="checkout-recovery-price">210 EGP</span>
+            </div>
+            <button
+              type="button"
+              class="checkout-recovery-add-btn"
+              data-quick-add="chicken-popcorn-pizza"
+              aria-label="Add Chicken Popcorn Pizza to order"
+            >
+              + Add
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 4. CHECKERED PLAID SECTION DIVIDER -->
+  <div class="checkered-divider" aria-hidden="true"></div>
+
+  <!-- 5. FULL-VIEWPORT FOOTER SECTION -->
+  <footer class="site-footer" id="contact" dir="ltr" lang="en">
+    <div class="footer-top-group">
+      <a href="index.html#home" class="footer-logo" aria-label="Toomy's Home">
+        <img
+          src="assets/logo-main.webp"
+          alt="Toomy's"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+        />
+        <span class="footer-logo-fallback" style="display: none;">Toomy's</span>
+      </a>
+
+      <p class="footer-tagline">Freshly fried. Loaded with flavor in Asyut.</p>
+
+      <div class="footer-dashed-rule" aria-hidden="true"></div>
+
+      <nav class="footer-nav" aria-label="Footer Navigation">
+        <div class="footer-col">
+          <h3 class="footer-col-heading">OUR MENU</h3>
+          <ul class="footer-col-list">
+            <li><a href="menu.html?cat=burgers" class="footer-link">Burger</a></li>
+            <li><a href="menu.html?cat=pizza" class="footer-link">Pizza</a></li>
+            <li><a href="menu.html?cat=tenders" class="footer-link">Tenders</a></li>
+            <li><a href="menu.html?cat=crispy" class="footer-link">Crispy Rolls</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col" id="about">
+          <h3 class="footer-col-heading">LOCATION</h3>
+          <ul class="footer-col-list">
+            <li><span class="footer-info-text">Asyut, Abrag El Nasr</span></li>
+            <li><span class="footer-info-text">Daily: 2:00 PM – 2:00 AM</span></li>
+            <li>
+              <a
+                href="https://maps.google.com/?q=Abrag+El+Nasr+Asyut"
+                target="_blank"
+                rel="noopener"
+                class="footer-link footer-map-link"
+              >
+                Get Directions &#8599;
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3 class="footer-col-heading">GET IN TOUCH</h3>
+          <ul class="footer-col-list">
+            <li><a href="newsletter.html" class="footer-link">Contact Us</a></li>
+            <li><a href="menu.html" class="footer-link">Order Online</a></li>
+            <li><a href="about.html" class="footer-link">Our Story</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <div class="footer-watermark" aria-hidden="true">Toomy's</div>
+
+    <div class="footer-bottom-zone">
+      <div class="footer-socials" aria-label="Social Media Links">
+        <a
+          href="https://www.instagram.com/"
+          target="_blank"
+          rel="noopener"
+          class="footer-social-link"
+          aria-label="Instagram"
+        >
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+        </a>
+
+        <a
+          href="https://www.facebook.com/toomyseg"
+          target="_blank"
+          rel="noopener"
+          class="footer-social-link"
+          aria-label="Facebook"
+        >
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12c0-5.523-4.477-10-10-10z"/>
+          </svg>
+        </a>
+
+        <a
+          href="https://www.tiktok.com/"
+          target="_blank"
+          rel="noopener"
+          class="footer-social-link"
+          aria-label="TikTok"
+        >
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+          </svg>
+        </a>
+      </div>
+
+      <div class="footer-burger-wrap" id="footerBurger">
+        <img
+          src="assets/Toomy's noBG/toomy-footer.webp"
+          alt="Toomy's Signature Burger"
+          class="footer-burger-img"
+          draggable="false"
+        />
+      </div>
+
+      <p class="footer-copyright">
+        &copy; <span id="footerYear">2026</span> Toomy's. All rights reserved.
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

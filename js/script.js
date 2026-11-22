@@ -432,6 +432,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch {
         // Ignore storage quota errors
       }
+      window.dispatchEvent(new CustomEvent("toomys:cart-sync"));
     }
 
     let cartItems = loadCart();
@@ -751,14 +752,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Place Order action
+    // Place Order button in Cart Drawer -> navigate to Checkout page
     if (cartCheckoutBtn) {
       cartCheckoutBtn.addEventListener("click", () => {
-        cartItems = [];
-        saveCart(cartItems);
-        renderCart(true);
-        updateBadge(true);
-        syncMenuCardButtons();
+        if (cartItems.length === 0) return;
+        closeCartDrawer();
+        window.location.href = "checkout.html";
       });
     }
 
@@ -1310,5 +1309,482 @@ document.addEventListener("DOMContentLoaded", () => {
         closeQuickView();
       });
     }
+  }
+  /* =========================================
+     15. CHECKOUT & ORDER CONFIRMATION CONTROLLERS
+     ========================================= */
+  const LAST_ORDER_KEY = "toomys_last_order_v1";
+  const ORDERS_HISTORY_KEY = "toomys_orders_history_v1";
+
+  function generateOrderCode() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let suffix = "";
+    for (let i = 0; i < 5; i++) {
+      suffix += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return `T-${suffix}`;
+  }
+
+  // --- A. CHECKOUT PAGE (checkout.html) ---
+  const checkoutForm = document.getElementById("checkoutForm");
+  const checkoutItemsContainer = document.getElementById("checkoutItemsContainer");
+  const checkoutShell = document.getElementById("checkoutShell");
+  const checkoutEmptyView = document.getElementById("checkoutEmptyView");
+
+  if (checkoutForm && checkoutItemsContainer) {
+    const fulfillmentToggle = document.getElementById("fulfillmentToggle");
+    const checkoutAddressWrap = document.getElementById("checkoutAddressWrap");
+    const paymentMethodDesc = document.getElementById("paymentMethodDesc");
+    const checkoutSubtotalVal = document.getElementById("checkoutSubtotalVal");
+    const checkoutFeeLabel = document.getElementById("checkoutFeeLabel");
+    const checkoutFeeVal = document.getElementById("checkoutFeeVal");
+    const checkoutGrandTotalVal = document.getElementById("checkoutGrandTotalVal");
+    const checkoutSubmitTotal = document.getElementById("checkoutSubmitTotal");
+    const checkoutSubmitBtn = document.getElementById("checkoutSubmitBtn");
+    const checkoutFormError = document.getElementById("checkoutFormError");
+
+    let fulfillmentMethod = "delivery"; // "delivery" | "pickup"
+    let isEmptyViewActive = false;
+
+    function getCheckoutItems() {
+      try {
+        const saved = JSON.parse(localStorage.getItem("toomys_cart_v1"));
+        return Array.isArray(saved) ? saved : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function setCheckoutItems(items) {
+      try {
+        localStorage.setItem("toomys_cart_v1", JSON.stringify(items));
+      } catch {
+        // Ignore quota errors
+      }
+      const badge = document.getElementById("cartCountBadge");
+      const toggle = document.getElementById("cartToggle");
+      const count = items.reduce((sum, i) => sum + i.qty, 0);
+      if (badge) {
+        badge.textContent = count;
+        badge.classList.toggle("has-items", count > 0);
+      }
+      if (toggle) {
+        toggle.classList.toggle("has-items", count > 0);
+      }
+    }
+
+    let checkoutCart = getCheckoutItems();
+
+    function swapToEmptyCheckoutView({ smoothScroll = true } = {}) {
+      if (checkoutShell) checkoutShell.hidden = true;
+      if (checkoutEmptyView) {
+        checkoutEmptyView.hidden = false;
+        // Re-trigger entrance animation cleanly
+        checkoutEmptyView.style.animation = "none";
+        void checkoutEmptyView.offsetWidth;
+        checkoutEmptyView.style.animation = "";
+      }
+
+      if (!isEmptyViewActive) {
+        isEmptyViewActive = true;
+        if (smoothScroll) {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      }
+    }
+
+    function updateCheckoutTotals() {
+      const subtotal = checkoutCart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const fee = checkoutCart.length === 0 ? 0 : fulfillmentMethod === "delivery" ? 25 : 0;
+      const grandTotal = subtotal + fee;
+
+      if (checkoutSubtotalVal) checkoutSubtotalVal.textContent = `${subtotal.toLocaleString("en-US")} EGP`;
+      if (checkoutFeeLabel) checkoutFeeLabel.textContent = fulfillmentMethod === "delivery" ? "Delivery" : "Pickup";
+      if (checkoutFeeVal) checkoutFeeVal.textContent = fee === 0 ? "Free" : `${fee} EGP`;
+      if (checkoutGrandTotalVal) checkoutGrandTotalVal.textContent = `${grandTotal.toLocaleString("en-US")} EGP`;
+      if (checkoutSubmitTotal) checkoutSubmitTotal.textContent = `${grandTotal.toLocaleString("en-US")} EGP`;
+    }
+
+    function renderCheckoutSummary({ isInitial = false } = {}) {
+      if (checkoutCart.length === 0) {
+        swapToEmptyCheckoutView({ smoothScroll: !isInitial });
+        return;
+      }
+
+      isEmptyViewActive = false;
+      if (checkoutShell) checkoutShell.hidden = false;
+      if (checkoutEmptyView) checkoutEmptyView.hidden = true;
+
+      updateCheckoutTotals();
+
+      checkoutItemsContainer.innerHTML = `
+        <ul class="checkout-summary-list">
+          ${checkoutCart
+            .map(
+              (item, idx) => `
+            <li class="checkout-summary-item" data-idx="${idx}">
+              <div class="checkout-summary-item-inner">
+                <div class="checkout-item-thumb">
+                  <img src="${item.image}" alt="${item.title}" />
+                </div>
+
+                <div class="checkout-item-meta">
+                  <h3 class="checkout-item-title">${item.title}</h3>
+                  <p class="checkout-item-sub">${item.sub || "Regular"}</p>
+
+                  <div class="checkout-item-actions">
+                    <div class="checkout-stepper-pill">
+                      <button type="button" class="checkout-step-btn" data-co-action="dec" data-idx="${idx}" aria-label="Decrease quantity">&minus;</button>
+                      <span class="checkout-step-qty">${item.qty}</span>
+                      <button type="button" class="checkout-step-btn" data-co-action="inc" data-idx="${idx}" aria-label="Increase quantity">+</button>
+                    </div>
+                    <button type="button" class="checkout-remove-link" data-co-action="remove" data-idx="${idx}">Remove</button>
+                  </div>
+                </div>
+
+                <div class="checkout-item-price">${(item.price * item.qty).toLocaleString("en-US")} EGP</div>
+              </div>
+            </li>
+          `
+            )
+            .join("")}
+        </ul>
+      `;
+    }
+
+    // Keep checkout view synced if items are removed from the slide-out cart drawer
+    window.addEventListener("toomys:cart-sync", () => {
+      checkoutCart = getCheckoutItems();
+      renderCheckoutSummary({ isInitial: false });
+    });
+
+    // 1-Click Quick-Add Recovery Flow from the Empty Tray View
+    const QUICK_ADD_PICKS = {
+      "toomy-burger": {
+        title: "Toomy Burger",
+        sub: "Signature Double Smash",
+        price: 185,
+        image: "assets/products/toomy-burger.png"
+      },
+      "triple-smash-meal": {
+        title: "Triple Smash Meal",
+        sub: "Triple Beef & Fries",
+        price: 235,
+        image: "assets/products/toomy-burger.png"
+      },
+      "chicken-popcorn-pizza": {
+        title: "Chicken Popcorn Pizza",
+        sub: "Buffalo & Ranch Drizzle",
+        price: 210,
+        image: "assets/products/pizza-popcorn-buffalo.png"
+      }
+    };
+
+    if (checkoutEmptyView) {
+      checkoutEmptyView.addEventListener("click", (e) => {
+        const quickBtn = e.target.closest("[data-quick-add]");
+        if (!quickBtn) return;
+
+        const pick = QUICK_ADD_PICKS[quickBtn.dataset.quickAdd];
+        if (!pick) return;
+
+        checkoutCart = [{ ...pick, qty: 1 }];
+        setCheckoutItems(checkoutCart);
+
+        // Animate smoothly back into the active 2-column Checkout view
+        if (checkoutShell) {
+          checkoutShell.classList.remove("is-recovering");
+          void checkoutShell.offsetWidth;
+          checkoutShell.classList.add("is-recovering");
+        }
+        renderCheckoutSummary({ isInitial: false });
+      });
+    }
+
+    // Fulfillment Toggle (Delivery <-> Branch Pickup)
+    if (fulfillmentToggle) {
+      fulfillmentToggle.addEventListener("click", (e) => {
+        const tab = e.target.closest(".fulfillment-tab");
+        if (!tab) return;
+
+        const nextMethod = tab.dataset.method;
+        if (nextMethod === fulfillmentMethod) return;
+
+        fulfillmentMethod = nextMethod;
+        const isPickup = fulfillmentMethod === "pickup";
+
+        fulfillmentToggle.classList.toggle("is-pickup", isPickup);
+        fulfillmentToggle.querySelectorAll(".fulfillment-tab").forEach((btn) => {
+          const active = btn.dataset.method === fulfillmentMethod;
+          btn.classList.toggle("is-active", active);
+          btn.setAttribute("aria-selected", active ? "true" : "false");
+        });
+
+        if (checkoutAddressWrap) {
+          checkoutAddressWrap.classList.toggle("is-hidden", isPickup);
+        }
+
+        if (paymentMethodDesc) {
+          paymentMethodDesc.textContent = isPickup
+            ? "Pay at the branch upon pickup"
+            : "Pay cash on delivery";
+        }
+
+        updateCheckoutTotals();
+      });
+    }
+
+    // Order Summary Quantity Steppers & Smooth Row Removal
+    checkoutItemsContainer.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-co-action]");
+      if (!btn) return;
+
+      const idx = Number(btn.dataset.idx);
+      const action = btn.dataset.coAction;
+      const rowEl = btn.closest(".checkout-summary-item");
+      if (Number.isNaN(idx) || !checkoutCart[idx]) return;
+
+      if (action === "inc") {
+        checkoutCart[idx].qty += 1;
+        setCheckoutItems(checkoutCart);
+        renderCheckoutSummary();
+        return;
+      }
+
+      if (action === "dec" && checkoutCart[idx].qty > 1) {
+        checkoutCart[idx].qty -= 1;
+        setCheckoutItems(checkoutCart);
+        renderCheckoutSummary();
+        return;
+      }
+
+      // Remove item smoothly (and switch to empty-tray state if last item)
+      if (rowEl && !rowEl.classList.contains("is-removing")) {
+        checkoutCart.splice(idx, 1);
+        setCheckoutItems(checkoutCart);
+
+        if (checkoutCart.length === 0) {
+          rowEl.classList.add("is-removing");
+          setTimeout(() => {
+            renderCheckoutSummary({ isInitial: false });
+          }, 260);
+        } else {
+          updateCheckoutTotals();
+          rowEl.classList.add("is-removing");
+          setTimeout(() => renderCheckoutSummary(), 340);
+        }
+      }
+    });
+
+    // Confirm Order Form Submission -> Save Order & Redirect to order-confirmation.html
+    checkoutForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (checkoutCart.length === 0) return;
+
+      const nameVal = document.getElementById("checkoutName")?.value.trim() || "";
+      const phoneVal = document.getElementById("checkoutPhone")?.value.trim() || "";
+      const addressVal = document.getElementById("checkoutAddress")?.value.trim() || "";
+      const notesVal = document.getElementById("checkoutNotes")?.value.trim() || "";
+
+      if (!nameVal) {
+        checkoutFormError.textContent = "Please enter your name so we know who to prepare the order for.";
+        document.getElementById("checkoutName")?.focus();
+        return;
+      }
+
+      if (!phoneVal || phoneVal.replace(/\D/g, "").length < 8) {
+        checkoutFormError.textContent = "Please enter a valid phone number so we can confirm your order.";
+        document.getElementById("checkoutPhone")?.focus();
+        return;
+      }
+
+      if (fulfillmentMethod === "delivery" && !addressVal) {
+        checkoutFormError.textContent = "Please enter your delivery address in Asyut.";
+        document.getElementById("checkoutAddress")?.focus();
+        return;
+      }
+
+      checkoutFormError.textContent = "";
+      checkoutSubmitBtn.classList.add("is-submitting");
+
+      const subtotal = checkoutCart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const fee = fulfillmentMethod === "delivery" ? 25 : 0;
+      const orderPayload = {
+        code: generateOrderCode(),
+        customerName: nameVal,
+        firstName: nameVal.split(/\s+/)[0] || "Friend",
+        phone: phoneVal,
+        address: fulfillmentMethod === "delivery" ? addressVal : "Asyut, Abrag El Nasr Branch",
+        notes: notesVal,
+        fulfillment: fulfillmentMethod === "delivery" ? "Delivery" : "Branch Pickup",
+        payment: "Cash",
+        items: checkoutCart.map((item) => ({ ...item })),
+        subtotal,
+        fee,
+        total: subtotal + fee,
+        createdAt: new Date().toLocaleString("en-US", {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        })
+      };
+
+      try {
+        localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(orderPayload));
+        const history = JSON.parse(localStorage.getItem(ORDERS_HISTORY_KEY)) || [];
+        history.unshift(orderPayload);
+        localStorage.setItem(ORDERS_HISTORY_KEY, JSON.stringify(history.slice(0, 15)));
+      } catch {
+        // Ignore storage errors
+      }
+
+      // Clear active cart without triggering empty-state flash before redirect
+      localStorage.setItem("toomys_cart_v1", "[]");
+
+      setTimeout(() => {
+        window.location.href = "order-confirmation.html";
+      }, 360);
+    });
+
+    // Initial render on page load
+    renderCheckoutSummary({ isInitial: true });
+  }
+
+  // --- B. ORDER CONFIRMATION PAGE (order-confirmation.html) ---
+  const paperReceipt = document.getElementById("paperReceipt");
+
+  if (paperReceipt) {
+    let orderData = null;
+    try {
+      orderData = JSON.parse(localStorage.getItem(LAST_ORDER_KEY));
+    } catch {
+      orderData = null;
+    }
+
+    // Graceful fallback if user opens order-confirmation.html directly
+    if (!orderData || !Array.isArray(orderData.items) || orderData.items.length === 0) {
+      orderData = {
+        code: "T-WE6UW",
+        customerName: "Ali Rady Ibrahim",
+        firstName: "Ali",
+        phone: "0110000000",
+        fulfillment: "Branch Pickup",
+        payment: "Cash",
+        items: [
+          { title: "Triple Smash Meal", sub: "Triple Beef & Fries", qty: 2, price: 160 },
+          { title: "Toomy Burger", sub: "Single", qty: 1, price: 185 }
+        ],
+        subtotal: 505,
+        fee: 0,
+        total: 505
+      };
+    }
+
+    const firstNameEl = document.getElementById("confirmFirstName");
+    const inlineCodeEl = document.getElementById("confirmInlineCode");
+    const inlinePhoneEl = document.getElementById("confirmInlinePhone");
+    const receiptCodeEl = document.getElementById("receiptOrderCode");
+    const receiptMetaEl = document.getElementById("receiptMetaTag");
+    const receiptItemsList = document.getElementById("receiptItemsList");
+    const receiptSubtotalEl = document.getElementById("receiptSubtotal");
+    const receiptFeeLabelEl = document.getElementById("receiptFeeLabel");
+    const receiptFeeValEl = document.getElementById("receiptFeeVal");
+    const receiptGrandTotalEl = document.getElementById("receiptGrandTotal");
+
+    if (firstNameEl) firstNameEl.textContent = orderData.firstName || "Ali";
+    if (inlineCodeEl) inlineCodeEl.textContent = `#${orderData.code}`;
+    if (inlinePhoneEl) inlinePhoneEl.textContent = orderData.phone;
+    if (receiptCodeEl) receiptCodeEl.textContent = orderData.code;
+    if (receiptMetaEl) receiptMetaEl.textContent = `${orderData.fulfillment} · ${orderData.payment}`;
+
+    if (receiptItemsList) {
+      receiptItemsList.innerHTML = orderData.items
+        .map(
+          (item) => `
+        <li class="receipt-item-row">
+          <div class="receipt-item-left">
+            <span class="receipt-item-name">${item.qty}&times; ${item.title}</span>
+            ${item.sub ? `<span class="receipt-item-variant">${item.sub}</span>` : ""}
+          </div>
+          <span class="receipt-item-price">${(item.price * item.qty).toLocaleString("en-US")} EGP</span>
+        </li>
+      `
+        )
+        .join("");
+    }
+
+    if (receiptSubtotalEl) {
+      receiptSubtotalEl.textContent = `${orderData.subtotal.toLocaleString("en-US")} EGP`;
+    }
+    if (receiptFeeLabelEl) {
+      receiptFeeLabelEl.textContent = orderData.fulfillment === "Delivery" ? "Delivery" : "Pickup";
+    }
+    if (receiptFeeValEl) {
+      receiptFeeValEl.textContent = orderData.fee === 0 ? "Free" : `${orderData.fee} EGP`;
+    }
+    if (receiptGrandTotalEl) {
+      receiptGrandTotalEl.textContent = `${orderData.total.toLocaleString("en-US")} EGP`;
+    }
+
+    // "My Orders" Secondary Pill Modal Controller
+    const myOrdersBtn = document.getElementById("myOrdersBtn");
+    const ordersModal = document.getElementById("ordersModal");
+    const ordersModalBackdrop = document.getElementById("ordersModalBackdrop");
+    const ordersModalClose = document.getElementById("ordersModalClose");
+    const ordersModalBody = document.getElementById("ordersModalBody");
+
+    function openOrdersModal() {
+      if (!ordersModal || !ordersModalBody) return;
+      let history = [];
+      try {
+        history = JSON.parse(localStorage.getItem(ORDERS_HISTORY_KEY)) || [];
+      } catch {
+        history = [];
+      }
+      if (history.length === 0) history = [orderData];
+
+      ordersModalBody.innerHTML = history
+        .map(
+          (entry) => `
+        <div class="past-order-card">
+          <div class="past-order-top">
+            <span class="past-order-id">#${entry.code}</span>
+            <span class="past-order-total">${entry.total.toLocaleString("en-US")} EGP</span>
+          </div>
+          <p class="past-order-items">
+            ${entry.items.map((i) => `${i.qty}× ${i.title}`).join(", ")}
+          </p>
+          <p class="past-order-meta">
+            ${entry.fulfillment} &middot; ${entry.payment}${entry.createdAt ? ` &middot; ${entry.createdAt}` : ""}
+          </p>
+        </div>
+      `
+        )
+        .join("");
+
+      ordersModalBackdrop.classList.add("is-open");
+      ordersModal.classList.add("is-open");
+      ordersModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeOrdersModal() {
+      if (!ordersModal) return;
+      ordersModalBackdrop.classList.remove("is-open");
+      ordersModal.classList.remove("is-open");
+      ordersModal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    if (myOrdersBtn) myOrdersBtn.addEventListener("click", openOrdersModal);
+    if (ordersModalClose) ordersModalClose.addEventListener("click", closeOrdersModal);
+    if (ordersModalBackdrop) ordersModalBackdrop.addEventListener("click", closeOrdersModal);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && ordersModal?.classList.contains("is-open")) {
+        closeOrdersModal();
+      }
+    });
   }
 });
