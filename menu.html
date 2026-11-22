@@ -178,7 +178,7 @@
 
           <button type="button" class="menu-filter-tab is-active" data-cat="all">
             <span class="tab-name">All</span>
-            <sup class="tab-count" data-count-for="all">24</sup>
+            <sup class="tab-count" data-count-for="all">16</sup>
           </button>
 
           <button type="button" class="menu-filter-tab" data-cat="burgers">
@@ -193,22 +193,22 @@
 
           <button type="button" class="menu-filter-tab" data-cat="tenders">
             <span class="tab-name">Tenders</span>
-            <sup class="tab-count" data-count-for="tenders">3</sup>
+            <sup class="tab-count" data-count-for="tenders">1</sup>
           </button>
 
           <button type="button" class="menu-filter-tab" data-cat="pizza">
             <span class="tab-name">Pizza</span>
-            <sup class="tab-count" data-count-for="pizza">4</sup>
+            <sup class="tab-count" data-count-for="pizza">3</sup>
           </button>
 
           <button type="button" class="menu-filter-tab" data-cat="basmati">
             <span class="tab-name">Basmati</span>
-            <sup class="tab-count" data-count-for="basmati">4</sup>
+            <sup class="tab-count" data-count-for="basmati">2</sup>
           </button>
 
           <button type="button" class="menu-filter-tab" data-cat="crispy">
             <span class="tab-name">Crispy</span>
-            <sup class="tab-count" data-count-for="crispy">4</sup>
+            <sup class="tab-count" data-count-for="crispy">1</sup>
           </button>
         </nav>
       </div>
@@ -222,38 +222,87 @@
   </main>
 
   <!-- 4. QUICK-VIEW PRODUCT MODAL -->
-  <div class="qv-backdrop" id="qvBackdrop" aria-hidden="true"></div>
   <div
-    class="qv-modal"
-    id="qvModal"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="qvTitle"
+    class="qv-overlay"
+    id="qvOverlay"
     aria-hidden="true"
   >
-    <button type="button" class="qv-close-btn" id="qvCloseBtn" aria-label="Close Quick View">
-      &#10005;
-    </button>
+    <div
+      class="qv-dialog"
+      id="qvDialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="qvTitle"
+    >
+      <!-- Left Column (46%): Warm Sand Product Image Showcase -->
+      <div class="qv-showcase-pane">
+        <span class="qv-badge" id="qvBadge">Try It Now</span>
+        <img
+          src="assets/products/tenders-meal.webp"
+          alt="Tenders Meal"
+          class="qv-image"
+          id="qvImage"
+          draggable="false"
+        />
+      </div>
 
-    <div class="qv-visual-pane" id="qvVisualPane">
-      <span class="qv-badge" id="qvBadge">The Original</span>
-      <img src="" alt="" id="qvImage" class="qv-image" />
-    </div>
+      <!-- Right Column (54%): Details, Ingredient Chips, Options & Purchase Controls -->
+      <div class="qv-details-pane">
+        <button
+          type="button"
+          class="qv-close-btn"
+          id="qvCloseBtn"
+          aria-label="Close Quick View"
+        >
+          &#10005;
+        </button>
 
-    <div class="qv-details-pane">
-      <span class="qv-subtitle" id="qvSubtitle">SIGNATURE SMASH</span>
-      <h2 class="qv-title" id="qvTitle">Toomy Burger</h2>
-      <p class="qv-desc" id="qvDesc"></p>
+        <div class="qv-scroll-content">
+          <div class="qv-eyebrow">
+            <span class="qv-eyebrow-dot" aria-hidden="true"></span>
+            <span id="qvCategory">Tenders</span>
+          </div>
 
-      <div class="qv-footer">
-        <div class="qv-price-block">
-          <span class="qv-price-label">Price</span>
-          <span class="qv-price" id="qvPrice">185 EGP</span>
+          <h2 class="qv-title" id="qvTitle">Tenders Meal</h2>
+
+          <p class="qv-subtitle" id="qvSubtitle">HAND-BATTERED CRISPY STRIPS</p>
+
+          <p class="qv-desc" id="qvDesc"></p>
+
+          <!-- Included-Items Ingredient Chips -->
+          <div class="qv-chips-row" id="qvChipsRow" aria-label="Included Items"></div>
+
+          <!-- Dynamic Option Selector Groups -->
+          <div class="qv-options-stack" id="qvOptionsStack"></div>
         </div>
 
-        <button type="button" class="qv-add-btn" id="qvAddBtn">
-          <span>+ Add to Order</span>
-        </button>
+        <!-- Bottom Purchase Row -->
+        <div class="qv-purchase-row">
+          <div class="qv-qty-stepper" role="group" aria-label="Item Quantity">
+            <button
+              type="button"
+              class="qv-qty-btn"
+              id="qvQtyDec"
+              aria-label="Decrease quantity"
+            >
+              &minus;
+            </button>
+            <span class="qv-qty-val" id="qvQtyVal">1</span>
+            <button
+              type="button"
+              class="qv-qty-btn"
+              id="qvQtyInc"
+              aria-label="Increase quantity"
+            >
+              +
+            </button>
+          </div>
+
+          <button type="button" class="qv-add-btn" id="qvAddBtn">
+            <span class="qv-add-label" id="qvAddLabel">Add to Cart</span>
+            <span class="qv-price-badge" id="qvPriceBadge">185 EGP</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -373,6 +422,7 @@
     </div>
   </footer>
 
+  <script src="js/menu-data.js"></script>
   <script src="js/script.js"></script>
 </body>
 </html>

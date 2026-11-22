@@ -467,11 +467,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Keep both Home (.star-card) and Menu (.menu-card) buttons synced with live cart quantities
+    // Keep Home (.star-card) inline steppers synced; keep Menu (.menu-card) "+ Add" buttons open for option selection
     function syncMenuCardButtons(changedTitle = null) {
-      document.querySelectorAll(".star-card, .menu-card").forEach((card) => {
-        const title = card.querySelector(".star-title, .menu-card-title")?.textContent.trim();
-        const btn = card.querySelector(".star-add-btn, .menu-card-cta");
+      document.querySelectorAll(".star-card").forEach((card) => {
+        const title = card.querySelector(".star-title")?.textContent.trim();
+        const btn = card.querySelector(".star-add-btn");
         if (!title || !btn) return;
 
         const match = cartItems.find((item) => item.title === title);
@@ -532,6 +532,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function openCartDrawer() {
+      // Reload latest items from localStorage before opening (syncs PDP & Quick View additions)
+      cartItems = loadCart();
+      renderCart(false);
+
       cartDrawer.classList.remove("is-animating-items");
       void cartDrawer.offsetWidth;
       cartDrawer.classList.add("is-open", "is-animating-items");
@@ -545,6 +549,16 @@ document.addEventListener("DOMContentLoaded", () => {
         cartDrawer.classList.remove("is-animating-items");
       }, 900);
     }
+
+    // Keep drawer in sync when external views (product.html / Quick View) write to localStorage
+    window.addEventListener("toomys:cart-sync", () => {
+      const latest = loadCart();
+      if (JSON.stringify(latest) !== JSON.stringify(cartItems)) {
+        cartItems = latest;
+        renderCart(false);
+        syncMenuCardButtons();
+      }
+    });
 
     function closeCartDrawer() {
       cartDrawer.classList.remove("is-open", "is-animating-items");
@@ -762,12 +776,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Unified Card CTA & Inline Stepper Handler ("+ ADD" -> "Added ✓" -> "- 1 +")
+    // Unified Card CTA Handler:
+    // - Menu & Upsell cards (".menu-card-cta"): open Quick View modal to choose options first
+    // - Home Menu Stars (".star-add-btn"): quick-add with inline "- 1 +" stepper
     document.addEventListener("click", (e) => {
-      const addBtn = e.target.closest(".star-add-btn, .menu-card-cta");
-      if (!addBtn) return;
+      const menuAddBtn = e.target.closest(".menu-card-cta");
+      if (menuAddBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const menuCard = menuAddBtn.closest(".menu-card");
+        const itemId = menuCard?.dataset.id;
+        if (itemId && typeof window.openToomysQuickView === "function") {
+          window.openToomysQuickView(itemId);
+        }
+        return;
+      }
 
-      const card = addBtn.closest(".star-card, .menu-card");
+      const addBtn = e.target.closest(".star-add-btn");
+      if (!addBtn) return;
+      e.stopPropagation();
+
+      const card = addBtn.closest(".star-card");
       if (!card) return;
+
+      // ...keep your existing Home ".star-add-btn" logic below this line...
 
       const title =
         card.querySelector(".star-title, .menu-card-title")?.textContent.trim() ||
@@ -833,313 +865,112 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================================
-     14. FULL MENU PAGE (FILTERING, STICKY HEADER & QUICK VIEW)
+     14. FULL MENU PAGE (SHARED MENU_ITEMS + PRODUCT NAVIGATION)
      ========================================= */
+  const SHARED_MENU_ITEMS = window.MENU_ITEMS || {};
+  const SHARED_MENU_LIST = window.MENU_ITEMS_LIST || Object.values(SHARED_MENU_ITEMS);
+
+  document.querySelectorAll(".nav-row-count").forEach((el) => {
+    if (SHARED_MENU_LIST.length > 0) el.textContent = `(${SHARED_MENU_LIST.length})`;
+  });
+
+  function getCardThemeClass(item) {
+    const raw = (item.cardTheme || item.theme || "red").toLowerCase();
+    return raw.startsWith("theme-") ? raw : `theme-${raw}`;
+  }
+
+  function buildMenuCardHTML(item, idx, overrideThemeClass = null) {
+    const themeClass = overrideThemeClass || getCardThemeClass(item);
+    return `
+      <article
+        class="menu-card ${themeClass}"
+        data-id="${item.id}"
+        data-category="${item.category}"
+        style="--card-stagger: ${idx};"
+      >
+        <div class="menu-card-media">
+          <span class="menu-card-badge">${item.badge}</span>
+
+          <button
+            type="button"
+            class="menu-qv-btn"
+            data-qv-id="${item.id}"
+            aria-label="Quick View ${item.title}"
+          >
+            <span class="menu-qv-icon" aria-hidden="true">&#10530;</span>
+            <span class="menu-qv-label">Quick View</span>
+          </button>
+
+          <img
+            src="${item.image}"
+            alt="${item.title}"
+            class="menu-card-img"
+            loading="lazy"
+            draggable="false"
+          />
+        </div>
+
+        <div class="menu-card-body">
+          <span class="menu-card-sub">${item.subtitle}</span>
+          <h2 class="menu-card-title">${item.title}</h2>
+          <p class="menu-card-desc">${item.description}</p>
+        </div>
+
+        <div class="menu-card-footer">
+          <span class="menu-card-price">${item.basePrice} EGP</span>
+
+          <button type="button" class="menu-card-cta">
+            <span class="star-btn-view star-btn-view-default">+ Add</span>
+            <span class="star-btn-view star-btn-view-added" aria-hidden="true">Added &#10003;</span>
+            <span class="star-btn-view star-btn-view-stepper">
+              <span class="card-step-btn" data-card-step="dec" role="button" tabindex="0" aria-label="Decrease quantity">&minus;</span>
+              <span class="card-step-qty">1</span>
+              <span class="card-step-btn" data-card-step="inc" role="button" tabindex="0" aria-label="Increase quantity">+</span>
+            </span>
+          </button>
+        </div>
+      </article>
+    `;
+  }
+
   const menuProductGrid = document.getElementById("menuProductGrid");
   const menuFilterBar = document.getElementById("menuFilterBar");
   const menuFilterWrap = document.getElementById("menuFilterWrap");
   const menuFilterIndicator = document.getElementById("menuFilterIndicator");
   const siteHeaderEl = document.getElementById("siteHeader");
 
-  if (menuProductGrid && menuFilterBar) {
-    const MENU_CATALOG = [
-      // BURGERS (5)
-      {
-        id: "toomy-burger",
-        category: "burgers",
-        theme: "theme-red",
-        badge: "The Original",
-        title: "Toomy Burger",
-        subtitle: "SIGNATURE DOUBLE SMASH",
-        desc: "Double smashed beef patties, crispy onion rings, melted mozzarella sticks, beef bacon, and Toomy's smoky house sauce.",
-        price: 185,
-        image: "assets/products/toomy-burger.webp"
-      },
-      {
-        id: "juicy-jack-burger",
-        category: "burgers",
-        theme: "theme-yellow",
-        badge: "For True Hungry",
-        title: "Juicy Jack Burger",
-        subtitle: "JUICY & SPICY",
-        desc: "Three seared Angus smash patties layered with aged cheddar, caramelized onions, pickles, and seasoned golden fries.",
-        price: 235,
-        image: "assets/products/juicy-jack.png"
-      },
-      {
-        id: "pepperonzi-burger",
-        category: "burgers",
-        theme: "theme-cream",
-        badge: "Just Right",
-        title: "Pizza-Style Smash",
-        subtitle: "ALL-AMERICAN MELT",
-        desc: "Juicy smashed beef patty topped with double American cheddar, crisp lettuce, ripe tomatoes, and tangy diner sauce.",
-        price: 145,
-        image: "assets/products/pepperonzi.png"
-      },
-      {
-        id: "mushroom-swiss-smash",
-        category: "burgers",
-        theme: "theme-red",
-        badge: "Rich & Creamy",
-        title: "Mushroom Swiss Smash",
-        subtitle: "TRUFFLE CREAM GLAZE",
-        desc: "Smashed beef seared to perfection under roasted button mushrooms, melted Swiss cheese, and creamy peppercorn aioli.",
-        price: 195,
-        image: "assets/products/truck.png"
-      },
-      {
-        id: "jalapeno-fire-burger",
-        category: "burgers",
-        theme: "theme-yellow",
-        badge: "Spicy Kick",
-        title: "Jalapeno Fire Burger",
-        subtitle: "HABANERO CHEDDAR",
-        desc: "Flame-seared smash patty stacked with pickled jalapenos, crispy onions, spicy cheese sauce, and chipotle mayo.",
-        price: 175,
-        image: "assets/products/burger-boom.png"
-      },
-
-      // CHICKEN (4)
-      {
-        id: "truck-chicken-sandwich",
-        category: "chicken",
-        theme: "theme-cream",
-        badge: "Crowd Favorite",
-        title: "Truck Chicken Crunch",
-        subtitle: "EXTRA CRISPY FILLET",
-        desc: "Hand-breaded crunchy chicken breast glazed with honey mustard, coleslaw, melted cheddar, and toasted brioche.",
-        price: 160,
-        image: "assets/products/truck-chicken.webp"
-      },
-      {
-        id: "buffalo-chicken-sandwich",
-        category: "chicken",
-        theme: "theme-red",
-        badge: "Hot & Tangy",
-        title: "Buffalo Chicken",
-        subtitle: "SPICY GLAZED BREAST",
-        desc: "Crispy fried chicken fillet tossed in bold Buffalo sauce, cooled with house buttermilk ranch and crunchy pickles.",
-        price: 165,
-        image: "assets/products/buffalo.png"
-      },
-      {
-        id: "ranch-chicken-sandwich",
-        category: "chicken",
-        theme: "theme-yellow",
-        badge: "Sweet & Smoky",
-        title: "Ranch Chicken",
-        subtitle: "BUTTERMILK RANCH GLAZE",
-        desc: "Golden fried chicken breast brushed with sweet hickory BBQ sauce, crispy turkey bacon, and smoked gouda.",
-        price: 170,
-        image: "assets/products/ranch.png"
-      },
-      {
-        id: "chicken-boom-sandwich",
-        category: "chicken",
-        theme: "theme-cream",
-        badge: "Full Feast",
-        title: "Loaded Chicken Box",
-        subtitle: "2 PIECES + SIDES",
-        desc: "Two golden-fried crispy chicken pieces served with seasoned fries, creamy garlic dip, coleslaw, and a warm bun.",
-        price: 190,
-        image: "assets/products/chicken-boom.png"
-      },
-
-      // TENDERS (3)
-      {
-        id: "tenders-meal",
-        category: "tenders",
-        theme: "theme-red",
-        badge: "Best Seller",
-        title: "Tenders Meal",
-        subtitle: "SIZE DIFFERS • 4 / 6 PCS",
-        desc: "Crispy hand-battered chicken tenders, golden fries, toasted brioche buns, and your choice of two signature dips.",
-        price: 175,
-        image: "assets/products/tenders-meal.webp"
-      },
-      {
-        id: "nashville-hot-tenders",
-        category: "tenders",
-        theme: "theme-yellow",
-        badge: "Extra Heat",
-        title: "Nashville Hot Tenders",
-        subtitle: "CAYENNE SPICE DUST",
-        desc: "Crunchy chicken tenders basted in fiery Nashville chili oil, served over Texas toast with dill pickles and ranch.",
-        price: 185,
-        image: "assets/products/tenders-meal.webp"
-      },
-      {
-        id: "honey-mustard-tenders",
-        category: "tenders",
-        theme: "theme-cream",
-        badge: "Just Right",
-        title: "Golden Tenders Trio",
-        subtitle: "3 STRIPS + FRIES",
-        desc: "Three juicy all-white-meat crispy tenders paired with crinkle-cut fries and our house honey mustard sauce.",
-        price: 135,
-        image: "assets/products/tenders-meal.webp"
-      },
-
-      // PIZZA (3)
-      {
-        id: "chicken-popcorn-pizza",
-        category: "pizza",
-        theme: "theme-red",
-        badge: "House Star",
-        title: "Chicken Popcorn Pizza",
-        subtitle: "BUFFALO & RANCH DRIZZLE",
-        desc: "Toomy's signature tomato sauce, stretchy mozzarella, golden fried popcorn chicken, and a rich Buffalo-ranch drizzle.",
-        price: 210,
-        image: "assets/products/pizza-popcorn-buffalo.webp"
-      },
-      {
-        id: "sea-ranch-pizza",
-        category: "pizza",
-        theme: "theme-yellow",
-        badge: "Wood-Fired Style",
-        title: "Sea Ranch Pizza",
-        subtitle: "BUTTERMILK RANCH & SHRIMP",
-        desc: "Tangy BBQ base loaded with crispy chicken chunks, red onions, smoked mozzarella, and fresh cilantro.",
-        price: 205,
-        image: "assets/products/pizza-searanch.png"
-      },
-      {
-        id: "steak-pizza",
-        category: "pizza",
-        theme: "theme-cream",
-        badge: "Cheese Pull",
-        title: "Steak Melt Pizza",
-        subtitle: "JUICY STEAK & MOZZARELLA",
-        desc: "Rich blend of mozzarella, aged cheddar, gouda, and parmesan baked on a hand-stretched golden crust.",
-        price: 185,
-        image: "assets/products/pizza-steak.png"
-      },
-      // BASMATI (2)
-      {
-        id: "basmati-crispy-bowl",
-        category: "basmati",
-        theme: "theme-yellow",
-        badge: "The House Signature",
-        title: "Basmati Crispy Bowl",
-        subtitle: "SPICED GOLDEN RICE",
-        desc: "Fragrant yellow basmati rice topped with sliced crispy chicken tenders, garlic sauce, and toasted almonds.",
-        price: 155,
-        image: "assets/products/basmati-chicken.webp"
-      },
-      {
-        id: "smoky-beef-basmati-bowl",
-        category: "basmati",
-        theme: "theme-cream",
-        badge: "Hearty Bowl",
-        title: "Smoky Beef Basmati Bowl",
-        subtitle: "CHARGRILLED STRIPS",
-        desc: "Aromatic seasoned basmati rice loaded with seared beef strips, roasted peppers, and smoky tahini-garlic drizzle.",
-        price: 170,
-        image: "assets/products/basmati-steak.png"
-      },
-
-      // CRISPY (1)
-      {
-        id: "hot-dog-crispy-roll",
-        category: "crispy",
-        theme: "theme-cream",
-        badge: "Roll Up",
-        title: "Hot Dog Crispy Roll",
-        subtitle: "STACKED & MELTED",
-        desc: "Crispy tortilla wrap packed with grilled hot dog bites, melted mozzarella, cheddar sauce, and fresh veggies.",
-        price: 145,
-        image: "assets/products/crispy-roll.webp"
-      }
-    ];
-
+  if (menuProductGrid && menuFilterBar && SHARED_MENU_LIST.length > 0) {
     const VALID_CATS = ["all", "burgers", "chicken", "tenders", "pizza", "basmati", "crispy"];
 
-    // Update tab counts dynamically
+    // Update category tab counts dynamically from SHARED_MENU_LIST
     VALID_CATS.forEach((cat) => {
       const countEl = menuFilterBar.querySelector(`[data-count-for="${cat}"]`);
       if (countEl) {
         const count =
           cat === "all"
-            ? MENU_CATALOG.length
-            : MENU_CATALOG.filter((item) => item.category === cat).length;
+            ? SHARED_MENU_LIST.length
+            : SHARED_MENU_LIST.filter((item) => item.category === cat).length;
         countEl.textContent = count;
       }
     });
 
-    // Position the sliding red indicator pill behind the active tab
     function moveFilterIndicator(activeTab) {
       if (!menuFilterIndicator || !activeTab) return;
-      const left = activeTab.offsetLeft;
-      const width = activeTab.offsetWidth;
-      menuFilterIndicator.style.width = `${width}px`;
-      menuFilterIndicator.style.transform = `translate3d(${left}px, 0, 0)`;
+      menuFilterIndicator.style.width = `${activeTab.offsetWidth}px`;
+      menuFilterIndicator.style.transform = `translate3d(${activeTab.offsetLeft}px, 0, 0)`;
     }
 
-    // Render cards for the selected category with staggered entrance
     function renderMenuCards(category, animate = true) {
       const filtered =
         category === "all"
-          ? MENU_CATALOG
-          : MENU_CATALOG.filter((item) => item.category === category);
+          ? SHARED_MENU_LIST
+          : SHARED_MENU_LIST.filter((item) => item.category === category);
 
       const buildMarkup = () => {
         menuProductGrid.innerHTML = filtered
-          .map(
-            (item, idx) => `
-          <article
-            class="menu-card ${item.theme}"
-            data-id="${item.id}"
-            data-category="${item.category}"
-            style="--card-stagger: ${idx};"
-          >
-            <div class="menu-card-media">
-              <span class="menu-card-badge">${item.badge}</span>
-
-              <button
-                type="button"
-                class="menu-qv-btn"
-                data-qv-id="${item.id}"
-                aria-label="Quick View ${item.title}"
-              >
-                <span class="menu-qv-icon" aria-hidden="true">&#10530;</span>
-                <span class="menu-qv-label">Quick View</span>
-              </button>
-
-              <img
-                src="${item.image}"
-                alt="${item.title}"
-                class="menu-card-img"
-                loading="lazy"
-                draggable="false"
-              />
-            </div>
-
-            <div class="menu-card-body">
-              <span class="menu-card-sub">${item.subtitle}</span>
-              <h2 class="menu-card-title">${item.title}</h2>
-              <p class="menu-card-desc">${item.desc}</p>
-            </div>
-
-            <div class="menu-card-footer">
-              <span class="menu-card-price">${item.price} EGP</span>
-
-              <button type="button" class="menu-card-cta">
-                <span class="star-btn-view star-btn-view-default">+ Add</span>
-                <span class="star-btn-view star-btn-view-added" aria-hidden="true">Added &#10003;</span>
-                <span class="star-btn-view star-btn-view-stepper">
-                  <span class="card-step-btn" data-card-step="dec" role="button" tabindex="0" aria-label="Decrease quantity">&minus;</span>
-                  <span class="card-step-qty">1</span>
-                  <span class="card-step-btn" data-card-step="inc" role="button" tabindex="0" aria-label="Increase quantity">+</span>
-                </span>
-              </button>
-            </div>
-          </article>
-        `
-          )
+          .map((item, idx) => buildMenuCardHTML(item, idx))
           .join("");
 
-        // Sync live cart quantities onto newly rendered card buttons
         if (typeof syncMenuCardButtons === "function") {
           syncMenuCardButtons();
         }
@@ -1150,7 +981,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Fade & scale out current cards (~150ms), then stagger new cards in (~280ms)
       menuProductGrid.classList.add("is-filtering-out");
       clearTimeout(menuProductGrid._filterTimer);
       menuProductGrid._filterTimer = setTimeout(() => {
@@ -1159,7 +989,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 150);
     }
 
-    // Set active category tab + update URL query (?cat=...) without reload
     function setActiveCategory(cat, { updateUrl = true, animate = true } = {}) {
       const normalized = VALID_CATS.includes(cat) ? cat : "all";
       const tabs = menuFilterBar.querySelectorAll(".menu-filter-tab");
@@ -1186,20 +1015,43 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Tab click delegation
     menuFilterBar.addEventListener("click", (e) => {
       const tab = e.target.closest(".menu-filter-tab");
       if (!tab || tab.classList.contains("is-active")) return;
       setActiveCategory(tab.dataset.cat, { updateUrl: true, animate: true });
     });
 
-    // Keep sliding indicator aligned on window resize / font load
     window.addEventListener("resize", () => {
       const activeTab = menuFilterBar.querySelector(".menu-filter-tab.is-active");
       moveFilterIndicator(activeTab);
     });
 
-    // Initial category from URL (?cat=burgers, etc.)
+    // Clicking anywhere on a Menu Card (body, image, title, or Quick View button) -> product.html?id=<id>
+    // (+ Add button uses e.stopPropagation() so it adds to cart without navigating)
+    // Clicking Quick View opens the modal; clicking the rest of the card navigates to product.html?id=<id>
+    menuProductGrid.addEventListener("click", (e) => {
+      if (e.target.closest(".menu-card-cta, [data-card-step]")) return;
+
+      const qvTrigger = e.target.closest("[data-qv-id]");
+      if (qvTrigger) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof window.openToomysQuickView === "function") {
+          window.openToomysQuickView(qvTrigger.dataset.qvId);
+        }
+        return;
+      }
+
+      const card = e.target.closest(".menu-card");
+      if (!card) return;
+
+      const itemId = card.dataset.id;
+      if (itemId && SHARED_MENU_ITEMS[itemId]) {
+        e.preventDefault();
+        window.location.href = `product.html?id=${encodeURIComponent(itemId)}`;
+      }
+    });
+
     const initialCat =
       new URLSearchParams(window.location.search).get("cat")?.toLowerCase() || "all";
     setActiveCategory(initialCat, { updateUrl: false, animate: false });
@@ -1208,7 +1060,7 @@ document.addEventListener("DOMContentLoaded", () => {
       moveFilterIndicator(activeTab);
     });
 
-    // Scroll-Linked Top Nav Auto-Hide & Sticky Filter Pill Elevation
+    // Scroll-linked header auto-hide & sticky filter elevation
     let lastScrollY = window.scrollY;
     window.addEventListener(
       "scroll",
@@ -1235,80 +1087,341 @@ document.addEventListener("DOMContentLoaded", () => {
       },
       { passive: true }
     );
+  }
+  /* =========================================
+     14B. QUICK-VIEW MODAL CONTROLLER (menu.html & upsell cards)
+     ========================================= */
+  /* =========================================
+     14B. QUICK-VIEW MODAL CONTROLLER (menu.html & product.html)
+     ========================================= */
+  let qvOverlay = document.getElementById("qvOverlay");
+  let qvDialog = document.getElementById("qvDialog");
 
-    // Quick-View Modal Controller
-    const qvBackdrop = document.getElementById("qvBackdrop");
-    const qvModal = document.getElementById("qvModal");
+  if (!qvOverlay && SHARED_MENU_LIST.length > 0) {
+    qvOverlay = document.createElement("div");
+    qvOverlay.className = "qv-overlay";
+    qvOverlay.id = "qvOverlay";
+    qvOverlay.setAttribute("aria-hidden", "true");
+    qvOverlay.innerHTML = `
+      <div class="qv-dialog" id="qvDialog" role="dialog" aria-modal="true" aria-labelledby="qvTitle">
+        <div class="qv-showcase-pane">
+          <span class="qv-badge" id="qvBadge">Try It Now</span>
+          <img src="" alt="" class="qv-image" id="qvImage" draggable="false" />
+        </div>
+        <div class="qv-details-pane">
+          <button type="button" class="qv-close-btn" id="qvCloseBtn" aria-label="Close Quick View">&#10005;</button>
+          <div class="qv-scroll-content">
+            <div class="qv-eyebrow">
+              <span class="qv-eyebrow-dot" aria-hidden="true"></span>
+              <span id="qvCategory">Menu</span>
+            </div>
+            <h2 class="qv-title" id="qvTitle">Product</h2>
+            <p class="qv-subtitle" id="qvSubtitle"></p>
+            <p class="qv-desc" id="qvDesc"></p>
+            <div class="qv-chips-row" id="qvChipsRow" aria-label="Included Items"></div>
+            <div class="qv-options-stack" id="qvOptionsStack"></div>
+          </div>
+          <div class="qv-purchase-row">
+            <div class="qv-qty-stepper" role="group" aria-label="Item Quantity">
+              <button type="button" class="qv-qty-btn" id="qvQtyDec" aria-label="Decrease quantity">&minus;</button>
+              <span class="qv-qty-val" id="qvQtyVal">1</span>
+              <button type="button" class="qv-qty-btn" id="qvQtyInc" aria-label="Increase quantity">+</button>
+            </div>
+            <button type="button" class="qv-add-btn" id="qvAddBtn">
+              <span class="qv-add-label" id="qvAddLabel">Add to Cart</span>
+              <span class="qv-price-badge" id="qvPriceBadge">0 EGP</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(qvOverlay);
+    qvDialog = document.getElementById("qvDialog");
+  }
+
+  if (qvOverlay && qvDialog && SHARED_MENU_LIST.length > 0) {
     const qvCloseBtn = document.getElementById("qvCloseBtn");
-    const qvVisualPane = document.getElementById("qvVisualPane");
     const qvBadge = document.getElementById("qvBadge");
     const qvImage = document.getElementById("qvImage");
-    const qvSubtitle = document.getElementById("qvSubtitle");
+    const qvCategory = document.getElementById("qvCategory");
     const qvTitle = document.getElementById("qvTitle");
+    const qvSubtitle = document.getElementById("qvSubtitle");
     const qvDesc = document.getElementById("qvDesc");
-    const qvPrice = document.getElementById("qvPrice");
+    const qvChipsRow = document.getElementById("qvChipsRow");
+    const qvOptionsStack = document.getElementById("qvOptionsStack");
+    const qvQtyDec = document.getElementById("qvQtyDec");
+    const qvQtyInc = document.getElementById("qvQtyInc");
+    const qvQtyVal = document.getElementById("qvQtyVal");
     const qvAddBtn = document.getElementById("qvAddBtn");
-    let activeQvItem = null;
+    const qvAddLabel = document.getElementById("qvAddLabel");
+    const qvPriceBadge = document.getElementById("qvPriceBadge");
 
-    function openQuickView(item) {
-      if (!item || !qvModal) return;
-      activeQvItem = item;
-      qvVisualPane.className = `qv-visual-pane ${item.theme}`;
-      qvBadge.textContent = item.badge;
-      qvImage.src = item.image;
-      qvImage.alt = item.title;
-      qvSubtitle.textContent = item.subtitle;
-      qvTitle.textContent = item.title;
-      qvDesc.textContent = item.desc;
-      qvPrice.textContent = `${item.price} EGP`;
+    let qvActiveItem = null;
+    let qvSelectedOptions = [];
+    let qvQty = 1;
+    let qvCloseTimer = null;
 
-      qvBackdrop.classList.add("is-open");
-      qvModal.classList.add("is-open");
-      qvModal.setAttribute("aria-hidden", "false");
+    function computeQvUnitPrice() {
+      if (!qvActiveItem) return 0;
+      const deltaSum = (qvActiveItem.optionGroups || []).reduce((sum, group, gIdx) => {
+        const optIdx = qvSelectedOptions[gIdx] ?? 0;
+        const opt = group.options[optIdx];
+        return sum + (opt ? opt.delta : 0);
+      }, 0);
+      return qvActiveItem.basePrice + deltaSum;
+    }
+
+    function updateQvPrice() {
+      const total = computeQvUnitPrice() * qvQty;
+      if (qvPriceBadge) {
+        qvPriceBadge.textContent = `${total.toLocaleString("en-US")} EGP`;
+      }
+    }
+
+    function renderQvOptions() {
+      const groups = qvActiveItem?.optionGroups || [];
+      if (groups.length === 0) {
+        qvOptionsStack.hidden = true;
+        qvOptionsStack.innerHTML = "";
+        return;
+      }
+
+      qvOptionsStack.hidden = false;
+      qvOptionsStack.innerHTML = groups
+        .map((group, gIdx) => {
+          const activeIdx = qvSelectedOptions[gIdx] ?? 0;
+          return `
+            <div class="qv-option-group" data-qv-group="${gIdx}">
+              <span class="qv-option-label">${group.name}</span>
+              <div class="qv-option-pills" role="radiogroup" aria-label="${group.name}">
+                ${group.options
+                  .map((opt, oIdx) => {
+                    const isSelected = oIdx === activeIdx;
+                    const deltaTag =
+                      opt.delta > 0
+                        ? `<span class="qv-option-delta">+${opt.delta}</span>`
+                        : "";
+                    return `
+                      <button
+                        type="button"
+                        class="qv-option-pill${isSelected ? " is-active" : ""}"
+                        data-qv-g="${gIdx}"
+                        data-qv-o="${oIdx}"
+                        role="radio"
+                        aria-checked="${isSelected ? "true" : "false"}"
+                      >
+                        <span>${opt.label}</span>
+                        ${deltaTag}
+                      </button>
+                    `;
+                  })
+                  .join("")}
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function openQuickViewModal(itemId) {
+      const item = SHARED_MENU_ITEMS[itemId];
+      if (!item) return;
+
+      clearTimeout(qvCloseTimer);
+      qvActiveItem = item;
+      qvSelectedOptions = (item.optionGroups || []).map(() => 0);
+      qvQty = 1;
+
+      if (qvBadge) qvBadge.textContent = item.badge;
+      if (qvImage) {
+        qvImage.src = item.image;
+        qvImage.alt = item.title;
+      }
+      if (qvCategory) {
+        qvCategory.textContent = item.categoryLabel || item.category;
+      }
+      if (qvTitle) qvTitle.textContent = item.title;
+      if (qvSubtitle) qvSubtitle.textContent = item.subtitle;
+      if (qvDesc) qvDesc.textContent = item.description;
+
+      const chips = item.includedChips || [];
+      if (chips.length === 0) {
+        qvChipsRow.hidden = true;
+        qvChipsRow.innerHTML = "";
+      } else {
+        qvChipsRow.hidden = false;
+        qvChipsRow.innerHTML = chips
+          .map((chip) => `<span class="qv-chip">${chip}</span>`)
+          .join("");
+      }
+
+      if (qvQtyVal) qvQtyVal.textContent = "1";
+      clearTimeout(qvAddBtn._addedTimer);
+      qvAddBtn.classList.remove("is-added");
+      if (qvAddLabel) qvAddLabel.textContent = "Add to Cart";
+
+      renderQvOptions();
+      updateQvPrice();
+
+      qvOverlay.classList.remove("is-closing");
+      void qvOverlay.offsetWidth;
+      qvOverlay.classList.add("is-open");
+      qvOverlay.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
     }
 
-    function closeQuickView() {
-      if (!qvModal) return;
-      qvBackdrop.classList.remove("is-open");
-      qvModal.classList.remove("is-open");
-      qvModal.setAttribute("aria-hidden", "true");
-      if (
-        !document.body.classList.contains("is-menu-open") &&
-        !document.getElementById("cartDrawer")?.classList.contains("is-open")
-      ) {
-        document.body.style.overflow = "";
-      }
+    function closeQuickViewModal() {
+      if (!qvOverlay.classList.contains("is-open")) return;
+      qvOverlay.classList.add("is-closing");
+      qvOverlay.classList.remove("is-open");
+      qvOverlay.setAttribute("aria-hidden", "true");
+
+      clearTimeout(qvCloseTimer);
+      qvCloseTimer = setTimeout(() => {
+        qvOverlay.classList.remove("is-closing");
+        if (
+          !document.body.classList.contains("is-menu-open") &&
+          !document.getElementById("cartDrawer")?.classList.contains("is-open")
+        ) {
+          document.body.style.overflow = "";
+        }
+      }, 190);
     }
 
-    menuProductGrid.addEventListener("click", (e) => {
-      const qvBtn = e.target.closest("[data-qv-id]");
-      if (!qvBtn) return;
-      const item = MENU_CATALOG.find((entry) => entry.id === qvBtn.dataset.qvId);
-      if (item) openQuickView(item);
-    });
+    window.openToomysQuickView = openQuickViewModal;
 
-    if (qvCloseBtn) qvCloseBtn.addEventListener("click", closeQuickView);
-    if (qvBackdrop) qvBackdrop.addEventListener("click", closeQuickView);
+    // Option selection & live price update
+    qvOptionsStack.addEventListener("click", (e) => {
+      const pill = e.target.closest(".qv-option-pill");
+      if (!pill) return;
 
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && qvModal?.classList.contains("is-open")) {
-        closeQuickView();
+      const gIdx = Number(pill.dataset.qvG);
+      const oIdx = Number(pill.dataset.qvO);
+      if (Number.isNaN(gIdx) || Number.isNaN(oIdx)) return;
+
+      if (qvSelectedOptions[gIdx] === oIdx) return;
+      qvSelectedOptions[gIdx] = oIdx;
+
+      const groupEl = qvOptionsStack.querySelector(`[data-qv-group="${gIdx}"]`);
+      if (groupEl) {
+        groupEl.querySelectorAll(".qv-option-pill").forEach((btn, idx) => {
+          const active = idx === oIdx;
+          btn.classList.toggle("is-active", active);
+          btn.setAttribute("aria-checked", active ? "true" : "false");
+        });
       }
+
+      updateQvPrice();
     });
 
-    if (qvAddBtn) {
-      qvAddBtn.addEventListener("click", () => {
-        if (!activeQvItem) return;
-        const matchingCard = menuProductGrid.querySelector(
-          `.menu-card[data-id="${activeQvItem.id}"] .menu-card-cta`
-        );
-        if (matchingCard) {
-          matchingCard.click();
-        }
-        closeQuickView();
+    // Quantity stepper
+    if (qvQtyDec) {
+      qvQtyDec.addEventListener("click", () => {
+        if (qvQty <= 1) return;
+        qvQty -= 1;
+        qvQtyVal.textContent = qvQty;
+        updateQvPrice();
       });
     }
+
+    if (qvQtyInc) {
+      qvQtyInc.addEventListener("click", () => {
+        qvQty += 1;
+        qvQtyVal.textContent = qvQty;
+        updateQvPrice();
+      });
+    }
+
+    // Add to Cart from Quick View
+    if (qvAddBtn) {
+      qvAddBtn.addEventListener("click", () => {
+        if (!qvActiveItem) return;
+
+        const chosenLabels = (qvActiveItem.optionGroups || [])
+          .map((group, gIdx) => {
+            const opt = group.options[qvSelectedOptions[gIdx] ?? 0];
+            return opt ? opt.label : null;
+          })
+          .filter(Boolean);
+
+        const variantSummary =
+          chosenLabels.length > 0 ? chosenLabels.join(" · ") : "Standard";
+        const unitPrice = computeQvUnitPrice();
+
+        let storedCart = [];
+        try {
+          const parsed = JSON.parse(localStorage.getItem("toomys_cart_v1"));
+          if (Array.isArray(parsed)) storedCart = parsed;
+        } catch {
+          storedCart = [];
+        }
+
+        const existing = storedCart.find(
+          (item) => item.title === qvActiveItem.title && item.sub === variantSummary
+        );
+        if (existing) {
+          existing.qty += qvQty;
+        } else {
+          storedCart.push({
+            title: qvActiveItem.title,
+            price: unitPrice,
+            image: qvActiveItem.image,
+            sub: variantSummary,
+            qty: qvQty
+          });
+        }
+
+        try {
+          localStorage.setItem("toomys_cart_v1", JSON.stringify(storedCart));
+        } catch {
+          // Ignore storage quota errors
+        }
+
+        const totalCount = storedCart.reduce((sum, i) => sum + i.qty, 0);
+        const badgeEl = document.getElementById("cartCountBadge");
+        const toggleEl = document.getElementById("cartToggle");
+        if (badgeEl) {
+          badgeEl.textContent = totalCount;
+          badgeEl.classList.add("has-items");
+          badgeEl.classList.remove("is-bumped");
+          void badgeEl.offsetWidth;
+          badgeEl.classList.add("is-bumped");
+          setTimeout(() => badgeEl.classList.remove("is-bumped"), 320);
+        }
+        if (toggleEl) {
+          toggleEl.classList.add("has-items");
+          toggleEl.classList.remove("is-pulsing");
+          void toggleEl.offsetWidth;
+          toggleEl.classList.add("is-pulsing");
+        }
+
+        window.dispatchEvent(new CustomEvent("toomys:cart-sync"));
+
+        qvAddBtn.classList.add("is-added");
+        if (qvAddLabel) qvAddLabel.textContent = "Added \u2713";
+        clearTimeout(qvAddBtn._addedTimer);
+        qvAddBtn._addedTimer = setTimeout(() => {
+          closeQuickViewModal();
+        }, 550);
+      });
+    }
+
+    // Close triggers: "×" button, backdrop click outside dialog, or Escape key
+    if (qvCloseBtn) {
+      qvCloseBtn.addEventListener("click", closeQuickViewModal);
+    }
+
+    qvOverlay.addEventListener("click", (e) => {
+      if (e.target === qvOverlay) {
+        closeQuickViewModal();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && qvOverlay.classList.contains("is-open")) {
+        closeQuickViewModal();
+      }
+    });
   }
   /* =========================================
      15. CHECKOUT & ORDER CONFIRMATION CONTROLLERS
@@ -1464,19 +1577,19 @@ document.addEventListener("DOMContentLoaded", () => {
         title: "Toomy Burger",
         sub: "Signature Double Smash",
         price: 185,
-        image: "assets/products/toomy-burger.png"
+        image: "assets/products/toomy-burger.webp"
       },
-      "triple-smash-meal": {
-        title: "Triple Smash Meal",
-        sub: "Triple Beef & Fries",
-        price: 235,
-        image: "assets/products/toomy-burger.png"
+      "juicy-jack-burger": {
+        title: "Juicy Jack Burger",
+        sub: "Monterey Jack & Jalapeno",
+        price: 195,
+        image: "assets/products/juicy-jack.png"
       },
-      "chicken-popcorn-pizza": {
-        title: "Chicken Popcorn Pizza",
+      "popcorn-chicken-pizza": {
+        title: "Popcorn Chicken Pizza",
         sub: "Buffalo & Ranch Drizzle",
         price: 210,
-        image: "assets/products/pizza-popcorn-buffalo.png"
+        image: "assets/products/pizza-popcorn-buffalo.webp"
       }
     };
 
@@ -1786,5 +1899,360 @@ document.addEventListener("DOMContentLoaded", () => {
         closeOrdersModal();
       }
     });
+  }
+
+  /* =========================================
+     16. PRODUCT DETAIL PAGE (product.html) DYNAMIC HYDRATION & MOTION
+     ========================================= */
+  const pdpHeroGrid = document.getElementById("pdpHeroGrid");
+
+  if (pdpHeroGrid && SHARED_MENU_LIST.length > 0) {
+    const pdpBadge = document.getElementById("pdpBadge");
+    const pdpImage = document.getElementById("pdpImage");
+    const pdpBackLink = document.getElementById("pdpBackLink");
+    const pdpBackLabel = document.getElementById("pdpBackLabel");
+    const pdpTitle = document.getElementById("pdpTitle");
+    const pdpSubtitle = document.getElementById("pdpSubtitle");
+    const pdpDesc = document.getElementById("pdpDesc");
+    const pdpChipsRow = document.getElementById("pdpChipsRow");
+    const pdpOptionsStack = document.getElementById("pdpOptionsStack");
+    const pdpQtyDec = document.getElementById("pdpQtyDec");
+    const pdpQtyInc = document.getElementById("pdpQtyInc");
+    const pdpQtyVal = document.getElementById("pdpQtyVal");
+    const pdpAddToCartBtn = document.getElementById("pdpAddToCartBtn");
+    const pdpAddLabel = document.getElementById("pdpAddLabel");
+    const pdpLivePriceBadge = document.getElementById("pdpLivePriceBadge");
+    const pdpUpsellSection = document.getElementById("pdpUpsellSection");
+    const pdpUpsellGrid = document.getElementById("pdpUpsellGrid");
+
+    let activeProduct = null;
+    let selectedOptionIndices = [];
+    let currentQty = 1;
+
+    // Replay staggered above-the-fold hero entrance (Showcase 0ms -> Copy 60ms -> Controls 140ms)
+    function playHeroEntrance() {
+      pdpHeroGrid.classList.remove("is-entered");
+      void pdpHeroGrid.offsetWidth;
+      requestAnimationFrame(() => {
+        pdpHeroGrid.classList.add("is-entered");
+      });
+    }
+
+    // Scroll-triggered stagger for "Goes Well With" (threshold: 0.15, once: true)
+    if (pdpUpsellSection) {
+      if ("IntersectionObserver" in window) {
+        const upsellObserver = new IntersectionObserver(
+          (entries, observer) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("is-in-view");
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.15 }
+        );
+        upsellObserver.observe(pdpUpsellSection);
+      } else {
+        pdpUpsellSection.classList.add("is-in-view");
+      }
+    }
+
+    function computeUnitPrice() {
+      if (!activeProduct) return 0;
+      const modifiersTotal = (activeProduct.optionGroups || []).reduce((sum, group, gIdx) => {
+        const chosenIdx = selectedOptionIndices[gIdx] ?? 0;
+        const chosenOption = group.options[chosenIdx];
+        return sum + (chosenOption ? chosenOption.delta : 0);
+      }, 0);
+      return activeProduct.basePrice + modifiersTotal;
+    }
+
+    function updateLivePriceDisplay(shouldPulse = false) {
+      const total = computeUnitPrice() * currentQty;
+      if (pdpLivePriceBadge) {
+        pdpLivePriceBadge.textContent = `${total.toLocaleString("en-US")} EGP`;
+        if (shouldPulse) {
+          pdpLivePriceBadge.classList.remove("is-popped");
+          void pdpLivePriceBadge.offsetWidth;
+          pdpLivePriceBadge.classList.add("is-popped");
+        }
+      }
+    }
+
+    function renderOptionGroups() {
+      const groups = activeProduct.optionGroups || [];
+
+      if (groups.length === 0) {
+        pdpOptionsStack.hidden = true;
+        pdpOptionsStack.innerHTML = "";
+        return;
+      }
+
+      pdpOptionsStack.hidden = false;
+      pdpOptionsStack.innerHTML = groups
+        .map((group, gIdx) => {
+          const activeOptIdx = selectedOptionIndices[gIdx] ?? 0;
+          return `
+            <div class="pdp-option-group" data-group-index="${gIdx}">
+              <span class="pdp-option-label">${group.name}</span>
+              <div class="pdp-option-pills" role="radiogroup" aria-label="${group.name}">
+                ${group.options
+                  .map((opt, oIdx) => {
+                    const isSelected = oIdx === activeOptIdx;
+                    const deltaMarkup =
+                      opt.delta > 0
+                        ? `<span class="pdp-option-delta">+${opt.delta}</span>`
+                        : "";
+                    return `
+                      <button
+                        type="button"
+                        class="pdp-option-pill${isSelected ? " is-active" : ""}"
+                        data-group-idx="${gIdx}"
+                        data-opt-idx="${oIdx}"
+                        role="radio"
+                        aria-checked="${isSelected ? "true" : "false"}"
+                      >
+                        <span>${opt.label}</span>
+                        ${deltaMarkup}
+                      </button>
+                    `;
+                  })
+                  .join("")}
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function renderUpsellSection() {
+      if (!pdpUpsellGrid || !activeProduct) return;
+
+      const recIds = (activeProduct.recommendedIds || [])
+        .filter((recId) => recId !== activeProduct.id && SHARED_MENU_ITEMS[recId])
+        .slice(0, 3);
+
+      const alternatingThemes = ["theme-red", "theme-cream", "theme-yellow"];
+
+      pdpUpsellGrid.innerHTML = recIds
+        .map((recId, idx) =>
+          buildMenuCardHTML(
+            SHARED_MENU_ITEMS[recId],
+            idx,
+            alternatingThemes[idx % alternatingThemes.length]
+          )
+        )
+        .join("");
+
+      if (typeof syncMenuCardButtons === "function") {
+        syncMenuCardButtons();
+      }
+    }
+
+    function loadProductById(productId, { updateUrl = true } = {}) {
+      const target =
+        SHARED_MENU_ITEMS[productId] ||
+        SHARED_MENU_ITEMS["tenders-meal"] ||
+        SHARED_MENU_LIST[0];
+
+      activeProduct = target;
+      selectedOptionIndices = (target.optionGroups || []).map(() => 0);
+      currentQty = 1;
+
+      document.title = `${target.title} — Toomy's | Asyut's Ultimate Burger & Pizza Spot`;
+
+      if (pdpBadge) pdpBadge.textContent = target.badge;
+      if (pdpImage) {
+        pdpImage.src = target.image;
+        pdpImage.alt = target.title;
+      }
+      if (pdpBackLink) {
+        pdpBackLink.href = `menu.html?cat=${encodeURIComponent(target.category)}`;
+      }
+      if (pdpBackLabel) {
+        pdpBackLabel.textContent = `Back to ${target.categoryLabel || target.category}`;
+      }
+      if (pdpTitle) pdpTitle.textContent = target.title;
+      if (pdpSubtitle) pdpSubtitle.textContent = target.subtitle;
+      if (pdpDesc) pdpDesc.textContent = target.description;
+
+      const chips = target.includedChips || [];
+      if (chips.length === 0) {
+        pdpChipsRow.hidden = true;
+        pdpChipsRow.innerHTML = "";
+      } else {
+        pdpChipsRow.hidden = false;
+        pdpChipsRow.innerHTML = chips
+          .map((chip) => `<span class="pdp-chip">${chip}</span>`)
+          .join("");
+      }
+
+      if (pdpQtyVal) pdpQtyVal.textContent = "1";
+      clearTimeout(pdpAddToCartBtn._addedTimer);
+      pdpAddToCartBtn.classList.remove("is-added");
+      if (pdpAddLabel) pdpAddLabel.textContent = "Add to Cart";
+
+      renderOptionGroups();
+      updateLivePriceDisplay(false);
+      renderUpsellSection();
+      playHeroEntrance();
+
+
+      if (updateUrl && window.history && window.history.replaceState) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("id", target.id);
+        window.history.replaceState({ id: target.id }, "", url.toString());
+      }
+    }
+
+    // Option pill selection (200ms transition + subtle price pulse)
+    pdpOptionsStack.addEventListener("click", (e) => {
+      const pill = e.target.closest(".pdp-option-pill");
+      if (!pill) return;
+
+      const gIdx = Number(pill.dataset.groupIdx);
+      const oIdx = Number(pill.dataset.optIdx);
+      if (Number.isNaN(gIdx) || Number.isNaN(oIdx)) return;
+
+      if (selectedOptionIndices[gIdx] === oIdx) return;
+      selectedOptionIndices[gIdx] = oIdx;
+
+      const groupEl = pdpOptionsStack.querySelector(`[data-group-index="${gIdx}"]`);
+      if (groupEl) {
+        groupEl.querySelectorAll(".pdp-option-pill").forEach((btn, idx) => {
+          const active = idx === oIdx;
+          btn.classList.toggle("is-active", active);
+          btn.setAttribute("aria-checked", active ? "true" : "false");
+        });
+      }
+
+      updateLivePriceDisplay(true);
+    });
+
+    // Quantity stepper (- / +)
+    if (pdpQtyDec) {
+      pdpQtyDec.addEventListener("click", () => {
+        if (currentQty <= 1) return;
+        currentQty -= 1;
+        pdpQtyVal.textContent = currentQty;
+        pdpQtyVal.classList.remove("is-popped");
+        void pdpQtyVal.offsetWidth;
+        pdpQtyVal.classList.add("is-popped");
+        updateLivePriceDisplay(true);
+      });
+    }
+
+    if (pdpQtyInc) {
+      pdpQtyInc.addEventListener("click", () => {
+        currentQty += 1;
+        pdpQtyVal.textContent = currentQty;
+        pdpQtyVal.classList.remove("is-popped");
+        void pdpQtyVal.offsetWidth;
+        pdpQtyVal.classList.add("is-popped");
+        updateLivePriceDisplay(true);
+      });
+    }
+
+    // Add to Cart with "Added ✓" feedback & top-right CART pill scale(1.12 -> 1) pop
+    if (pdpAddToCartBtn) {
+      pdpAddToCartBtn.addEventListener("click", () => {
+        if (!activeProduct) return;
+
+        const chosenLabels = (activeProduct.optionGroups || [])
+          .map((group, gIdx) => {
+            const opt = group.options[selectedOptionIndices[gIdx] ?? 0];
+            return opt ? opt.label : null;
+          })
+          .filter(Boolean);
+
+        const variantSummary =
+          chosenLabels.length > 0 ? chosenLabels.join(" · ") : "Standard";
+        const unitPrice = computeUnitPrice();
+
+        let storedCart = [];
+        try {
+          const parsed = JSON.parse(localStorage.getItem("toomys_cart_v1"));
+          if (Array.isArray(parsed)) storedCart = parsed;
+        } catch {
+          storedCart = [];
+        }
+
+        const existing = storedCart.find(
+          (item) => item.title === activeProduct.title && item.sub === variantSummary
+        );
+        if (existing) {
+          existing.qty += currentQty;
+        } else {
+          storedCart.push({
+            title: activeProduct.title,
+            price: unitPrice,
+            image: activeProduct.image,
+            sub: variantSummary,
+            qty: currentQty
+          });
+        }
+
+        try {
+          localStorage.setItem("toomys_cart_v1", JSON.stringify(storedCart));
+        } catch {
+          // Ignore storage quota errors
+        }
+
+        const totalItemsCount = storedCart.reduce((sum, i) => sum + i.qty, 0);
+        const badgeEl = document.getElementById("cartCountBadge");
+        const toggleEl = document.getElementById("cartToggle");
+        if (badgeEl) {
+          badgeEl.textContent = totalItemsCount;
+          badgeEl.classList.add("has-items");
+        }
+        if (toggleEl) {
+          toggleEl.classList.add("has-items");
+          toggleEl.classList.remove("is-pdp-popping");
+          void toggleEl.offsetWidth;
+          toggleEl.classList.add("is-pdp-popping");
+        }
+
+        window.dispatchEvent(new CustomEvent("toomys:cart-sync"));
+
+        pdpAddToCartBtn.classList.add("is-added");
+        if (pdpAddLabel) pdpAddLabel.textContent = "Added \u2713";
+        clearTimeout(pdpAddToCartBtn._addedTimer);
+        pdpAddToCartBtn._addedTimer = setTimeout(() => {
+          pdpAddToCartBtn.classList.remove("is-added");
+          if (pdpAddLabel) pdpAddLabel.textContent = "Add to Cart";
+        }, 1500);
+      });
+    }
+
+    // Clicking any "Goes Well With" card loads that item & replays the staggered hero entrance
+    pdpUpsellGrid.addEventListener("click", (e) => {
+      if (e.target.closest(".menu-card-cta, [data-card-step]")) return;
+
+      const qvTrigger = e.target.closest("[data-qv-id]");
+      if (qvTrigger) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof window.openToomysQuickView === "function") {
+          window.openToomysQuickView(qvTrigger.dataset.qvId);
+        }
+        return;
+      }
+
+      const card = e.target.closest(".menu-card");
+      if (!card) return;
+
+      const nextId = card.dataset.id;
+      if (nextId && SHARED_MENU_ITEMS[nextId]) {
+        e.preventDefault();
+        loadProductById(nextId, { updateUrl: true });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    });
+
+    // Initial page load hydration + staggered entrance
+    const initialProductId =
+      new URLSearchParams(window.location.search).get("id")?.toLowerCase() || "tenders-meal";
+    loadProductById(initialProductId, { updateUrl: false });
   }
 });

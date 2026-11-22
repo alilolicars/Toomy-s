@@ -3418,6 +3418,7 @@ body.is-menu-open .newsletter-top-tint {
   padding: 16px;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
   animation: menuCardEnter 0.28s ease-out both;
   animation-delay: calc(var(--card-stagger, 0) * 32ms);
   transition:
@@ -3748,201 +3749,463 @@ body.is-menu-open .newsletter-top-tint {
   pointer-events: auto;
 }
 
-/* --- 5. Quick-View Product Modal --- */
-.qv-backdrop {
+/* --- 5. Quick-View Product Modal (46% / 54% Split Dialog) --- */
+.qv-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(13, 11, 10, 0.56);
+  z-index: 160;
+  background-color: rgba(20, 16, 14, 0.58);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  z-index: 160;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.qv-backdrop.is-open {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-.qv-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -48%) scale(0.95);
-  width: min(740px, 92vw);
-  background-color: #faf6f0;
-  color: #1e1815;
-  border-radius: 28px;
-  box-shadow: 0 28px 64px rgba(13, 11, 10, 0.36);
-  z-index: 170;
   display: grid;
-  grid-template-columns: 1fr 1.1fr;
-  overflow: hidden;
+  place-items: center;
+  padding: 24px;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   transition:
-    opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-    visibility 0.3s ease;
+    opacity 200ms ease-out,
+    visibility 200ms ease-out;
 }
 
-.qv-modal.is-open {
+.qv-overlay.is-open {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-  transform: translate(-50%, -50%) scale(1);
 }
 
+.qv-overlay.is-closing {
+  opacity: 0;
+  transition:
+    opacity 180ms ease-in,
+    visibility 180ms ease-in;
+}
+
+.qv-dialog {
+  width: 100%;
+  max-width: 860px;
+  min-height: 440px;
+  max-height: calc(100vh - 48px);
+  max-height: calc(100svh - 48px);
+  border-radius: 28px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 46% 54%;
+  box-shadow: 0 28px 64px rgba(20, 16, 14, 0.35);
+  opacity: 0;
+  transform: scale(0.95) translate3d(0, 10px, 0);
+  will-change: transform, opacity;
+  transition:
+    opacity 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.qv-overlay.is-open .qv-dialog {
+  opacity: 1;
+  transform: scale(1) translate3d(0, 0, 0);
+}
+
+.qv-overlay.is-closing .qv-dialog {
+  opacity: 0;
+  transform: scale(0.96) translate3d(0, 0, 0);
+  transition:
+    opacity 180ms ease-in,
+    transform 180ms ease-in;
+}
+
+/* Left Column: Product Image Showcase (46% Width) */
+.qv-showcase-pane {
+  position: relative;
+  background-color: #eadbc8;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.qv-badge {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 2;
+  background-color: #1e1815;
+  color: #ffffff;
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  padding: 6px 14px;
+  border-radius: 9999px;
+}
+
+.qv-image {
+  width: 85%;
+  max-width: 310px;
+  height: auto;
+  max-height: 340px;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 26px rgba(30, 24, 21, 0.18));
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Right Column: Details, Options & Purchase Controls (54% Width) */
+.qv-details-pane {
+  position: relative;
+  background-color: #faf5ee;
+  color: #1e1815;
+  padding: 36px 36px 32px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(30, 24, 21, 0.18) transparent;
+}
+
+.qv-details-pane::-webkit-scrollbar {
+  width: 4px;
+}
+
+.qv-details-pane::-webkit-scrollbar-thumb {
+  background-color: rgba(30, 24, 21, 0.18);
+  border-radius: 999px;
+}
+
+/* Top-Right Close Button (36x36 circle -> #1E1815 inversion on hover) */
 .qv-close-btn {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 18px;
+  right: 18px;
+  z-index: 4;
   width: 36px;
   height: 36px;
   border-radius: 50%;
   border: none;
-  background-color: rgba(255, 255, 255, 0.92);
+  background-color: #efe7dc;
   color: #1e1815;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 4;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  transition: transform 0.25s var(--ease-out-expo), background-color 0.2s ease;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
 }
 
 .qv-close-btn:hover {
   background-color: #1e1815;
   color: #ffffff;
-  transform: rotate(90deg);
 }
 
-.qv-visual-pane {
-  position: relative;
-  background-color: #e3262e;
-  padding: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 290px;
-}
-
-.qv-visual-pane.theme-yellow {
-  background-color: #f5b727;
-}
-
-.qv-visual-pane.theme-cream {
-  background-color: #f3ece1;
-}
-
-.qv-badge {
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  background-color: #1e1815;
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 5px 12px;
-  border-radius: 9999px;
-}
-
-.qv-image {
-  width: 88%;
-  max-height: 230px;
-  object-fit: contain;
-  filter: drop-shadow(0 18px 26px rgba(13, 11, 10, 0.3));
-}
-
-.qv-details-pane {
-  padding: 32px 30px;
+.qv-scroll-content {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  text-align: left;
+  align-items: flex-start;
+  padding-right: 24px;
 }
 
-.qv-subtitle {
-  font-size: 11px;
+/* 1. Category Eyebrow */
+.qv-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 12px;
   font-weight: 800;
+  color: #e3262e;
+  margin-bottom: 4px;
+}
+
+.qv-eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #e3262e;
+  flex-shrink: 0;
+}
+
+/* 2. Product Title */
+.qv-title {
+  font-family: "Rubik", "Plus Jakarta Sans", sans-serif;
+  font-size: clamp(28px, 2.6vw, 36px);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: #1e1815;
+}
+
+/* 3. Uppercase Tracked Subtitle */
+.qv-subtitle {
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #e3262e;
+  margin: 4px 0 12px;
 }
 
-.qv-title {
-  font-family: "Fredoka", "Plus Jakarta Sans", sans-serif;
-  font-size: 28px;
-  font-weight: 700;
-  line-height: 1.15;
-  color: #1e1815;
-  margin-top: 6px;
-}
-
+/* 4. Product Description */
 .qv-desc {
-  font-size: 14px;
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 13.5px;
   font-weight: 500;
-  line-height: 1.6;
-  color: #6e655f;
-  margin-top: 12px;
+  line-height: 1.5;
+  color: #5a504a;
+  margin-bottom: 16px;
 }
 
-.qv-footer {
-  margin-top: 24px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(30, 24, 21, 0.1);
+/* 5. Included-Items Ingredient Chips */
+.qv-chips-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.qv-chips-row[hidden] {
+  display: none !important;
+}
+
+.qv-chip {
+  background-color: #f2eae0;
+  border: 1px solid rgba(30, 24, 21, 0.08);
+  border-radius: 9999px;
+  padding: 5px 12px;
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #4a413c;
+}
+.qv-backdrop,
+.qv-modal {
+  display: none !important;
+}
+
+/* 6. Option Selector Group(s) */
+.qv-options-stack {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
 }
 
-.qv-price-block {
+.qv-options-stack[hidden] {
+  display: none !important;
+}
+
+.qv-option-group {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
 }
 
-.qv-price-label {
-  font-size: 11px;
+.qv-option-label {
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 13px;
+  font-weight: 800;
+  color: #1e1815;
+  margin-bottom: 8px;
+}
+
+.qv-option-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.qv-option-pill {
+  background-color: #ffffff;
+  border: 1px solid rgba(30, 24, 21, 0.12);
+  color: #1e1815;
+  border-radius: 9999px;
+  padding: 8px 16px;
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    transform 140ms ease;
+}
+
+.qv-option-pill:hover:not(.is-active) {
+  border-color: rgba(30, 24, 21, 0.35);
+}
+
+.qv-option-pill:active {
+  transform: scale(0.97);
+}
+
+.qv-option-pill.is-active {
+  background-color: #1e1815;
+  border-color: #1e1815;
+  color: #ffffff;
+}
+
+.qv-option-delta {
+  font-size: 11.5px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #6e655f;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.72;
 }
 
-.qv-price {
-  font-size: 22px;
+.qv-option-pill.is-active .qv-option-delta {
+  color: #f5b727;
+  opacity: 1;
+}
+
+/* Bottom Purchase Row */
+.qv-purchase-row {
+  margin-top: auto;
+  padding-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.qv-qty-stepper {
+  height: 48px;
+  background-color: #ffffff;
+  border-radius: 9999px;
+  padding: 0 8px;
+  border: 1px solid rgba(30, 24, 21, 0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.qv-qty-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+  color: #1e1815;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    transform 140ms ease;
+}
+
+.qv-qty-btn:hover {
+  background-color: #f3ece1;
+}
+
+.qv-qty-btn:active {
+  transform: scale(0.92);
+}
+
+.qv-qty-val {
+  min-width: 18px;
+  text-align: center;
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 14.5px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: #1e1815;
 }
 
 .qv-add-btn {
-  height: 44px;
-  padding: 0 24px;
+  flex: 1;
+  height: 48px;
   border: none;
   border-radius: 9999px;
   background-color: #e3262e;
   color: #ffffff;
+  padding: 6px 8px 6px 20px;
   font-family: "Plus Jakarta Sans", var(--font-body);
   font-size: 13.5px;
   font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(227, 38, 46, 0.28);
-  transition: transform 0.22s ease, background-color 0.2s ease;
+  box-shadow: 0 10px 22px rgba(227, 38, 46, 0.24);
+  transition:
+    background-color 180ms ease,
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 180ms ease;
 }
 
 .qv-add-btn:hover {
-  background-color: #c91e26;
-  transform: translateY(-2px);
+  background-color: #d11f27;
+  transform: translateY(-1px);
+  box-shadow: 0 13px 26px rgba(227, 38, 46, 0.32);
+}
+
+.qv-add-btn:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.qv-add-btn.is-added {
+  background-color: #246b35;
+  box-shadow: 0 10px 22px rgba(36, 107, 53, 0.3);
+}
+
+.qv-price-badge {
+  background-color: #ffffff;
+  color: #e3262e;
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  line-height: 1.1;
+  white-space: nowrap;
+  transition: color 180ms ease;
+}
+
+.qv-add-btn.is-added .qv-price-badge {
+  color: #246b35;
+}
+
+@media (max-width: 780px) {
+  .qv-overlay {
+    padding: 16px;
+  }
+
+  .qv-dialog {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .qv-showcase-pane {
+    padding: 24px 20px;
+    min-height: 210px;
+  }
+
+  .qv-image {
+    width: 65%;
+    max-width: 210px;
+    max-height: 180px;
+  }
+
+  .qv-details-pane {
+    padding: 24px 22px 22px;
+  }
 }
 
 /* --- Responsive Grid Breakpoints --- */
@@ -5379,5 +5642,641 @@ body.is-menu-open .newsletter-top-tint {
     grid-template-columns: 1fr;
     max-width: 360px;
     margin: 0 auto;
+  }
+}
+
+/* =========================================
+   16. PRODUCT DETAIL PAGE (product.html)
+   ========================================= */
+.product-page-body {
+  background-color: #f5efe6;
+  color: #1e1815;
+  font-family: "Plus Jakarta Sans", var(--font-body);
+}
+
+/* Keep "+ MENU" crisp dark ink against the #F5EFE6 warm cream canvas */
+.product-page-body:not(.is-menu-open):not(.is-over-footer) .menu-toggle {
+  color: #1e1815;
+}
+
+.product-page-body:not(.is-menu-open):not(.is-over-footer) .menu-toggle:hover {
+  background-color: rgba(30, 24, 21, 0.07);
+}
+
+.product-page-body.is-over-footer:not(.is-menu-open) .menu-toggle {
+  color: #f8f5f0;
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.pdp-main {
+  width: 100%;
+  background-color: #f5efe6;
+  padding: clamp(98px, 12vh, 130px) clamp(1.25rem, 4vw, 3rem) clamp(64px, 8vh, 96px);
+}
+
+.pdp-shell {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* --- 1. Staggered Page-Load Entrance Keyframes (Above the Fold) --- */
+@keyframes pdpHeroRiseIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes pdpShowcaseImageScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* --- Top 2-Column Hero Split (max-width: 1280px, gap: 48px) --- */
+.pdp-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.06fr);
+  gap: 48px;
+  align-items: center;
+}
+
+/* Initial hidden state before .is-entered triggers */
+.pdp-hero-grid:not(.is-entered) .pdp-showcase-card,
+.pdp-hero-grid:not(.is-entered) .pdp-copy-group,
+.pdp-hero-grid:not(.is-entered) .pdp-controls-group {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+}
+
+.pdp-hero-grid:not(.is-entered) .pdp-showcase-img {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+/* 1A. Left Showcase Card (0ms delay, 340ms duration) */
+.pdp-hero-grid.is-entered .pdp-showcase-card {
+  animation: pdpHeroRiseIn 340ms cubic-bezier(0.22, 1, 0.36, 1) 0ms both;
+}
+
+/* Centered food tray image scales gently 0.95 -> 1 over 400ms */
+.pdp-hero-grid.is-entered .pdp-showcase-img {
+  animation: pdpShowcaseImageScale 400ms cubic-bezier(0.22, 1, 0.36, 1) 0ms both;
+}
+
+/* 1B. Right Column Copy Group (60ms delay, 300ms duration) */
+.pdp-hero-grid.is-entered .pdp-copy-group {
+  animation: pdpHeroRiseIn 300ms cubic-bezier(0.22, 1, 0.36, 1) 60ms both;
+}
+
+/* 1C. Customization Options & Purchase Row (140ms delay, 320ms duration) */
+.pdp-hero-grid.is-entered .pdp-controls-group {
+  animation: pdpHeroRiseIn 320ms cubic-bezier(0.22, 1, 0.36, 1) 140ms both;
+}
+
+/* Left Column: Warm Sand Showcase Card */
+.pdp-showcase-card {
+  position: relative;
+  width: 100%;
+  min-height: 480px;
+  border-radius: 32px;
+  background: linear-gradient(145deg, #eadbc8, #dfccb5);
+  border: 1px solid rgba(30, 24, 21, 0.06);
+  box-shadow:
+    0 20px 44px rgba(30, 24, 21, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  padding: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  will-change: transform, opacity;
+}
+
+.pdp-showcase-badge {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 2;
+  background-color: #1e1815;
+  color: #ffffff;
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 6px 15px;
+  border-radius: 9999px;
+  box-shadow: 0 6px 16px rgba(30, 24, 21, 0.16);
+}
+
+.pdp-showcase-media {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pdp-showcase-img {
+  width: min(86%, 430px);
+  max-height: 390px;
+  object-fit: contain;
+  filter: drop-shadow(0 24px 34px rgba(30, 24, 21, 0.24));
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  user-select: none;
+  will-change: transform, opacity;
+}
+
+.pdp-showcase-card:hover .pdp-showcase-img {
+  transform: scale(1.035) translateY(-4px);
+}
+
+/* Right Column: Product Copy, Ingredient Chips, Option Groups & Purchase Row */
+.pdp-info-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.pdp-copy-group,
+.pdp-controls-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  will-change: transform, opacity;
+}
+
+/* 3A. Breadcrumb Link (<- arrow shifts -3px left over 180ms ease on hover) */
+.pdp-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #e3262e;
+  text-decoration: none;
+  margin-bottom: 14px;
+}
+
+.pdp-back-arrow {
+  display: inline-block;
+  transition: transform 180ms ease;
+}
+
+.pdp-back-link:hover .pdp-back-arrow {
+  transform: translateX(-3px);
+}
+
+/* Massive Bold Red Product Title, Subtitle & Description */
+.pdp-title {
+  font-family: "Fredoka", "Rubik", sans-serif;
+  font-size: clamp(3.1rem, 4.8vw, 4.25rem);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  color: #e3262e;
+}
+
+.pdp-subtitle {
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6e655f;
+  margin-top: 10px;
+}
+
+.pdp-desc {
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+  color: #3a322d;
+  max-width: 540px;
+  margin-top: 12px;
+}
+
+/* Translucent Cream Ingredient Chips */
+.pdp-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.pdp-chips-row[hidden] {
+  display: none !important;
+}
+
+.pdp-chip {
+  background-color: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(30, 24, 21, 0.08);
+  color: #1e1815;
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 6px 13px;
+  border-radius: 9999px;
+}
+
+/* 3B. Dynamically Rendered Option Groups & Tactile Pills */
+.pdp-options-stack {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.pdp-options-stack[hidden] {
+  display: none !important;
+}
+
+.pdp-option-group {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.pdp-option-label {
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 14px;
+  font-weight: 800;
+  color: #1e1815;
+}
+
+.pdp-option-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pdp-option-pill {
+  background-color: #ffffff;
+  color: #1e1815;
+  border: 1px solid rgba(30, 24, 21, 0.08);
+  border-radius: 9999px;
+  padding: 9px 16px;
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(30, 24, 21, 0.04);
+  transition:
+    background-color 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pdp-option-pill:hover:not(.is-active) {
+  border-color: rgba(30, 24, 21, 0.24);
+  transform: translateY(-1px);
+}
+
+.pdp-option-pill:active {
+  transform: scale(0.97);
+}
+
+.pdp-option-pill.is-active {
+  background-color: #1e1815;
+  color: #ffffff;
+  border-color: #1e1815;
+  box-shadow: 0 6px 16px rgba(30, 24, 21, 0.16);
+}
+
+.pdp-option-delta {
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.68;
+}
+
+.pdp-option-pill.is-active .pdp-option-delta {
+  color: #f5b727;
+  opacity: 1;
+}
+
+/* 3C & 3D. Purchase Row: White Quantity Stepper + Red Add to Cart Pill */
+.pdp-purchase-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.pdp-qty-stepper {
+  height: 52px;
+  background-color: #ffffff;
+  border: 1px solid rgba(30, 24, 21, 0.08);
+  border-radius: 9999px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 6px 18px rgba(30, 24, 21, 0.05);
+}
+
+.pdp-qty-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+  color: #1e1815;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pdp-qty-btn:hover {
+  background-color: #f3ece1;
+  color: #1e1815;
+}
+
+.pdp-qty-btn:active {
+  transform: scale(0.92);
+}
+
+.pdp-qty-val {
+  min-width: 22px;
+  text-align: center;
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 16px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #1e1815;
+  display: inline-block;
+}
+
+.pdp-qty-val.is-popped {
+  animation: qtyNumPop 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pdp-add-btn {
+  height: 52px;
+  background-color: #e3262e;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 8px 8px 8px 24px;
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 15px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(227, 38, 46, 0.24);
+  transition:
+    background-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pdp-add-btn:hover {
+  background-color: #d42028;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(227, 38, 46, 0.32);
+}
+
+.pdp-add-btn:active {
+  transform: translateY(0) scale(0.985);
+  transition-duration: 120ms;
+  transition-timing-function: ease-out;
+}
+
+.pdp-add-btn.is-added {
+  background-color: #246b35;
+  box-shadow: 0 10px 24px rgba(36, 107, 53, 0.3);
+}
+
+/* Inner White Price Pill + Subtle Scale Pulse (1.06 -> 1) on Recalculation */
+@keyframes pdpPriceBadgePulse {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pdp-add-price-badge {
+  background-color: #ffffff;
+  color: #e3262e;
+  font-size: 13.5px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  padding: 7px 14px;
+  border-radius: 9999px;
+  line-height: 1.1;
+  display: inline-block;
+  transition: color 200ms ease;
+}
+
+.pdp-add-btn.is-added .pdp-add-price-badge {
+  color: #246b35;
+}
+
+.pdp-add-price-badge.is-popped {
+  animation: pdpPriceBadgePulse 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Nav CART Pill Scale Pop (1.12 -> 1) when adding from PDP */
+@keyframes pdpCartNavPop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.cart-toggle.is-pdp-popping {
+  animation: pdpCartNavPop 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* --- Thin Horizontal Divider --- */
+.pdp-section-divider {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(30, 24, 21, 0.1);
+  margin: clamp(44px, 6vh, 64px) 0 clamp(36px, 5vh, 52px);
+}
+
+/* --- 2. Below-Fold "Goes Well With" Section (IntersectionObserver Reveal) --- */
+@keyframes pdpUpsellHeaderRise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes pdpUpsellCardRise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.pdp-upsell-header {
+  text-align: left;
+  margin-bottom: 24px;
+}
+
+/* Hidden prior to IntersectionObserver trigger */
+.pdp-upsell-section:not(.is-in-view) .pdp-upsell-header {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+}
+
+.pdp-upsell-section:not(.is-in-view) .pdp-upsell-grid .menu-card {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  animation: none;
+}
+
+/* Header rises up at 0ms delay over 280ms */
+.pdp-upsell-section.is-in-view .pdp-upsell-header {
+  animation: pdpUpsellHeaderRise 280ms cubic-bezier(0.22, 1, 0.36, 1) 0ms both;
+}
+
+/* 3 Recommendation Cards stagger at 80ms, 160ms, 240ms over 320ms */
+.pdp-upsell-section.is-in-view .pdp-upsell-grid .menu-card {
+  animation: pdpUpsellCardRise 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc((var(--card-stagger, 0) + 1) * 80ms);
+}
+
+.pdp-upsell-eyebrow {
+  font-family: "Plus Jakarta Sans", var(--font-body);
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #e3262e;
+  margin-bottom: 4px;
+}
+
+.pdp-upsell-title {
+  font-family: "Fredoka", "Rubik", sans-serif;
+  font-size: clamp(1.9rem, 3vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #1e1815;
+}
+
+/* 3-Column Alternating Red / Cream / Yellow Cards */
+.pdp-upsell-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+/* 3E. Goes Well With Card Hover Choreography (280ms cubic-bezier(0.22, 1, 0.36, 1)) */
+.pdp-upsell-grid .menu-card {
+  transition:
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pdp-upsell-grid .menu-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(30, 24, 21, 0.12);
+}
+
+.pdp-upsell-grid .menu-card .menu-card-img {
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pdp-upsell-grid .menu-card:hover .menu-card-img {
+  transform: scale(1.05);
+}
+
+.pdp-upsell-grid .menu-card .menu-qv-btn {
+  transition:
+    max-width 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pdp-upsell-grid .menu-card .menu-qv-label {
+  transition: opacity 240ms cubic-bezier(0.22, 1, 0.36, 1) 40ms;
+}
+
+.pdp-upsell-grid .menu-card-cta {
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 180ms ease,
+    background-color 220ms ease,
+    min-width 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pdp-upsell-grid .menu-card-cta:not(.is-added):not(.is-in-cart):hover {
+  transform: scale(1.04);
+}
+
+.pdp-upsell-grid .menu-card-cta:not(.is-added):not(.is-in-cart):active {
+  transform: scale(0.97);
+}
+
+
+@media (max-width: 960px) {
+  .pdp-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .pdp-showcase-card {
+    min-height: 340px;
+    padding: 28px;
+  }
+
+  .pdp-upsell-grid {
+    grid-template-columns: 1fr;
   }
 }
