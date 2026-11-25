@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Subscribe to Newsletter — Toomy's | Asyut's Ultimate Burger &amp; Pizza Spot</title>
+  <title>Contact Us — Toomy's | Asyut's Ultimate Burger &amp; Pizza Spot</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,8 +12,10 @@
     href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cormorant+Garamond:wght@400;500;600&family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Rubik:wght@700;800;900&display=swap"
     rel="stylesheet"
   />
-  <link href="https://fonts.googleapis.com/css2?family=Yellowtail&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Marhey:wght@600;700&family=Yellowtail&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/rtl.css" />
+  <script src="js/i18n.js"></script>
 </head>
 <body class="newsletter-page-body">
 
@@ -70,7 +72,323 @@
     </div>
   </div>
 
-  <!-- 3. NEWSLETTER 100VH WARM CREAM STAGE -->
+  <!-- 3. CONTACT / FIND US SECTION (first) -->
+  <section class="contact-section contact-section--first" id="contactInfo" aria-labelledby="contactHeading">
+    <div class="contact-inner">
+      <header class="contact-head js-soft-reveal">
+        <h2 class="contact-title" id="contactHeading">Call us, text us,<br />or just come by.</h2>
+        <p class="contact-lede">We pick up fast, and the grill is on every day from 2 PM till 2 AM.</p>
+      </header>
+
+      <div class="contact-grid">
+        <!-- Interactive tablet (iOS-style) -->
+        <div class="tablet-stage js-soft-reveal" style="--reveal-delay: 2">
+          <div class="tablet" id="contactTablet">
+            <div class="tablet-bezel">
+              <span class="tablet-camera" aria-hidden="true"></span>
+
+              <div class="tablet-screen" data-active-app="home">
+                <div class="ios">
+                  <!-- Status bar -->
+                  <div class="ios-statusbar" aria-hidden="true">
+                    <span class="ios-sb-time" data-ios-time>2:00</span>
+                    <span class="ios-sb-date" data-ios-date></span>
+                    <span class="ios-sb-icons">
+                      <svg viewBox="0 0 20 14" class="ios-sb-wifi"><path d="M10 13.5l2.6-3.2a4 4 0 0 0-5.2 0L10 13.5zM4.9 7.4l1.4 1.7a5.8 5.8 0 0 1 7.4 0l1.4-1.7a8 8 0 0 0-10.2 0zM1.6 3.4l1.4 1.7a10.9 10.9 0 0 1 14 0l1.4-1.7a13.1 13.1 0 0 0-16.8 0z" fill="currentColor"/></svg>
+                      <span class="ios-sb-battery"><span></span></span>
+                    </span>
+                  </div>
+
+                  <!-- ========== HOME SCREEN ========== -->
+                  <section class="ios-view ios-home" data-view="home" aria-label="Tablet home screen">
+                    <div class="ios-widgets">
+                      <div class="ios-widget ios-widget-hours">
+                        <span class="ios-w-eyebrow">Toomy's</span>
+                        <span class="ios-w-status" data-open-status>
+                          <span class="ios-w-dot" aria-hidden="true"></span>
+                          <span class="ios-w-status-text" data-open-status-text>Open now</span>
+                        </span>
+                        <span class="ios-w-big">2 PM – 2 AM</span>
+                        <span class="ios-w-sub">Every day</span>
+                      </div>
+
+                      <button type="button" class="ios-widget ios-widget-map" data-open-app="maps">
+                        <span class="ios-mini-map" aria-hidden="true">
+                          <span class="ios-mini-road r1"></span>
+                          <span class="ios-mini-road r2"></span>
+                          <span class="ios-mini-road r3"></span>
+                          <span class="ios-mini-pin"></span>
+                        </span>
+                        <span class="ios-w-map-label">
+                          <span class="ios-w-map-title">Abrag El Nasr</span>
+                          <span class="ios-w-map-sub">Next to Kheir Zaman</span>
+                        </span>
+                      </button>
+                    </div>
+
+                    <div class="ios-app-grid">
+                      <button type="button" class="ios-app" data-open-app="maps">
+                        <span class="ios-icon ios-icon-maps" aria-hidden="true">
+                          <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" fill="currentColor"/></svg>
+                        </span>
+                        <span class="ios-app-label">Maps</span>
+                      </button>
+
+                      <button type="button" class="ios-app" data-open-app="contact">
+                        <span class="ios-icon ios-icon-contacts" aria-hidden="true">
+                          <svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4" fill="currentColor"/><path d="M4 20.5c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" fill="currentColor"/></svg>
+                        </span>
+                        <span class="ios-app-label">Contacts</span>
+                      </button>
+
+                      <a href="tel:+201040078750" class="ios-app">
+                        <span class="ios-icon ios-icon-phone" aria-hidden="true">
+                          <svg viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" fill="currentColor"/></svg>
+                        </span>
+                        <span class="ios-app-label">Call</span>
+                      </a>
+
+                      <a href="https://wa.me/201040078750" target="_blank" rel="noopener" data-open-app="chat" class="ios-app">
+                        <span class="ios-icon ios-icon-whatsapp" aria-hidden="true">
+                          <svg viewBox="0 0 24 24"><path d="M12 2.5a9.4 9.4 0 0 0-8.1 14.2L2.6 21.4l4.8-1.3A9.4 9.4 0 1 0 12 2.5zm5.4 13.2c-.2.6-1.3 1.2-1.8 1.3-.5 0-1 .3-3.4-.7-2.9-1.2-4.7-4.1-4.8-4.3-.1-.2-1.2-1.6-1.2-3s.8-2.2 1-2.5c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.3.5-.4.5c-.2.2-.3.3-.1.6.2.3.8 1.4 1.8 2.2 1.2 1.1 2.2 1.4 2.5 1.6.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.3z" fill="currentColor"/></svg>
+                        </span>
+                        <span class="ios-app-label">WhatsApp</span>
+                      </a>
+
+                      <a href="https://www.instagram.com/toomyseg" target="_blank" rel="noopener" class="ios-app">
+                        <span class="ios-icon ios-icon-instagram" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
+                        </span>
+                        <span class="ios-app-label">Instagram</span>
+                      </a>
+
+                      <a href="https://www.facebook.com/toomyseg" target="_blank" rel="noopener" class="ios-app">
+                        <span class="ios-icon ios-icon-facebook" aria-hidden="true">
+                          <svg viewBox="0 0 24 24"><path d="M13.5 21v-7.5H16l.4-3h-2.9V8.6c0-.9.3-1.4 1.5-1.4h1.5V4.5c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2.3H8v3h2.6V21h2.9z" fill="currentColor"/></svg>
+                        </span>
+                        <span class="ios-app-label">Facebook</span>
+                      </a>
+
+                      <a href="menu.html" class="ios-app">
+                        <span class="ios-icon ios-icon-menu" aria-hidden="true">
+                          <img src="assets/logo-small.webp" alt="" loading="lazy" decoding="async" />
+                        </span>
+                        <span class="ios-app-label">Menu</span>
+                      </a>
+                    </div>
+
+                    <div class="ios-dock">
+                      <a href="tel:+201040078750" class="ios-app ios-dock-app" aria-label="Call Toomy's">
+                        <span class="ios-icon ios-icon-phone" aria-hidden="true">
+                          <svg viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" fill="currentColor"/></svg>
+                        </span>
+                      </a>
+                      <button type="button" class="ios-app ios-dock-app" data-open-app="maps" aria-label="Open Maps">
+                        <span class="ios-icon ios-icon-maps" aria-hidden="true">
+                          <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" fill="currentColor"/></svg>
+                        </span>
+                      </button>
+                      <button type="button" class="ios-app ios-dock-app" data-open-app="contact" aria-label="Open Contact card">
+                        <span class="ios-icon ios-icon-contacts" aria-hidden="true">
+                          <svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4" fill="currentColor"/><path d="M4 20.5c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" fill="currentColor"/></svg>
+                        </span>
+                      </button>
+                      <a href="https://wa.me/201040078750" target="_blank" rel="noopener" data-open-app="chat" class="ios-app ios-dock-app" aria-label="WhatsApp Toomy's">
+                        <span class="ios-icon ios-icon-whatsapp" aria-hidden="true">
+                          <svg viewBox="0 0 24 24"><path d="M12 2.5a9.4 9.4 0 0 0-8.1 14.2L2.6 21.4l4.8-1.3A9.4 9.4 0 1 0 12 2.5zm5.4 13.2c-.2.6-1.3 1.2-1.8 1.3-.5 0-1 .3-3.4-.7-2.9-1.2-4.7-4.1-4.8-4.3-.1-.2-1.2-1.6-1.2-3s.8-2.2 1-2.5c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.3.5-.4.5c-.2.2-.3.3-.1.6.2.3.8 1.4 1.8 2.2 1.2 1.1 2.2 1.4 2.5 1.6.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.3z" fill="currentColor"/></svg>
+                        </span>
+                      </a>
+                    </div>
+                  </section>
+
+                  <!-- ========== MAPS APP ========== -->
+                  <section class="ios-view ios-maps" data-view="maps" aria-label="Maps" inert>
+                    <iframe
+                      class="ios-maps-frame"
+                      title="Toomy's location on the map — Abrag El Nasr, Asyut"
+                      data-src="https://www.google.com/maps?q=27.18261,31.18335&amp;z=17&amp;output=embed"
+                      referrerpolicy="no-referrer-when-downgrade"
+                    ></iframe>
+
+                    <div class="ios-maps-panel" data-sheet="full">
+                      <button type="button" class="ios-grabber" data-sheet-toggle aria-label="Show fewer details"></button>
+
+                      <div class="ios-place-head">
+                        <div>
+                          <h3 class="ios-place-name">Toomy's</h3>
+                          <p class="ios-place-kind">Burgers &amp; Pizza · Abrag El Nasr</p>
+                        </div>
+                        <button type="button" class="ios-close" data-go-home aria-label="Close Maps">&#10005;</button>
+                      </div>
+
+                      <div class="ios-place-actions">
+                        <a href="https://www.google.com/maps/dir/?api=1&amp;destination=27.18261,31.18335" target="_blank" rel="noopener" class="ios-action ios-action-primary">
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8-8-2z" fill="currentColor"/></svg>
+                          <span class="ios-action-label ios-action-directions">Directions</span>
+                        </a>
+                        <a href="tel:+201040078750" class="ios-action">
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" fill="currentColor"/></svg>
+                          <span class="ios-action-label ios-action-call">Call</span>
+                        </a>
+                        <a href="https://wa.me/201040078750" target="_blank" rel="noopener" data-open-app="chat" class="ios-action">
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4h-0A1.5 1.5 0 0 1 4 14.5v-9z" fill="currentColor"/></svg>
+                          <span class="ios-action-label ios-action-message">Message</span>
+                        </a>
+                        <a href="menu.html" class="ios-action">
+                          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M17 21V3c-2 0-3.5 2.5-3.5 6s1.5 4 3.5 4"/></svg>
+                          <span class="ios-action-label ios-action-menu">Menu</span>
+                        </a>
+                      </div>
+
+                      <div class="ios-place-info">
+                        <div class="ios-info-row">
+                          <span class="ios-info-label ios-info-hours-label">Hours</span>
+                          <span class="ios-info-value"><span class="ios-open-pill" data-open-status-text>Open now</span> · <span class="ios-info-hours">2 PM – 2 AM daily</span></span>
+                        </div>
+                        <div class="ios-info-row">
+                          <span class="ios-info-label ios-info-phone-label">Phone</span>
+                          <a href="tel:+201040078750" class="ios-info-value ios-link" dir="ltr">010 4007 8750</a>
+                        </div>
+                        <div class="ios-info-row">
+                          <span class="ios-info-label ios-info-address-label">Address</span>
+                          <span class="ios-info-value ios-info-address">Abrag El Nasr, next to Kheir Zaman, Asyut 71511, Egypt</span>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <!-- ========== CONTACT CARD APP ========== -->
+                  <section class="ios-view ios-contact" data-view="contact" aria-label="Contact card" inert>
+                    <div class="ios-nav">
+                      <button type="button" class="ios-back" data-go-home>
+                        <svg viewBox="0 0 12 20" aria-hidden="true"><path d="M10 2L2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span class="ios-back-label">Home</span>
+                      </button>
+                    </div>
+
+                    <div class="ios-contact-scroll">
+                      <div class="ios-contact-hero">
+                        <span class="ios-avatar"><img src="assets/logo-small.webp" alt="" loading="lazy" decoding="async" /></span>
+                        <h3 class="ios-contact-name">Toomy's</h3>
+                        <p class="ios-contact-sub">Burger &amp; Pizza · Asyut</p>
+                      </div>
+
+                      <div class="ios-quick-actions">
+                        <a href="https://wa.me/201040078750" target="_blank" rel="noopener" data-open-app="chat" class="ios-quick">
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4h-0A1.5 1.5 0 0 1 4 14.5v-9z" fill="currentColor"/></svg>
+                          <span class="ios-quick-label ios-quick-message">message</span>
+                        </a>
+                        <a href="tel:+201040078750" class="ios-quick">
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" fill="currentColor"/></svg>
+                          <span class="ios-quick-label ios-quick-call">call</span>
+                        </a>
+                        <button type="button" class="ios-quick" data-open-app="maps">
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8-8-2z" fill="currentColor"/></svg>
+                          <span class="ios-quick-label ios-quick-map">map</span>
+                        </button>
+                        <a href="https://www.instagram.com/toomyseg" target="_blank" rel="noopener" class="ios-quick">
+                          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/></svg>
+                          <span class="ios-quick-label ios-quick-insta">follow</span>
+                        </a>
+                      </div>
+
+                      <div class="ios-group">
+                        <a href="tel:+201040078750" class="ios-cell">
+                          <span class="ios-cell-label ios-cell-mobile">mobile</span>
+                          <span class="ios-cell-value ios-link" dir="ltr">010 4007 8750</span>
+                        </a>
+                        <a href="https://wa.me/201040078750" target="_blank" rel="noopener" data-open-app="chat" class="ios-cell">
+                          <span class="ios-cell-label">WhatsApp</span>
+                          <span class="ios-cell-value ios-link" dir="ltr">+20 10 4007 8750</span>
+                        </a>
+                      </div>
+
+                      <div class="ios-group">
+                        <button type="button" class="ios-cell" data-open-app="maps">
+                          <span class="ios-cell-label ios-cell-address">address</span>
+                          <span class="ios-cell-value ios-cell-address-value">Abrag El Nasr, next to Kheir Zaman<br />Asyut 71511<br />Egypt</span>
+                        </button>
+                        <div class="ios-cell">
+                          <span class="ios-cell-label ios-cell-hours">hours</span>
+                          <span class="ios-cell-value ios-cell-hours-value">Every day · 2:00 PM – 2:00 AM</span>
+                        </div>
+                      </div>
+
+                      <div class="ios-group">
+                        <a href="https://www.instagram.com/toomyseg" target="_blank" rel="noopener" class="ios-cell">
+                          <span class="ios-cell-label">Instagram</span>
+                          <span class="ios-cell-value ios-link" dir="ltr">@toomyseg</span>
+                        </a>
+                        <a href="https://www.facebook.com/toomyseg" target="_blank" rel="noopener" class="ios-cell">
+                          <span class="ios-cell-label">Facebook</span>
+                          <span class="ios-cell-value ios-link" dir="ltr">facebook.com/toomyseg</span>
+                        </a>
+                      </div>
+                    </div>
+                  </section>
+
+                  <!-- ========== WHATSAPP CHAT APP ========== -->
+                  <section class="ios-view ios-chat" data-view="chat" aria-label="WhatsApp chat with Toomy's" inert>
+                    <header class="wa-header">
+                      <button type="button" class="wa-back" data-go-home aria-label="Back to home screen">
+                        <svg viewBox="0 0 12 20" aria-hidden="true"><path d="M10 2L2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      </button>
+                      <span class="wa-avatar"><img src="assets/logo-small.webp" alt="" loading="lazy" decoding="async" /></span>
+                      <span class="wa-head-text">
+                        <span class="wa-name">Toomy's</span>
+                        <span class="wa-sub">Burger &amp; Pizza · Asyut</span>
+                      </span>
+                      <a href="tel:+201040078750" class="wa-call" aria-label="Call Toomy's">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" fill="currentColor"/></svg>
+                      </a>
+                    </header>
+
+                    <div class="wa-body" data-wa-thread aria-live="polite">
+                      <span class="wa-day">Today</span>
+                      <p class="wa-system">Type your message here — sending opens WhatsApp with it ready to go.</p>
+                      <div class="wa-typing" data-wa-typing aria-hidden="true"><span></span><span></span><span></span></div>
+                      <div class="wa-bubble wa-in" data-wa-greeting hidden>
+                        <span class="wa-text">Hey! 👋 Welcome to Toomy's. What are you craving today?</span>
+                        <span class="wa-meta"><span class="wa-time" data-wa-now></span></span>
+                      </div>
+                      <div class="wa-chips" data-wa-chips hidden>
+                        <button type="button" class="wa-chip" data-wa-chip>I'd like to place an order 🍔</button>
+                        <button type="button" class="wa-chip" data-wa-chip>Do you deliver to my area?</button>
+                        <button type="button" class="wa-chip" data-wa-chip>What's on the menu today?</button>
+                      </div>
+                    </div>
+
+                    <form class="wa-compose" data-wa-form novalidate>
+                      <label for="waMessage" class="sr-only">Message to Toomy's</label>
+                      <input type="text" id="waMessage" class="wa-input" placeholder="Message" maxlength="600" autocomplete="off" enterkeyhint="send" />
+                      <button type="submit" class="wa-send" aria-label="Send on WhatsApp">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.4 20.4 21 12 3.4 3.6 3.4 10.2 15 12 3.4 13.8z" fill="currentColor"/></svg>
+                      </button>
+                    </form>
+                  </section>
+
+                  <button type="button" class="ios-home-bar" data-go-home aria-label="Go to home screen"><span></span></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <nav class="tablet-socials" aria-label="Toomy's on social media">
+            <a href="https://www.facebook.com/toomyseg" target="_blank" rel="noopener" class="tablet-social tablet-social-facebook" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5H16l.4-3h-2.9V8.6c0-.9.3-1.4 1.5-1.4h1.5V4.5c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2.3H8v3h2.6V21h2.9z"/></svg>
+            </a>
+            <a href="https://www.instagram.com/toomyseg" target="_blank" rel="noopener" class="tablet-social tablet-social-instagram" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
+            </a>
+            <a href="https://wa.me/201040078750" target="_blank" rel="noopener" class="tablet-social tablet-social-whatsapp" data-open-tablet-chat aria-label="WhatsApp">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M12 2.5a9.4 9.4 0 0 0-8.1 14.2L2.6 21.4l4.8-1.3A9.4 9.4 0 1 0 12 2.5zm5.4 13.2c-.2.6-1.3 1.2-1.8 1.3-.5 0-1 .3-3.4-.7-2.9-1.2-4.7-4.1-4.8-4.3-.1-.2-1.2-1.6-1.2-3s.8-2.2 1-2.5c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.3.5-.4.5c-.2.2-.3.3-.1.6.2.3.8 1.4 1.8 2.2 1.2 1.1 2.2 1.4 2.5 1.6.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.3z"/></svg>
+            </a>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3b. NEWSLETTER 100VH WARM CREAM STAGE -->
   <main class="newsletter-page" id="newsletterMain">
     <div class="newsletter-stage">
 
@@ -194,7 +512,7 @@
             <li><span class="footer-info-text">Daily: 2:00 PM – 2:00 AM</span></li>
             <li>
               <a
-                href="https://maps.google.com/?q=Abrag+El+Nasr+Asyut"
+                href="https://www.google.com/maps/search/?api=1&amp;query=27.18261,31.18335"
                 target="_blank"
                 rel="noopener"
                 class="footer-link footer-map-link"
@@ -208,6 +526,7 @@
         <div class="footer-col">
           <h3 class="footer-col-heading">GET IN TOUCH</h3>
           <ul class="footer-col-list">
+            <li><a href="tel:+201040078750" class="footer-link footer-phone-link" dir="ltr">010 4007 8750</a></li>
             <li><a href="newsletter.html" class="footer-link">Contact Us</a></li>
             <li><a href="menu.html" class="footer-link">Order Online</a></li>
             <li><a href="about.html" class="footer-link">Our Story</a></li>
@@ -216,12 +535,12 @@
       </nav>
     </div>
 
-    <img src="assets/logo-main.webp" alt="" aria-hidden="true" class="footer-watermark" draggable="false" />
+    <img loading="lazy" decoding="async" src="assets/logo-main.webp" alt="" aria-hidden="true" class="footer-watermark" draggable="false" />
 
     <div class="footer-bottom-zone">
       <div class="footer-socials" aria-label="Social Media Links">
         <a
-          href="https://www.instagram.com/"
+          href="https://www.instagram.com/toomyseg"
           target="_blank"
           rel="noopener"
           class="footer-social-link"
@@ -245,20 +564,20 @@
         </a>
 
         <a
-          href="https://www.tiktok.com/"
+          href="https://wa.me/201040078750"
           target="_blank"
           rel="noopener"
           class="footer-social-link"
-          aria-label="TikTok"
+          aria-label="WhatsApp"
         >
           <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor">
-            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
           </svg>
         </a>
       </div>
 
       <div class="footer-burger-wrap" id="footerBurger">
-        <img
+        <img loading="lazy" decoding="async"
           src="assets/Toomy's noBG/toomy-footer.webp"
           alt="Toomy's Signature Burger"
           class="footer-burger-img"
@@ -285,14 +604,20 @@
         const raw = newsletterPhone.value.replace(/\s+/g, "");
         const valid = /^(\+20|0)?1[0125][0-9]{8}$/.test(raw);
 
+        const isAr = Boolean(window.TOOMYS_I18N && window.TOOMYS_I18N.isAr);
+
         if (!valid) {
-          newsletterFeedback.textContent = "Please enter a valid Egyptian number (e.g. +2010XXXXXXXX).";
+          newsletterFeedback.textContent = isAr
+            ? "اكتب رقم موبايل مصري مظبوط (مثلًا 010XXXXXXXX)."
+            : "Please enter a valid Egyptian number (e.g. +2010XXXXXXXX).";
           newsletterFeedback.className = "ticket-feedback is-error";
           newsletterPhone.focus();
           return;
         }
 
-        newsletterFeedback.textContent = "You're on the VIP list! Watch your phone for first-hand Toomy's drops.";
+        newsletterFeedback.textContent = isAr
+          ? "نوّرت قايمة الـ VIP! خلّي موبايلك جنبك عشان عروض توميز هتنزلك أول بأول."
+          : "You're on the VIP list! Watch your phone for first-hand Toomy's drops.";
         newsletterFeedback.className = "ticket-feedback is-success";
         newsletterPhone.value = "";
       });

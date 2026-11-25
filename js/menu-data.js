@@ -15,7 +15,7 @@ window.MENU_ITEMS = {
     description:
       "Juicy smashed beef patty seared on a hot griddle with melted American cheddar, crisp lettuce, ripe tomatoes, pickles, and Toomy's signature truck sauce.",
     basePrice: 145,
-    image: "assets/products/truck.png",
+    image: "assets/products/truck.webp",
     includedChips: [
       "Smashed Beef Patty",
       "American Cheddar",
@@ -55,7 +55,7 @@ window.MENU_ITEMS = {
     description:
       "Thick seared smash patties smothered in melted Monterey Jack cheese, grilled jalapenos, caramelized onions, and smoky chipotle diner sauce.",
     basePrice: 195,
-    image: "assets/products/juicy-jack.png",
+    image: "assets/products/juicy-jack.webp",
     includedChips: [
       "Double Smash Patty",
       "Monterey Jack",
@@ -93,7 +93,7 @@ window.MENU_ITEMS = {
     description:
       "Smashed beef patty crowned with seared beef pepperoni slices, stretchy melted mozzarella, rich marinara glaze, and Italian herb butter on toasted brioche.",
     basePrice: 175,
-    image: "assets/products/pepperonzi.png",
+    image: "assets/products/pepperonzi.webp",
     includedChips: [
       "Smashed Beef",
       "Seared Pepperoni",
@@ -178,7 +178,7 @@ window.MENU_ITEMS = {
     description:
       "Double smashed beef patties loaded with crispy onion strings and drenched table-side in a rich, velvety molten cheddar cheese cascade.",
     basePrice: 205,
-    image: "assets/products/burger-boom.png",
+    image: "assets/products/burger-boom.webp",
     includedChips: [
       "Double Smash Patty",
       "Molten Cheddar Cascade",
@@ -247,7 +247,7 @@ window.MENU_ITEMS = {
     description:
       "Golden crispy fried chicken breast tossed in bold, tangy Buffalo hot sauce, balanced with cool buttermilk ranch, crisp lettuce, and dill pickles.",
     basePrice: 165,
-    image: "assets/products/buffalo.png",
+    image: "assets/products/buffalo.webp",
     includedChips: [
       "Crispy Chicken Fillet",
       "Buffalo Hot Glaze",
@@ -284,7 +284,7 @@ window.MENU_ITEMS = {
     description:
       "Crunchy all-white-meat fried chicken breast layered with smoked turkey, melted Swiss-cheddar blend, iceberg lettuce, and house herb ranch.",
     basePrice: 165,
-    image: "assets/products/ranch.png",
+    image: "assets/products/ranch.webp",
     includedChips: [
       "Crispy Chicken Fillet",
       "House Herb Ranch",
@@ -314,7 +314,7 @@ window.MENU_ITEMS = {
     description:
       "Extra-crunchy fried chicken fillet stacked with mozzarella sticks, turkey bacon, and a generous pour of warm, creamy cheddar cheese sauce.",
     basePrice: 185,
-    image: "assets/products/chicken-boom.png",
+    image: "assets/products/chicken-boom.webp",
     includedChips: [
       "Crispy Chicken Fillet",
       "Molten Cheddar Sauce",
@@ -422,7 +422,7 @@ window.MENU_ITEMS = {
     description:
       "Creamy herb ranch base topped with seasoned shrimp, tender calamari rings, sweet bell peppers, black olives, and bubbling mozzarella cheese.",
     basePrice: 235,
-    image: "assets/products/pizza-searanch.png",
+    image: "assets/products/pizza-searanch.webp",
     includedChips: [
       "Seasoned Shrimp",
       "Calamari Rings",
@@ -459,7 +459,7 @@ window.MENU_ITEMS = {
     description:
       "Tender strips of chargrilled steak, roasted mushrooms, caramelized onions, green peppers, and smoked mozzarella finished with savory steakhouse glaze.",
     basePrice: 225,
-    image: "assets/products/pizza-steak.png",
+    image: "assets/products/pizza-steak.webp",
     includedChips: [
       "Chargrilled Steak",
       "Roasted Mushrooms",
@@ -527,7 +527,7 @@ window.MENU_ITEMS = {
     description:
       "Aromatic seasoned basmati rice loaded with tender chargrilled steak strips, sauteed peppers, and smoky peppercorn-garlic sauce.",
     basePrice: 175,
-    image: "assets/products/basmati-steak.png",
+    image: "assets/products/basmati-steak.webp",
     includedChips: [
       "Seasoned Basmati Rice",
       "Chargrilled Steak",
@@ -577,5 +577,253 @@ window.MENU_ITEMS = {
     recommendedIds: ["toomy-burger", "tenders-meal", "basmati-chicken"]
   }
 };
+
+window.MENU_ITEMS_AR = {
+  "truck-burger": {
+    categoryLabel: "برجر",
+    badge: "كلاسيك الشارع",
+    title: "تراك برجر",
+    subtitle: "سماش بيف وصوص التراك",
+    description:
+      "قطعة لحمة سماش طرية مشوية على صاج مولّع، فوقها جبنة شيدر أمريكاني سايحة، خس فريش، طماطم، مخلل، وصوص التراك السبيشيال بتاع توميز.",
+    includedChips: ["لحمة سماش", "شيدر أمريكاني", "خس ومخلل", "صوص التراك", "عيش بريوش"],
+    optionGroups: [
+      { name: "حجم البرجر", options: ["سنجل", "دبل", "تربل"] },
+      { name: "صوص زيادة", options: ["من غير", "صوص تومي", "صوص شيدر"] }
+    ]
+  },
+
+  "juicy-jack-burger": {
+    categoryLabel: "برجر",
+    badge: "للجعانين بجد",
+    title: "جوسي جاك برجر",
+    subtitle: "مونتيري جاك وهالابينو",
+    description:
+      "قطعتين سماش محترمين متغطيين بجبنة مونتيري جاك سايحة، هالابينو مشوي، بصل مكرمل، وصوص شيبوتلي مدخّن يظبط المزاج.",
+    includedChips: ["دبل سماش", "مونتيري جاك", "هالابينو مشوي", "صوص شيبوتلي", "عيش بريوش"],
+    optionGroups: [
+      { name: "حجم البرجر", options: ["دبل", "تربل"] },
+      { name: "الشطة", options: ["حراق على الخفيف", "مولّع نار"] }
+    ]
+  },
+
+  "pepperonzi-burger": {
+    categoryLabel: "برجر",
+    badge: "بيتزا على برجر",
+    title: "بيبرونزي برجر",
+    subtitle: "بيبروني مقرمش وموتزاريلا",
+    description:
+      "سماش بيف وفوقه شرائح بيف بيبروني مشوية، موتزاريلا بتمط، رشة صوص مارينارا، وزبدة أعشاب إيطالي في عيش بريوش محمّص.",
+    includedChips: ["سماش بيف", "بيبروني مشوي", "موتزاريلا سايحة", "صوص مارينارا", "عيش بريوش"],
+    optionGroups: [
+      { name: "حجم البرجر", options: ["سنجل", "دبل"] },
+      { name: "جبنة زيادة", options: ["موتزاريلا عادي", "دبل موتزاريلا بتمط"] }
+    ]
+  },
+
+  "toomy-burger": {
+    categoryLabel: "برجر",
+    badge: "الأصلي",
+    title: "تومي برجر",
+    subtitle: "دبل سماش توميز السبيشيال",
+    description:
+      "دبل سماش بيف مشوي على الصاج، متقّل بأونيون رينجز مقرمشة، أصابع موتزاريلا سايحة، بيف بيكون، وصوص تومي المدخّن السري.",
+    includedChips: ["دبل سماش", "أصابع موتزاريلا", "أونيون رينجز", "صوص تومي", "عيش بريوش"],
+    optionGroups: [
+      { name: "حجم البرجر", options: ["سنجل", "دبل", "تربل"] },
+      { name: "العيش", options: ["عيش بريوش", "لفّة خس"] },
+      { name: "صوص زيادة", options: ["من غير", "صوص تومي", "صوص شيدر"] }
+    ]
+  },
+
+  "cheesy-burger-boom": {
+    categoryLabel: "برجر",
+    badge: "غرقان جبنة",
+    title: "تشيزي برجر بوم",
+    subtitle: "متغرّق شيدر سايح",
+    description:
+      "دبل سماش بيف وعليه بصل مقرمش، ونازل عليه شلال جبنة شيدر سخنة وسايحة من الآخر.. لمحبين الجبنة بجد.",
+    includedChips: ["دبل سماش", "شلال شيدر سايح", "بصل مقرمش", "بريوش محمّص"],
+    optionGroups: [
+      { name: "حجم البرجر", options: ["دبل", "تربل"] },
+      { name: "ديب زيادة", options: ["من غير", "علبة شيدر زيادة"] }
+    ]
+  },
+
+  "truck-chicken": {
+    categoryLabel: "فراخ",
+    badge: "المحبوب",
+    title: "تراك تشيكن",
+    subtitle: "فيليه مقرمش على الآخر",
+    description:
+      "صدر فراخ مقرمش متبّل بإيدينا، مع هاني ماسترد، كول سلو كريمي، شيدر سايحة، ومخلل.. كله جوه عيش بريوش محمّص.",
+    includedChips: ["صدر فراخ مقرمش", "هاني ماسترد", "كول سلو", "شيدر سايحة", "عيش بريوش"],
+    optionGroups: [
+      { name: "تخليه وجبة؟", options: ["ساندوتش بس", "وجبة (+ بطاطس)"] }
+    ]
+  },
+
+  "buffalo-chicken": {
+    categoryLabel: "فراخ",
+    badge: "حراق ولذيذ",
+    title: "بافلو تشيكن",
+    subtitle: "تسييحة بافلو حراقة",
+    description:
+      "صدر فراخ مقلي ودهبي متقلّب في صوص بافلو حراق ومزز، وبيهدّيه صوص رانش بارد، خس مقرمش، ومخلل.",
+    includedChips: ["فيليه فراخ مقرمش", "صوص بافلو حراق", "صوص رانش", "مخلل"],
+    optionGroups: [
+      { name: "الشطة", options: ["بافلو كلاسيك", "سبايسي زيادة"] },
+      { name: "تخليه وجبة؟", options: ["ساندوتش بس", "وجبة (+ بطاطس)"] }
+    ]
+  },
+
+  "ranch-chicken": {
+    categoryLabel: "فراخ",
+    badge: "كريمي ومقرمش",
+    title: "رانش تشيكن",
+    subtitle: "رانش بالأعشاب طازة",
+    description:
+      "صدر فراخ مقرمش من أحلى حتة، معاه تركي مدخّن، ميكس جبنة سويس وشيدر سايحة، خس آيسبرج، وصوص الرانش بتاع البيت.",
+    includedChips: ["فيليه فراخ مقرمش", "رانش بالأعشاب", "تركي مدخّن", "عيش بريوش"],
+    optionGroups: [
+      { name: "تخليه وجبة؟", options: ["ساندوتش بس", "وجبة (+ بطاطس)"] }
+    ]
+  },
+
+  "cheesy-chicken-boom": {
+    categoryLabel: "فراخ",
+    badge: "تسييحة مظبوطة",
+    title: "تشيزي تشيكن بوم",
+    subtitle: "فيليه غرقان شيدر",
+    description:
+      "فيليه فراخ مقرمش زيادة، فوقه أصابع موتزاريلا، تركي بيكون، ومغرّق بصوص جبنة شيدر دافي وكريمي.",
+    includedChips: ["فيليه فراخ مقرمش", "صوص شيدر سايح", "أصابع موتزاريلا", "عيش بريوش"],
+    optionGroups: [
+      { name: "تخليه وجبة؟", options: ["ساندوتش بس", "وجبة (+ بطاطس)"] }
+    ]
+  },
+
+  "tenders-meal": {
+    categoryLabel: "تندرز",
+    badge: "جرّبها دلوقتي",
+    title: "وجبة تندرز",
+    subtitle: "ستريبس مقرمشة شغل إيد",
+    description:
+      "ستريبس فراخ متبّلة ومقرمشة، بطاطس دهبي، عيش بريوش محمّص، كول سلو كريمي، ومعاها 2 صوص من اللي بتحبهم.",
+    includedChips: ["ستريبس مقرمشة", "3 عيش بريوش", "كول سلو", "2 صوص", "رز أو بطاطس"],
+    optionGroups: [
+      { name: "الحجم", options: ["عادي · قطعتين", "تربل · 3 قطع", "كبير · 5 قطع"] },
+      { name: "تحب معاها إيه؟", options: ["بطاطس", "رز"] }
+    ]
+  },
+
+  "popcorn-chicken-pizza": {
+    categoryLabel: "بيتزا",
+    badge: "نجمة البيت",
+    title: "بيتزا بوب كورن تشيكن",
+    subtitle: "بافلو ورانش على الوش",
+    description:
+      "عجينة مفرودة بالإيد وعليها صوص طماطم توميز الخاص، موتزاريلا بتمط، فراخ بوب كورن دهبي، وتسييحة بافلو على رانش.",
+    includedChips: ["بوب كورن تشيكن", "موتزاريلا بتمط", "صوص بافلو", "صوص رانش"],
+    optionGroups: [
+      { name: "مقاس البيتزا", options: ["وسط · 10 بوصة", "كبير · 12 بوصة"] },
+      { name: "العجينة", options: ["كلاسيك بان", "أطراف محشية جبنة"] }
+    ]
+  },
+
+  "sea-ranch-pizza": {
+    categoryLabel: "بيتزا",
+    badge: "مذاق بحري",
+    title: "بيتزا سي رانش",
+    subtitle: "جمبري وكاليماري ورانش",
+    description:
+      "قاعدة رانش كريمي بالأعشاب، وعليها جمبري متبّل، حلقات كاليماري طرية، فلفل ألوان، زيتون أسود، وموتزاريلا سايحة.",
+    includedChips: ["جمبري متبّل", "حلقات كاليماري", "قاعدة رانش", "موتزاريلا سايحة"],
+    optionGroups: [
+      { name: "مقاس البيتزا", options: ["وسط · 10 بوصة", "كبير · 12 بوصة"] },
+      { name: "العجينة", options: ["كلاسيك بان", "أطراف محشية جبنة"] }
+    ]
+  },
+
+  "steak-pizza": {
+    categoryLabel: "بيتزا",
+    badge: "طعم جريء",
+    title: "بيتزا ستيك",
+    subtitle: "لحمة مشوية ومشروم",
+    description:
+      "شرائح ستيك مشوي طرية، مشروم محمّص، بصل مكرمل، فلفل أخضر، وموتزاريلا مدخّنة.. وفي الآخر رشة صوص ستيك هاوس.",
+    includedChips: ["ستيك مشوي", "مشروم محمّص", "بصل مكرمل", "موتزاريلا مدخّنة"],
+    optionGroups: [
+      { name: "مقاس البيتزا", options: ["وسط · 10 بوصة", "كبير · 12 بوصة"] },
+      { name: "العجينة", options: ["كلاسيك بان", "أطراف محشية جبنة"] }
+    ]
+  },
+
+  "basmati-chicken": {
+    categoryLabel: "بسمتي",
+    badge: "سبيشيال البيت",
+    title: "بسمتي تشيكن",
+    subtitle: "بولة رز دهبي متبّل",
+    description:
+      "رز بسمتي أصفر ريحته تجنن، فوقه شرائح تندرز مقرمشة، صوص تومية كريمي، رشة صوص تومي، ومكسرات محمّصة.",
+    includedChips: ["رز بسمتي دهبي", "شرائح فراخ مقرمشة", "تومية وصوص تومي"],
+    optionGroups: [
+      { name: "الصوص على الوش", options: ["تومية وصوص تومي", "سويت تشيلي", "صوص شيدر"] }
+    ]
+  },
+
+  "basmati-steak": {
+    categoryLabel: "بسمتي",
+    badge: "بولة تشبّع",
+    title: "بسمتي ستيك",
+    subtitle: "ستيك مشوي ورز بسمتي",
+    description:
+      "رز بسمتي متبّل على أصوله، مليان شرائح ستيك مشوي طرية، فلفل متشوّح، وصوص فلفل أسود بالتوم مدخّن.",
+    includedChips: ["رز بسمتي متبّل", "ستيك مشوي", "فلفل متشوّح", "صوص فلفل بالتوم"],
+    optionGroups: [
+      { name: "الصوص على الوش", options: ["فلفل أسود بالتوم", "كريمة مشروم"] }
+    ]
+  },
+
+  "hotdog-crispy-roll": {
+    categoryLabel: "كرسبي",
+    badge: "لفّها وكلها",
+    title: "هوت دوج كرسبي رول",
+    subtitle: "متقّل وجبنته سايحة",
+    description:
+      "عيش تورتيلا محمّص ومقرمش، محشي قطع هوت دوج مشوي، موتزاريلا بتمط، صوص شيدر، وخضار فريش مقرمش.",
+    includedChips: ["هوت دوج مشوي", "موتزاريلا سايحة", "صوص شيدر", "تورتيلا محمّصة"],
+    optionGroups: [
+      { name: "حجم الرول", options: ["سنجل رول", "دبل رول"] }
+    ]
+  }
+};
+
+// Apply Egyptian Arabic overlay when Arabic mode is active
+if (window.TOOMYS_I18N && window.TOOMYS_I18N.isAr) {
+  Object.keys(window.MENU_ITEMS).forEach(function (id) {
+    var item = window.MENU_ITEMS[id];
+    var ar = window.MENU_ITEMS_AR[id];
+    if (!ar) return;
+    item.categoryLabel = ar.categoryLabel;
+    item.badge = ar.badge;
+    item.title = ar.title;
+    item.subtitle = ar.subtitle;
+    item.description = ar.description;
+    item.includedChips = ar.includedChips;
+    if (Array.isArray(item.optionGroups) && Array.isArray(ar.optionGroups)) {
+      item.optionGroups.forEach(function (group, gIdx) {
+        var arGroup = ar.optionGroups[gIdx];
+        if (!arGroup) return;
+        group.name = arGroup.name;
+        if (Array.isArray(group.options) && Array.isArray(arGroup.options)) {
+          group.options.forEach(function (opt, oIdx) {
+            if (arGroup.options[oIdx]) opt.label = arGroup.options[oIdx];
+          });
+        }
+      });
+    }
+  });
+}
 
 window.MENU_ITEMS_LIST = Object.values(window.MENU_ITEMS);

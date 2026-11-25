@@ -1,6 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
-    
-    /* =========================================
+  const IS_AR = Boolean(window.TOOMYS_I18N && window.TOOMYS_I18N.isAr);
+  const CURRENCY_LABEL = IS_AR ? "جنيه" : "EGP";
+  const formatPrice = (amount) => `${Number(amount).toLocaleString("en-US")} ${CURRENCY_LABEL}`;
+  const t = (en, ar) => (IS_AR ? ar : en);
+
+  /* =========================================
      1. FLOATING PILL NAVBAR & MOBILE TAKEOVER CONTROLLER
      ========================================= */
   const navbar = document.querySelector(".floating-navbar");
@@ -334,26 +338,26 @@ document.addEventListener("DOMContentLoaded", () => {
       cartDrawer.setAttribute("aria-labelledby", "cartDrawerTitle");
       cartDrawer.innerHTML = `
         <div class="cart-drawer-header">
-          <h2 class="cart-drawer-title" id="cartDrawerTitle">Your Order</h2>
-          <button type="button" class="cart-close-btn" id="cartCloseBtn" aria-label="Close Cart">&#10005;</button>
+          <h2 class="cart-drawer-title" id="cartDrawerTitle">${t("Your Order", "الأوردر بتاعك")}</h2>
+          <button type="button" class="cart-close-btn" id="cartCloseBtn" aria-label="${t("Close Cart", "اقفل الأوردر")}">&#10005;</button>
         </div>
         <div class="cart-drawer-body" id="cartDrawerBody"></div>
         <div class="cart-drawer-footer" id="cartDrawerFooter" style="display: none;">
           <div class="cart-summary-rows">
             <div class="cart-summary-line">
-              <span>Subtotal</span>
-              <span id="cartSubtotalValue">0 EGP</span>
+              <span>${t("Subtotal", "المجموع")}</span>
+              <span id="cartSubtotalValue">${formatPrice(0)}</span>
             </div>
             <div class="cart-summary-line">
-              <span>Asyut Delivery</span>
-              <span>${DELIVERY_FEE_EGP} EGP</span>
+              <span>${t("Asyut Delivery", "توصيل داخل أسيوط")}</span>
+              <span>${formatPrice(DELIVERY_FEE_EGP)}</span>
             </div>
           </div>
           <div class="cart-total-row">
-            <span class="cart-total-label">Total</span>
-            <span class="cart-total-value" id="cartTotalValue">0 EGP</span>
+            <span class="cart-total-label">${t("Total", "الإجمالي")}</span>
+            <span class="cart-total-value" id="cartTotalValue">${formatPrice(0)}</span>
           </div>
-          <button type="button" class="cart-checkout-btn" id="cartCheckoutBtn">Place Order</button>
+          <button type="button" class="cart-checkout-btn" id="cartCheckoutBtn">${t("Place Order", "كمّل الأوردر")}</button>
         </div>
       `;
       document.body.appendChild(cartDrawer);
@@ -387,7 +391,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let cartItems = loadCart();
 
     function formatEGP(amount) {
-      return `${Number(amount).toLocaleString("en-US")} EGP`;
+      return formatPrice(amount);
     }
 
     function triggerPop(el, className = "is-popped") {
@@ -501,11 +505,11 @@ document.addEventListener("DOMContentLoaded", () => {
         cartDrawerBody.innerHTML = `
           <div class="cart-empty-state">
             <div class="cart-success-badge" aria-hidden="true">&#10003;</div>
-            <h3 class="cart-empty-heading">Order received!</h3>
-            <p class="cart-empty-subtext">We're firing up the grill in Asyut. Your order will be hot and ready soon.</p>
-            <span class="cart-order-ref">Order #TM-${orderNum}</span>
+            <h3 class="cart-empty-heading">${t("Order received!", "الأوردر وصلنا!")}</h3>
+            <p class="cart-empty-subtext">${t("We're firing up the grill in Asyut. Your order will be hot and ready soon.", "بنولّع الجريل في أسيوط حالًا. أوردرك هيوصلك سخن ومقرمش قريب أوي.")}</p>
+            <span class="cart-order-ref">${t("Order", "أوردر")} #TM-${orderNum}</span>
             <button type="button" class="cart-empty-cta" id="cartBackToMenuBtn">
-              <span>Back to Menu</span>
+              <span>${t("Back to Menu", "ارجع للمنيو")}</span>
               <span class="cart-cta-arrow" aria-hidden="true">&#8594;</span>
             </button>
           </div>
@@ -522,14 +526,14 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="cart-empty-state">
             <img
               src="assets/logo-main.webp"
-              alt="Toomy's"
+              alt="${t("Toomy's", "توميز")}"
               class="cart-empty-logo"
               draggable="false"
             />
-            <h3 class="cart-empty-heading">Nothing yet, let's order</h3>
-            <p class="cart-empty-subtext">Your tray is empty—pick something delicious from our menu.</p>
+            <h3 class="cart-empty-heading">${t("Nothing yet, let's order", "لسه مفيش حاجة، يلا نطلب!")}</h3>
+            <p class="cart-empty-subtext">${t("Your tray is empty—pick something delicious from our menu.", "الصينية فاضية — اختارلك حاجة حلوة من المنيو.")}</p>
             <button type="button" class="cart-empty-cta" id="cartBackToMenuBtn">
-              <span>Back to Menu</span>
+              <span>${t("Back to Menu", "ارجع للمنيو")}</span>
               <span class="cart-cta-arrow" aria-hidden="true">&#8594;</span>
             </button>
           </div>
@@ -558,11 +562,11 @@ document.addEventListener("DOMContentLoaded", () => {
                   <p class="cart-item-sub">${item.sub}</p>
                   <div class="cart-item-controls">
                     <div class="cart-qty-stepper">
-                      <button type="button" class="cart-qty-btn" data-action="dec" data-index="${index}" aria-label="Decrease quantity">&minus;</button>
+                      <button type="button" class="cart-qty-btn" data-action="dec" data-index="${index}" aria-label="${t("Decrease quantity", "قلّل الكمية")}">&minus;</button>
                       <span class="cart-qty-val">${item.qty}</span>
-                      <button type="button" class="cart-qty-btn" data-action="inc" data-index="${index}" aria-label="Increase quantity">+</button>
+                      <button type="button" class="cart-qty-btn" data-action="inc" data-index="${index}" aria-label="${t("Increase quantity", "زوّد الكمية")}">+</button>
                     </div>
-                    <button type="button" class="cart-remove-btn" data-action="remove" data-index="${index}">Remove</button>
+                    <button type="button" class="cart-remove-btn" data-action="remove" data-index="${index}">${t("Remove", "شيل")}</button>
                   </div>
                 </div>
                 <div class="cart-item-price">${formatEGP(item.price * item.qty)}</div>
@@ -808,10 +812,10 @@ document.addEventListener("DOMContentLoaded", () => {
             type="button"
             class="menu-qv-btn"
             data-qv-id="${item.id}"
-            aria-label="Quick View ${item.title}"
+            aria-label="${t(`Quick View ${item.title}`, `نظرة سريعة على ${item.title}`)}"
           >
             <span class="menu-qv-icon" aria-hidden="true">&#10530;</span>
-            <span class="menu-qv-label">Quick View</span>
+            <span class="menu-qv-label">${t("Quick View", "نظرة سريعة")}</span>
           </button>
 
           <img
@@ -830,15 +834,15 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
 
         <div class="menu-card-footer">
-          <span class="menu-card-price">${item.basePrice} EGP</span>
+          <span class="menu-card-price">${formatPrice(item.basePrice)}</span>
 
           <button type="button" class="menu-card-cta">
-            <span class="star-btn-view star-btn-view-default">+ Add</span>
-            <span class="star-btn-view star-btn-view-added" aria-hidden="true">Added &#10003;</span>
+            <span class="star-btn-view star-btn-view-default">${t("+ Add", "+ ضيف")}</span>
+            <span class="star-btn-view star-btn-view-added" aria-hidden="true">${t("Added &#10003;", "اتضاف &#10003;")}</span>
             <span class="star-btn-view star-btn-view-stepper">
-              <span class="card-step-btn" data-card-step="dec" role="button" tabindex="0" aria-label="Decrease quantity">&minus;</span>
+              <span class="card-step-btn" data-card-step="dec" role="button" tabindex="0" aria-label="${t("Decrease quantity", "قلّل الكمية")}">&minus;</span>
               <span class="card-step-qty">1</span>
-              <span class="card-step-btn" data-card-step="inc" role="button" tabindex="0" aria-label="Increase quantity">+</span>
+              <span class="card-step-btn" data-card-step="inc" role="button" tabindex="0" aria-label="${t("Increase quantity", "زوّد الكمية")}">+</span>
             </span>
           </button>
         </div>
@@ -972,6 +976,13 @@ document.addEventListener("DOMContentLoaded", () => {
       moveFilterIndicator(activeTab);
     });
 
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        const activeTab = menuFilterBar.querySelector(".menu-filter-tab.is-active");
+        moveFilterIndicator(activeTab);
+      });
+    }
+
     // Scroll-linked header auto-hide handled globally by handleNavbarScroll()
   }
   /* =========================================
@@ -991,31 +1002,31 @@ document.addEventListener("DOMContentLoaded", () => {
     qvOverlay.innerHTML = `
       <div class="qv-dialog" id="qvDialog" role="dialog" aria-modal="true" aria-labelledby="qvTitle">
         <div class="qv-showcase-pane">
-          <span class="qv-badge" id="qvBadge">Try It Now</span>
+          <span class="qv-badge" id="qvBadge">${t("Try It Now", "جرّبها دلوقتي")}</span>
           <img src="" alt="" class="qv-image" id="qvImage" draggable="false" />
         </div>
         <div class="qv-details-pane">
-          <button type="button" class="qv-close-btn" id="qvCloseBtn" aria-label="Close Quick View">&#10005;</button>
+          <button type="button" class="qv-close-btn" id="qvCloseBtn" aria-label="${t("Close Quick View", "اقفل")}">&#10005;</button>
           <div class="qv-scroll-content">
             <div class="qv-eyebrow">
               <span class="qv-eyebrow-dot" aria-hidden="true"></span>
-              <span id="qvCategory">Menu</span>
+              <span id="qvCategory">${t("Menu", "المنيو")}</span>
             </div>
-            <h2 class="qv-title" id="qvTitle">Product</h2>
+            <h2 class="qv-title" id="qvTitle">${t("Product", "الصنف")}</h2>
             <p class="qv-subtitle" id="qvSubtitle"></p>
             <p class="qv-desc" id="qvDesc"></p>
-            <div class="qv-chips-row" id="qvChipsRow" aria-label="Included Items"></div>
+            <div class="qv-chips-row" id="qvChipsRow" aria-label="${t("Included Items", "المكونات")}"></div>
             <div class="qv-options-stack" id="qvOptionsStack"></div>
           </div>
           <div class="qv-purchase-row">
-            <div class="qv-qty-stepper" role="group" aria-label="Item Quantity">
-              <button type="button" class="qv-qty-btn" id="qvQtyDec" aria-label="Decrease quantity">&minus;</button>
+            <div class="qv-qty-stepper" role="group" aria-label="${t("Item Quantity", "الكمية")}">
+              <button type="button" class="qv-qty-btn" id="qvQtyDec" aria-label="${t("Decrease quantity", "قلّل الكمية")}">&minus;</button>
               <span class="qv-qty-val" id="qvQtyVal">1</span>
-              <button type="button" class="qv-qty-btn" id="qvQtyInc" aria-label="Increase quantity">+</button>
+              <button type="button" class="qv-qty-btn" id="qvQtyInc" aria-label="${t("Increase quantity", "زوّد الكمية")}">+</button>
             </div>
             <button type="button" class="qv-add-btn" id="qvAddBtn">
-              <span class="qv-add-label" id="qvAddLabel">Add to Cart</span>
-              <span class="qv-price-badge" id="qvPriceBadge">0 EGP</span>
+              <span class="qv-add-label" id="qvAddLabel">${t("Add to Cart", "ضيف للأوردر")}</span>
+              <span class="qv-price-badge" id="qvPriceBadge">${formatPrice(0)}</span>
             </button>
           </div>
         </div>
@@ -1060,7 +1071,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateQvPrice() {
       const total = computeQvUnitPrice() * qvQty;
       if (qvPriceBadge) {
-        qvPriceBadge.textContent = `${total.toLocaleString("en-US")} EGP`;
+        qvPriceBadge.textContent = formatPrice(total);
       }
     }
 
@@ -1144,7 +1155,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (qvQtyVal) qvQtyVal.textContent = "1";
       clearTimeout(qvAddBtn._addedTimer);
       qvAddBtn.classList.remove("is-added");
-      if (qvAddLabel) qvAddLabel.textContent = "Add to Cart";
+      if (qvAddLabel) qvAddLabel.textContent = t("Add to Cart", "ضيف للأوردر");
 
       renderQvOptions();
       updateQvPrice();
@@ -1240,7 +1251,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .filter(Boolean);
 
         const variantSummary =
-          chosenLabels.length > 0 ? chosenLabels.join(" · ") : "Standard";
+          chosenLabels.length > 0 ? chosenLabels.join(" · ") : t("Standard", "عادي");
         const unitPrice = computeQvUnitPrice();
 
         let storedCart = [];
@@ -1293,7 +1304,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.dispatchEvent(new CustomEvent("toomys:cart-sync"));
 
         qvAddBtn.classList.add("is-added");
-        if (qvAddLabel) qvAddLabel.textContent = "Added \u2713";
+        if (qvAddLabel) qvAddLabel.textContent = t("Added \u2713", "اتضاف \u2713");
         clearTimeout(qvAddBtn._addedTimer);
         qvAddBtn._addedTimer = setTimeout(() => {
           closeQuickViewModal();
@@ -1406,11 +1417,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const fee = checkoutCart.length === 0 ? 0 : fulfillmentMethod === "delivery" ? 25 : 0;
       const grandTotal = subtotal + fee;
 
-      if (checkoutSubtotalVal) checkoutSubtotalVal.textContent = `${subtotal.toLocaleString("en-US")} EGP`;
-      if (checkoutFeeLabel) checkoutFeeLabel.textContent = fulfillmentMethod === "delivery" ? "Delivery" : "Pickup";
-      if (checkoutFeeVal) checkoutFeeVal.textContent = fee === 0 ? "Free" : `${fee} EGP`;
-      if (checkoutGrandTotalVal) checkoutGrandTotalVal.textContent = `${grandTotal.toLocaleString("en-US")} EGP`;
-      if (checkoutSubmitTotal) checkoutSubmitTotal.textContent = `${grandTotal.toLocaleString("en-US")} EGP`;
+      if (checkoutSubtotalVal) checkoutSubtotalVal.textContent = formatPrice(subtotal);
+      if (checkoutFeeLabel) {
+        checkoutFeeLabel.textContent =
+          fulfillmentMethod === "delivery"
+            ? t("Delivery", "التوصيل")
+            : t("Pickup", "الاستلام من الفرع");
+      }
+      if (checkoutFeeVal) {
+        checkoutFeeVal.textContent = fee === 0 ? t("Free", "مجانًا") : formatPrice(fee);
+      }
+      if (checkoutGrandTotalVal) checkoutGrandTotalVal.textContent = formatPrice(grandTotal);
+      if (checkoutSubmitTotal) checkoutSubmitTotal.textContent = formatPrice(grandTotal);
     }
 
     function renderCheckoutSummary({ isInitial = false } = {}) {
@@ -1438,19 +1456,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 <div class="checkout-item-meta">
                   <h3 class="checkout-item-title">${item.title}</h3>
-                  <p class="checkout-item-sub">${item.sub || "Regular"}</p>
+                  <p class="checkout-item-sub">${item.sub || t("Regular", "عادي")}</p>
 
                   <div class="checkout-item-actions">
                     <div class="checkout-stepper-pill">
-                      <button type="button" class="checkout-step-btn" data-co-action="dec" data-idx="${idx}" aria-label="Decrease quantity">&minus;</button>
+                      <button type="button" class="checkout-step-btn" data-co-action="dec" data-idx="${idx}" aria-label="${t("Decrease quantity", "قلّل الكمية")}">&minus;</button>
                       <span class="checkout-step-qty">${item.qty}</span>
-                      <button type="button" class="checkout-step-btn" data-co-action="inc" data-idx="${idx}" aria-label="Increase quantity">+</button>
+                      <button type="button" class="checkout-step-btn" data-co-action="inc" data-idx="${idx}" aria-label="${t("Increase quantity", "زوّد الكمية")}">+</button>
                     </div>
-                    <button type="button" class="checkout-remove-link" data-co-action="remove" data-idx="${idx}">Remove</button>
+                    <button type="button" class="checkout-remove-link" data-co-action="remove" data-idx="${idx}">${t("Remove", "شيل")}</button>
                   </div>
                 </div>
 
-                <div class="checkout-item-price">${(item.price * item.qty).toLocaleString("en-US")} EGP</div>
+                <div class="checkout-item-price">${formatPrice(item.price * item.qty)}</div>
               </div>
             </li>
           `
@@ -1469,20 +1487,20 @@ document.addEventListener("DOMContentLoaded", () => {
     // 1-Click Quick-Add Recovery Flow from the Empty Tray View
     const QUICK_ADD_PICKS = {
       "toomy-burger": {
-        title: "Toomy Burger",
-        sub: "Signature Double Smash",
+        title: t("Toomy Burger", "تومي برجر"),
+        sub: t("Signature Double Smash", "دبل سماش توميز السبيشيال"),
         price: 185,
         image: "assets/products/toomy-burger.webp"
       },
       "juicy-jack-burger": {
-        title: "Juicy Jack Burger",
-        sub: "Monterey Jack & Jalapeno",
+        title: t("Juicy Jack Burger", "جوسي جاك برجر"),
+        sub: t("Monterey Jack & Jalapeno", "مونتيري جاك وهالابينو"),
         price: 195,
-        image: "assets/products/juicy-jack.png"
+        image: "assets/products/juicy-jack.webp"
       },
       "popcorn-chicken-pizza": {
-        title: "Popcorn Chicken Pizza",
-        sub: "Buffalo & Ranch Drizzle",
+        title: t("Popcorn Chicken Pizza", "بيتزا بوب كورن تشيكن"),
+        sub: t("Buffalo & Ranch Drizzle", "بافلو ورانش على الوش"),
         price: 210,
         image: "assets/products/pizza-popcorn-buffalo.webp"
       }
@@ -1534,8 +1552,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (paymentMethodDesc) {
           paymentMethodDesc.textContent = isPickup
-            ? "Pay at the branch upon pickup"
-            : "Pay cash on delivery";
+            ? t("Pay at the branch upon pickup", "ادفع في الفرع وإنت بتستلم")
+            : t("Pay cash on delivery", "ادفع كاش لما الأوردر يوصلك");
         }
 
         updateCheckoutTotals();
@@ -1595,19 +1613,28 @@ document.addEventListener("DOMContentLoaded", () => {
       const notesVal = document.getElementById("checkoutNotes")?.value.trim() || "";
 
       if (!nameVal) {
-        checkoutFormError.textContent = "Please enter your name so we know who to prepare the order for.";
+        checkoutFormError.textContent = t(
+          "Please enter your name so we know who to prepare the order for.",
+          "اكتب اسمك عشان نعرف بنجهّز الأوردر لمين."
+        );
         document.getElementById("checkoutName")?.focus();
         return;
       }
 
       if (!phoneVal || phoneVal.replace(/\D/g, "").length < 8) {
-        checkoutFormError.textContent = "Please enter a valid phone number so we can confirm your order.";
+        checkoutFormError.textContent = t(
+          "Please enter a valid phone number so we can confirm your order.",
+          "اكتب رقم موبايل مظبوط عشان نقدر نكلمك نأكد الأوردر."
+        );
         document.getElementById("checkoutPhone")?.focus();
         return;
       }
 
       if (fulfillmentMethod === "delivery" && !addressVal) {
-        checkoutFormError.textContent = "Please enter your delivery address in Asyut.";
+        checkoutFormError.textContent = t(
+          "Please enter your delivery address in Asyut.",
+          "اكتب عنوانك في أسيوط عشان نوصّلك على طول."
+        );
         document.getElementById("checkoutAddress")?.focus();
         return;
       }
@@ -1620,17 +1647,24 @@ document.addEventListener("DOMContentLoaded", () => {
       const orderPayload = {
         code: generateOrderCode(),
         customerName: nameVal,
-        firstName: nameVal.split(/\s+/)[0] || "Friend",
+        firstName: nameVal.split(/\s+/)[0] || t("Friend", "صاحبنا"),
         phone: phoneVal,
-        address: fulfillmentMethod === "delivery" ? addressVal : "Asyut, Abrag El Nasr Branch",
+        address:
+          fulfillmentMethod === "delivery"
+            ? addressVal
+            : t("Asyut, Abrag El Nasr Branch", "فرع أسيوط، أبراج النصر"),
         notes: notesVal,
-        fulfillment: fulfillmentMethod === "delivery" ? "Delivery" : "Branch Pickup",
-        payment: "Cash",
+        fulfillmentKey: fulfillmentMethod,
+        fulfillment:
+          fulfillmentMethod === "delivery"
+            ? t("Delivery", "توصيل")
+            : t("Branch Pickup", "استلام من الفرع"),
+        payment: t("Cash", "كاش"),
         items: checkoutCart.map((item) => ({ ...item })),
         subtotal,
         fee,
         total: subtotal + fee,
-        createdAt: new Date().toLocaleString("en-US", {
+        createdAt: new Date().toLocaleString(IS_AR ? "ar-EG" : "en-US", {
           month: "short",
           day: "numeric",
           hour: "2-digit",
@@ -1674,20 +1708,42 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!orderData || !Array.isArray(orderData.items) || orderData.items.length === 0) {
       orderData = {
         code: "T-WE6UW",
-        customerName: "Ali Rady Ibrahim",
-        firstName: "Ali",
+        customerName: t("Ali Rady Ibrahim", "علي راضي إبراهيم"),
+        firstName: t("Ali", "علي"),
         phone: "0110000000",
-        fulfillment: "Branch Pickup",
-        payment: "Cash",
+        fulfillmentKey: "pickup",
+        fulfillment: t("Branch Pickup", "استلام من الفرع"),
+        payment: t("Cash", "كاش"),
         items: [
-          { title: "Triple Smash Meal", sub: "Triple Beef & Fries", qty: 2, price: 160 },
-          { title: "Toomy Burger", sub: "Single", qty: 1, price: 185 }
+          {
+            title: t("Triple Smash Meal", "وجبة تربل سماش"),
+            sub: t("Triple Beef & Fries", "تربل بيف وبطاطس"),
+            qty: 2,
+            price: 160
+          },
+          {
+            title: t("Toomy Burger", "تومي برجر"),
+            sub: t("Single", "سنجل"),
+            qty: 1,
+            price: 185
+          }
         ],
         subtotal: 505,
         fee: 0,
         total: 505
       };
     }
+
+    const isDeliveryOrder = (entry) =>
+      entry.fulfillmentKey === "delivery" ||
+      entry.fulfillment === "Delivery" ||
+      entry.fulfillment === "توصيل";
+    const localizeFulfillment = (entry) =>
+      isDeliveryOrder(entry)
+        ? t("Delivery", "توصيل")
+        : t("Branch Pickup", "استلام من الفرع");
+    const localizePayment = (val) =>
+      val === "Cash" || val === "كاش" ? t("Cash", "كاش") : val;
 
     const firstNameEl = document.getElementById("confirmFirstName");
     const inlineCodeEl = document.getElementById("confirmInlineCode");
@@ -1700,11 +1756,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const receiptFeeValEl = document.getElementById("receiptFeeVal");
     const receiptGrandTotalEl = document.getElementById("receiptGrandTotal");
 
-    if (firstNameEl) firstNameEl.textContent = orderData.firstName || "Ali";
+    if (firstNameEl) firstNameEl.textContent = orderData.firstName || t("Ali", "علي");
     if (inlineCodeEl) inlineCodeEl.textContent = `#${orderData.code}`;
     if (inlinePhoneEl) inlinePhoneEl.textContent = orderData.phone;
     if (receiptCodeEl) receiptCodeEl.textContent = orderData.code;
-    if (receiptMetaEl) receiptMetaEl.textContent = `${orderData.fulfillment} · ${orderData.payment}`;
+    if (receiptMetaEl) {
+      receiptMetaEl.textContent = `${localizeFulfillment(orderData)} · ${localizePayment(orderData.payment)}`;
+    }
 
     if (receiptItemsList) {
       receiptItemsList.innerHTML = orderData.items
@@ -1715,7 +1773,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="receipt-item-name">${item.qty}&times; ${item.title}</span>
             ${item.sub ? `<span class="receipt-item-variant">${item.sub}</span>` : ""}
           </div>
-          <span class="receipt-item-price">${(item.price * item.qty).toLocaleString("en-US")} EGP</span>
+          <span class="receipt-item-price">${formatPrice(item.price * item.qty)}</span>
         </li>
       `
         )
@@ -1723,16 +1781,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (receiptSubtotalEl) {
-      receiptSubtotalEl.textContent = `${orderData.subtotal.toLocaleString("en-US")} EGP`;
+      receiptSubtotalEl.textContent = formatPrice(orderData.subtotal);
     }
     if (receiptFeeLabelEl) {
-      receiptFeeLabelEl.textContent = orderData.fulfillment === "Delivery" ? "Delivery" : "Pickup";
+      receiptFeeLabelEl.textContent = isDeliveryOrder(orderData)
+        ? t("Delivery", "التوصيل")
+        : t("Pickup", "الاستلام من الفرع");
     }
     if (receiptFeeValEl) {
-      receiptFeeValEl.textContent = orderData.fee === 0 ? "Free" : `${orderData.fee} EGP`;
+      receiptFeeValEl.textContent =
+        orderData.fee === 0 ? t("Free", "مجانًا") : formatPrice(orderData.fee);
     }
     if (receiptGrandTotalEl) {
-      receiptGrandTotalEl.textContent = `${orderData.total.toLocaleString("en-US")} EGP`;
+      receiptGrandTotalEl.textContent = formatPrice(orderData.total);
     }
 
     // "My Orders" Secondary Pill Modal Controller
@@ -1758,13 +1819,13 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="past-order-card">
           <div class="past-order-top">
             <span class="past-order-id">#${entry.code}</span>
-            <span class="past-order-total">${entry.total.toLocaleString("en-US")} EGP</span>
+            <span class="past-order-total">${formatPrice(entry.total)}</span>
           </div>
           <p class="past-order-items">
-            ${entry.items.map((i) => `${i.qty}× ${i.title}`).join(", ")}
+            ${entry.items.map((i) => `${i.qty}× ${i.title}`).join(IS_AR ? "، " : ", ")}
           </p>
           <p class="past-order-meta">
-            ${entry.fulfillment} &middot; ${entry.payment}${entry.createdAt ? ` &middot; ${entry.createdAt}` : ""}
+            ${localizeFulfillment(entry)} &middot; ${localizePayment(entry.payment)}${entry.createdAt ? ` &middot; ${entry.createdAt}` : ""}
           </p>
         </div>
       `
@@ -1866,7 +1927,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateLivePriceDisplay(shouldPulse = false) {
       const total = computeUnitPrice() * currentQty;
       if (pdpLivePriceBadge) {
-        pdpLivePriceBadge.textContent = `${total.toLocaleString("en-US")} EGP`;
+        pdpLivePriceBadge.textContent = formatPrice(total);
         if (shouldPulse) {
           pdpLivePriceBadge.classList.remove("is-popped");
           void pdpLivePriceBadge.offsetWidth;
@@ -1955,7 +2016,9 @@ document.addEventListener("DOMContentLoaded", () => {
       selectedOptionIndices = (target.optionGroups || []).map(() => 0);
       currentQty = 1;
 
-      document.title = `${target.title} — Toomy's | Asyut's Ultimate Burger & Pizza Spot`;
+      document.title = IS_AR
+        ? `${target.title} — توميز | أجمد برجر وبيتزا في أسيوط`
+        : `${target.title} — Toomy's | Asyut's Ultimate Burger & Pizza Spot`;
 
       if (pdpBadge) pdpBadge.textContent = target.badge;
       if (pdpImage) {
@@ -1966,7 +2029,9 @@ document.addEventListener("DOMContentLoaded", () => {
         pdpBackLink.href = `menu.html?cat=${encodeURIComponent(target.category)}`;
       }
       if (pdpBackLabel) {
-        pdpBackLabel.textContent = `Back to ${target.categoryLabel || target.category}`;
+        pdpBackLabel.textContent = IS_AR
+          ? `ارجع لقسم ${target.categoryLabel || target.category}`
+          : `Back to ${target.categoryLabel || target.category}`;
       }
       if (pdpTitle) pdpTitle.textContent = target.title;
       if (pdpSubtitle) pdpSubtitle.textContent = target.subtitle;
@@ -1986,7 +2051,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (pdpQtyVal) pdpQtyVal.textContent = "1";
       clearTimeout(pdpAddToCartBtn._addedTimer);
       pdpAddToCartBtn.classList.remove("is-added");
-      if (pdpAddLabel) pdpAddLabel.textContent = "Add to Cart";
+      if (pdpAddLabel) pdpAddLabel.textContent = t("Add to Cart", "ضيف للأوردر");
 
       renderOptionGroups();
       updateLivePriceDisplay(false);
@@ -2062,7 +2127,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .filter(Boolean);
 
         const variantSummary =
-          chosenLabels.length > 0 ? chosenLabels.join(" · ") : "Standard";
+          chosenLabels.length > 0 ? chosenLabels.join(" · ") : t("Standard", "عادي");
         const unitPrice = computeUnitPrice();
 
         let storedCart = [];
@@ -2111,11 +2176,11 @@ document.addEventListener("DOMContentLoaded", () => {
         window.dispatchEvent(new CustomEvent("toomys:cart-sync"));
 
         pdpAddToCartBtn.classList.add("is-added");
-        if (pdpAddLabel) pdpAddLabel.textContent = "Added \u2713";
+        if (pdpAddLabel) pdpAddLabel.textContent = t("Added \u2713", "اتضاف \u2713");
         clearTimeout(pdpAddToCartBtn._addedTimer);
         pdpAddToCartBtn._addedTimer = setTimeout(() => {
           pdpAddToCartBtn.classList.remove("is-added");
-          if (pdpAddLabel) pdpAddLabel.textContent = "Add to Cart";
+          if (pdpAddLabel) pdpAddLabel.textContent = t("Add to Cart", "ضيف للأوردر");
         }, 1500);
       });
     }
@@ -2157,11 +2222,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const newsletterMain = document.getElementById("newsletterMain");
   if (newsletterMain) {
     newsletterMain.classList.add("is-ready");
-    requestAnimationFrame(() => {
+    const enterNewsletter = () =>
       requestAnimationFrame(() => {
-        newsletterMain.classList.add("is-entered");
+        requestAnimationFrame(() => newsletterMain.classList.add("is-entered"));
       });
-    });
+
+    // The newsletter now sits below the contact section: play its entrance on scroll
+    if ("IntersectionObserver" in window) {
+      const newsletterObserver = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            enterNewsletter();
+            newsletterObserver.disconnect();
+          }
+        },
+        { threshold: 0.2 }
+      );
+      newsletterObserver.observe(newsletterMain);
+    } else {
+      enterNewsletter();
+    }
   }
 
   /* =========================================
@@ -2192,3 +2272,363 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 });
+/* =========================================================
+   CALM MOTION LAYER — soft scroll reveals + page fades
+   ========================================================= */
+(function () {
+  "use strict";
+
+  const reduceMotion =
+    window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function initSoftReveal() {
+    // Auto-tag shared sections so every page gets the same gentle entrance
+    const AUTO_TARGETS = [".menu-stars-header", ".star-card", ".footer-top-group"];
+    AUTO_TARGETS.forEach((selector) => {
+      document.querySelectorAll(selector).forEach((el, i) => {
+        if (el.classList.contains("js-soft-reveal")) return;
+        el.classList.add("js-soft-reveal");
+        if (!el.style.getPropertyValue("--reveal-delay")) {
+          el.style.setProperty("--reveal-delay", String(Math.min(i, 5)));
+        }
+      });
+    });
+
+    const targets = document.querySelectorAll(".js-soft-reveal");
+    if (!targets.length || reduceMotion || !("IntersectionObserver" in window)) {
+      targets.forEach((el) => el.classList.add("is-visible"));
+      return;
+    }
+
+    document.documentElement.classList.add("has-soft-reveal");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -6% 0px" }
+    );
+
+    targets.forEach((el) => observer.observe(el));
+  }
+
+  function initPageFades() {
+    if (reduceMotion) return;
+
+    document.addEventListener("click", (e) => {
+      if (e.defaultPrevented || e.button !== 0) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+      const link = e.target.closest("a[href]");
+      if (!link || link.target === "_blank" || link.hasAttribute("download")) return;
+
+      const url = new URL(link.href, window.location.href);
+      const samePage =
+        url.pathname === window.location.pathname && url.search === window.location.search;
+      if (url.origin !== window.location.origin || samePage || !/\.html?$|\/$/.test(url.pathname)) {
+        return;
+      }
+
+      e.preventDefault();
+      document.body.classList.add("is-leaving");
+      setTimeout(() => {
+        window.location.href = url.href;
+      }, 200);
+    });
+
+    // Coming back via the browser's back button restores the page from cache — un-fade it
+    window.addEventListener("pageshow", (e) => {
+      if (e.persisted) document.body.classList.remove("is-leaving");
+    });
+  }
+
+  function boot() {
+    initSoftReveal();
+    initPageFades();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
+
+/* =========================================================
+   CONTACT PAGE — INTERACTIVE TABLET (iOS-style)
+   Home screen ⇄ Maps ⇄ Contact card, live Cairo clock,
+   and an "Open now / Closed" status from the real hours.
+   ========================================================= */
+(function () {
+  "use strict";
+
+  function boot() {
+    const tablet = document.getElementById("contactTablet");
+    if (!tablet) return;
+
+    const screen = tablet.querySelector(".tablet-screen");
+    const views = screen.querySelectorAll(".ios-view");
+    const mapFrame = screen.querySelector(".ios-maps-frame");
+    const isAr = Boolean(window.TOOMYS_I18N && window.TOOMYS_I18N.isAr);
+    const t = (en, ar) => (isAr ? ar : en);
+
+    /* ---------- App switching ---------- */
+    function setApp(name, originEl) {
+      if (originEl) {
+        const s = screen.getBoundingClientRect();
+        const r = originEl.getBoundingClientRect();
+        const ox = (((r.left + r.width / 2 - s.left) / s.width) * 100).toFixed(1) + "%";
+        const oy = (((r.top + r.height / 2 - s.top) / s.height) * 100).toFixed(1) + "%";
+        views.forEach((v) => {
+          v.style.setProperty("--ox", ox);
+          v.style.setProperty("--oy", oy);
+        });
+      }
+
+      // Only load the real map the first time Maps is opened
+      if (name === "maps" && mapFrame && !mapFrame.getAttribute("src")) {
+        mapFrame.setAttribute("src", mapFrame.dataset.src);
+      }
+
+      // Portrait screens: open the place sheet half-way so the pin stays visible
+      if (name === "maps" && screen.dataset.activeApp !== "maps") {
+        const panel = screen.querySelector(".ios-maps-panel");
+        const toggle = panel && panel.querySelector("[data-sheet-toggle]");
+        const portrait = screen.clientHeight > screen.clientWidth;
+        if (panel) panel.dataset.sheet = portrait ? "peek" : "full";
+        if (toggle) {
+          toggle.setAttribute(
+            "aria-label",
+            portrait ? t("Show more details", "اعرض تفاصيل أكتر") : t("Show fewer details", "اعرض تفاصيل أقل")
+          );
+        }
+      }
+
+      screen.dataset.activeApp = name;
+      views.forEach((v) => {
+        const on = v.dataset.view === name;
+        v.inert = !on;
+        v.setAttribute("aria-hidden", String(!on));
+      });
+
+      if (name === "chat") onChatOpen();
+    }
+
+    /* ---------- WhatsApp-style chat ---------- */
+    const WA_NUMBER = "201040078750";
+    const chatThread = screen.querySelector("[data-wa-thread]");
+    const chatForm = screen.querySelector("[data-wa-form]");
+    const chatInput = chatForm && chatForm.querySelector(".wa-input");
+    const typingEl = screen.querySelector("[data-wa-typing]");
+    const greetingEl = screen.querySelector("[data-wa-greeting]");
+    const chipsEl = screen.querySelector("[data-wa-chips]");
+    const reduceMotion =
+      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let chatGreeted = false;
+
+    function cairoClock() {
+      return new Intl.DateTimeFormat(isAr ? "ar-EG-u-nu-latn" : "en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        timeZone: "Africa/Cairo"
+      }).format(new Date());
+    }
+
+    function scrollThread() {
+      if (chatThread) chatThread.scrollTo({ top: chatThread.scrollHeight, behavior: reduceMotion ? "auto" : "smooth" });
+    }
+
+    function syncSendState() {
+      if (chatForm && chatInput) chatForm.classList.toggle("is-empty", !chatInput.value.trim());
+    }
+
+    function onChatOpen() {
+      // Desktop: put the cursor in the box. Phones: don't pop the keyboard uninvited.
+      if (chatInput && window.matchMedia && window.matchMedia("(pointer: fine)").matches) {
+        setTimeout(() => chatInput.focus({ preventScroll: true }), 420);
+      }
+      if (chatGreeted || !greetingEl) return;
+      chatGreeted = true;
+
+      const nowEl = greetingEl.querySelector("[data-wa-now]");
+      if (nowEl) nowEl.textContent = cairoClock();
+
+      const reveal = () => {
+        if (typingEl) typingEl.hidden = true;
+        greetingEl.hidden = false;
+        if (chipsEl) chipsEl.hidden = false;
+        scrollThread();
+      };
+
+      if (reduceMotion) {
+        reveal();
+      } else {
+        if (typingEl) typingEl.hidden = false;
+        setTimeout(reveal, 1100);
+      }
+    }
+
+    // Typing indicator is hidden until the chat is first opened
+    if (typingEl) typingEl.hidden = true;
+
+    if (chatInput) {
+      chatInput.addEventListener("input", syncSendState);
+      syncSendState();
+    }
+
+    if (chipsEl && chatInput) {
+      chipsEl.addEventListener("click", (e) => {
+        const chip = e.target.closest("[data-wa-chip]");
+        if (!chip) return;
+        chatInput.value = chip.textContent.trim();
+        syncSendState();
+        chatInput.focus({ preventScroll: true });
+      });
+    }
+
+    if (chatForm && chatInput && chatThread) {
+      chatForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const message = chatInput.value.trim();
+
+        if (!message) {
+          chatForm.classList.remove("is-shake");
+          void chatForm.offsetWidth; // restart the nudge animation
+          chatForm.classList.add("is-shake");
+          chatInput.focus({ preventScroll: true });
+          return;
+        }
+
+        // Open WhatsApp first, while the click still counts as a user action (avoids popup blockers)
+        const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`;
+        const win = window.open(url, "_blank");
+        if (win) {
+          win.opener = null;
+        } else {
+          window.location.href = url;
+        }
+
+        // Show the sent bubble in the tablet
+        const bubble = document.createElement("div");
+        bubble.className = "wa-bubble wa-out";
+        const text = document.createElement("span");
+        text.className = "wa-text";
+        text.textContent = message;
+        const meta = document.createElement("span");
+        meta.className = "wa-meta";
+        meta.innerHTML =
+          `<span class="wa-time"></span>` +
+          `<svg class="wa-ticks" viewBox="0 0 18 12" aria-hidden="true"><path d="M1 6.5l3.2 3.2L11 2.5M7.5 9.2l.5.5L15 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        meta.querySelector(".wa-time").textContent = cairoClock();
+        bubble.append(text, meta);
+        chatThread.appendChild(bubble);
+        if (chipsEl) chipsEl.hidden = true;
+
+        chatInput.value = "";
+        syncSendState();
+        scrollThread();
+        setTimeout(() => bubble.classList.add("is-read"), 900);
+      });
+    }
+
+    // The WhatsApp icon under the tablet opens the chat inside the tablet
+    document.querySelectorAll("[data-open-tablet-chat]").forEach((link) => {
+      link.addEventListener("click", (e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey) return; // let power users open wa.me directly
+        e.preventDefault();
+        const origin = screen.querySelector('.ios-dock [data-open-app="chat"]');
+        setApp("chat", origin);
+        const r = tablet.getBoundingClientRect();
+        if (r.top < 0 || r.bottom > window.innerHeight) {
+          tablet.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+        }
+      });
+    });
+
+    screen.addEventListener("click", (e) => {
+      const opener = e.target.closest("[data-open-app]");
+      if (opener) {
+        e.preventDefault();
+        setApp(opener.dataset.openApp, opener);
+        return;
+      }
+
+      if (e.target.closest("[data-go-home]")) {
+        setApp("home");
+        return;
+      }
+
+      const toggle = e.target.closest("[data-sheet-toggle]");
+      if (toggle) {
+        const panel = toggle.closest(".ios-maps-panel");
+        const expand = panel.dataset.sheet !== "full";
+        panel.dataset.sheet = expand ? "full" : "peek";
+        toggle.setAttribute(
+          "aria-label",
+          expand ? t("Show fewer details", "اعرض تفاصيل أقل") : t("Show more details", "اعرض تفاصيل أكتر")
+        );
+      }
+    });
+
+    tablet.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && screen.dataset.activeApp !== "home") setApp("home");
+    });
+
+    /* ---------- Live clock + open status (Cairo time) ---------- */
+    const timeEls = screen.querySelectorAll("[data-ios-time]");
+    const dateEls = screen.querySelectorAll("[data-ios-date]");
+    const statusEls = screen.querySelectorAll("[data-open-status-text]");
+    const statusWrap = screen.querySelectorAll("[data-open-status]");
+    const locale = isAr ? "ar-EG-u-nu-latn" : "en-US";
+    const TZ = "Africa/Cairo";
+
+    function tick() {
+      const now = new Date();
+
+      const timeText = new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit", timeZone: TZ })
+        .formatToParts(now)
+        .filter((p) => p.type !== "dayPeriod")
+        .map((p) => p.value)
+        .join("")
+        .trim();
+
+      const dateText = new Intl.DateTimeFormat(locale, {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        timeZone: TZ
+      }).format(now);
+
+      const hour = Number(
+        new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone: TZ }).format(now)
+      );
+
+      // Open daily 2:00 PM – 2:00 AM
+      const isOpen = hour >= 14 || hour < 2;
+
+      timeEls.forEach((el) => (el.textContent = timeText));
+      dateEls.forEach((el) => (el.textContent = dateText));
+      statusEls.forEach((el) => {
+        el.textContent = isOpen
+          ? t("Open now", "فاتحين دلوقتي")
+          : t("Closed · opens 2 PM", "مقفولين · بنفتح 2 الضهر");
+        el.classList.toggle("is-closed", !isOpen);
+      });
+      statusWrap.forEach((el) => el.classList.toggle("is-closed", !isOpen));
+    }
+
+    setApp("home");
+    tick();
+    setInterval(tick, 30000);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();

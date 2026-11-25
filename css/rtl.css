@@ -1,0 +1,687 @@
+/* =========================================================
+   TOOMY'S — RTL & ARABIC TYPOGRAPHY LAYER + LANGUAGE TOGGLE
+   ---------------------------------------------------------
+   • Keeps css/style.css 100% untouched for English (LTR).
+   • Styles the compact navbar language pill in both EN & AR.
+   • Applies Cairo + Marhey typography, zero letter-spacing
+     (preserves Arabic cursive ligatures), and exact mirrored
+     positioning / motion / directional arrows under [dir="rtl"].
+   ========================================================= */
+
+/* =========================================================
+   1. NAVBAR LANGUAGE SWITCHER PILL (EN <-> عربي)
+   ========================================================= */
+.nav-lang-toggle {
+  height: 36px;
+  min-width: 48px;
+  padding: 0 13px;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(30, 24, 21, 0.14);
+  background-color: rgba(255, 255, 255, 0.72);
+  color: #1E1815;
+  font-family: "Cairo", "Plus Jakarta Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.nav-lang-toggle:hover {
+  background-color: #1E1815;
+  border-color: #1E1815;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.nav-lang-toggle:active {
+  transform: translateY(0);
+}
+
+.nav-lang-toggle:focus-visible {
+  outline: 2px solid #E3262E;
+  outline-offset: 2px;
+}
+
+@media (max-width: 400px) {
+  .nav-lang-toggle {
+    height: 34px;
+    min-width: 42px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+}
+
+/* =========================================================
+   2. RTL TYPOGRAPHY TOKENS & FONT OVERRIDES
+   ========================================================= */
+[dir="rtl"] {
+  --font-display: "Cairo", "Rubik", sans-serif;
+  --font-rounded: "Cairo", "Fredoka", sans-serif;
+  --font-body: "Cairo", "Plus Jakarta Sans", sans-serif;
+  --font-script: "Marhey", "Cairo", cursive;
+  --heading-letter-spacing: 0;
+  --heading-letter-spacing-tight: 0;
+}
+
+/* Override hardcoded Latin font families in style.css & prevent letter-spacing breaking Arabic cursive joins */
+[dir="rtl"],
+[dir="rtl"] body,
+[dir="rtl"] button,
+[dir="rtl"] input,
+[dir="rtl"] textarea,
+[dir="rtl"] select,
+[dir="rtl"] .nav-link,
+[dir="rtl"] .cart-pill-label,
+[dir="rtl"] .cart-toggle-label,
+[dir="rtl"] .cart-pill-badge,
+[dir="rtl"] .cart-toggle-badge,
+[dir="rtl"] .mobile-takeover-link,
+[dir="rtl"] .hero-slogan,
+[dir="rtl"] .menu-stars-heading,
+[dir="rtl"] .menu-hero-title,
+[dir="rtl"] .menu-card-title,
+[dir="rtl"] .menu-card-badge,
+[dir="rtl"] .menu-qv-label,
+[dir="rtl"] .qv-badge,
+[dir="rtl"] .qv-title,
+[dir="rtl"] .qv-chip,
+[dir="rtl"] .qv-add-btn,
+[dir="rtl"] .checkout-title,
+[dir="rtl"] .confirm-starburst-text,
+[dir="rtl"] .confirm-headline,
+[dir="rtl"] .confirm-btn-secondary,
+[dir="rtl"] .checkout-empty-headline,
+[dir="rtl"] .pdp-showcase-badge,
+[dir="rtl"] .pdp-add-btn,
+[dir="rtl"] .star-title,
+[dir="rtl"] .star-desc,
+[dir="rtl"] .star-badge,
+[dir="rtl"] .star-price,
+[dir="rtl"] .star-add-btn,
+[dir="rtl"] .menu-card-sub,
+[dir="rtl"] .menu-card-desc,
+[dir="rtl"] .menu-card-price,
+[dir="rtl"] .menu-card-cta,
+[dir="rtl"] .menu-filter-tab,
+[dir="rtl"] .qv-subtitle,
+[dir="rtl"] .qv-desc,
+[dir="rtl"] .qv-option-label,
+[dir="rtl"] .qv-option-pill,
+[dir="rtl"] .pdp-subtitle,
+[dir="rtl"] .pdp-desc,
+[dir="rtl"] .pdp-chip,
+[dir="rtl"] .pdp-option-label,
+[dir="rtl"] .pdp-option-pill,
+[dir="rtl"] .checkout-label,
+[dir="rtl"] .checkout-input,
+[dir="rtl"] .checkout-textarea,
+[dir="rtl"] .checkout-card-title,
+[dir="rtl"] .checkout-summary-title,
+[dir="rtl"] .checkout-submit-btn,
+[dir="rtl"] .fulfillment-tab,
+[dir="rtl"] .footer-col-heading,
+[dir="rtl"] .footer-tagline,
+[dir="rtl"] .footer-link,
+[dir="rtl"] .footer-info-text,
+[dir="rtl"] .footer-copyright,
+[dir="rtl"] .cart-drawer,
+[dir="rtl"] .cart-drawer-title,
+[dir="rtl"] .cart-empty-heading,
+[dir="rtl"] .cart-empty-subtext,
+[dir="rtl"] .cart-empty-cta,
+[dir="rtl"] .cart-checkout-btn,
+[dir="rtl"] .orders-modal,
+[dir="rtl"] .ticket-headline,
+[dir="rtl"] .ticket-eyebrow,
+[dir="rtl"] .ticket-desc,
+[dir="rtl"] .ticket-stamp-text,
+[dir="rtl"] .ticket-vip-tag,
+[dir="rtl"] .subscribe-btn,
+[dir="rtl"] .hungry-eyebrow,
+[dir="rtl"] .hungry-headline,
+[dir="rtl"] .start-order-btn,
+[dir="rtl"] .about-display-headline,
+[dir="rtl"] .about-story-paragraph,
+[dir="rtl"] .about-pillar-title,
+[dir="rtl"] .about-pillar-desc,
+[dir="rtl"] .about-brand-seal-text {
+  font-family: var(--font-body);
+  letter-spacing: 0 !important;
+}
+
+/* Keep display weight punchy on headings */
+[dir="rtl"] .hero-wordmark,
+[dir="rtl"] .menu-stars-heading,
+[dir="rtl"] .menu-hero-title,
+[dir="rtl"] .checkout-title,
+[dir="rtl"] .confirm-headline,
+[dir="rtl"] .checkout-empty-headline,
+[dir="rtl"] .about-display-headline,
+[dir="rtl"] .ticket-headline,
+[dir="rtl"] .hungry-eyebrow,
+[dir="rtl"] .hungry-headline,
+[dir="rtl"] .pdp-title,
+[dir="rtl"] .pdp-upsell-title,
+[dir="rtl"] .qv-title,
+[dir="rtl"] .mobile-takeover-link,
+[dir="rtl"] .footer-col-heading {
+  font-family: var(--font-display);
+}
+
+/* Bouncy handwritten script font for the mobile takeover tagline */
+[dir="rtl"] .mobile-takeover-tagline {
+  font-family: var(--font-script);
+  letter-spacing: 0 !important;
+  line-height: 1.45;
+}
+
+/* Give tight Latin display headings breathing room for Arabic diacritics/dots */
+[dir="rtl"] .menu-hero-title,
+[dir="rtl"] .checkout-title {
+  line-height: 1.15;
+}
+
+[dir="rtl"] .menu-stars-heading,
+[dir="rtl"] .about-display-headline,
+[dir="rtl"] .confirm-headline,
+[dir="rtl"] .checkout-empty-headline,
+[dir="rtl"] .pdp-title,
+[dir="rtl"] .qv-title {
+  line-height: 1.22;
+}
+
+[dir="rtl"] .ticket-headline {
+  line-height: 1.22;
+}
+
+[dir="rtl"] .hungry-eyebrow {
+  line-height: 1.2;
+}
+
+[dir="rtl"] .hungry-headline {
+  line-height: 1.16;
+}
+
+[dir="rtl"] .hero-slogan {
+  line-height: 1.5;
+}
+
+[dir="rtl"] .menu-card-title {
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+[dir="rtl"] .confirm-starburst-text {
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+/* Keep order codes & phone numbers strictly LTR */
+[dir="rtl"] .confirm-code-inline,
+[dir="rtl"] .confirm-phone-inline,
+[dir="rtl"] .receipt-order-code,
+[dir="rtl"] .past-order-id,
+[dir="rtl"] .cart-order-ref {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+}
+
+[dir="rtl"] .checkout-input-num,
+[dir="rtl"] .ticket-contact-input {
+  direction: ltr;
+  text-align: right;
+}
+
+/* =========================================================
+   3. NAVBAR & HERO
+   ========================================================= */
+[dir="rtl"] .floating-navbar {
+  padding: 0 24px 0 12px;
+}
+
+[dir="rtl"] .nav-cart-pill,
+[dir="rtl"] .cart-toggle {
+  padding: 0 16px 0 8px;
+}
+
+@media (max-width: 767.98px) {
+  [dir="rtl"] .floating-navbar {
+    padding: 0 18px 0 10px;
+  }
+}
+
+@media (max-width: 400px) {
+  [dir="rtl"] .floating-navbar {
+    padding: 0 14px 0 8px;
+  }
+  [dir="rtl"] .nav-cart-pill,
+  [dir="rtl"] .cart-toggle {
+    padding: 0 12px 0 6px;
+  }
+}
+
+[dir="rtl"] .btn-order::before {
+  transform-origin: right center;
+}
+
+/* Keep JS infinite marquee coordinate math LTR while cards inside render RTL */
+[dir="rtl"] .category-track {
+  direction: ltr;
+}
+
+[dir="rtl"] .category-card {
+  direction: rtl;
+}
+
+[dir="rtl"] .category-meta {
+  text-align: right;
+}
+
+/* Promo ticker stays dir="ltr" for seamless -50% loop; isolate Arabic items */
+[dir="rtl"] .ticker-item {
+  direction: rtl;
+  unicode-bidi: isolate;
+  letter-spacing: 0 !important;
+}
+
+/* =========================================================
+   4. HOME: MENU STARS & FOOTER LINKS
+   ========================================================= */
+[dir="rtl"] .menu-stars-action::after,
+[dir="rtl"] .footer-link::after {
+  transform-origin: left center;
+}
+
+[dir="rtl"] .menu-stars-action:hover::after,
+[dir="rtl"] .footer-link:hover::after {
+  transform-origin: right center;
+}
+
+[dir="rtl"] .menu-stars-action .action-arrow {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .menu-stars-action:hover .action-arrow {
+  transform: translateX(-4px) scaleX(-1);
+}
+
+/* =========================================================
+   5. ABOUT US PAGE
+   ========================================================= */
+[dir="rtl"] .about-pillar-desc {
+  text-align: left;
+}
+
+[dir="rtl"] .about-collage-card-primary {
+  right: auto;
+  left: 24px;
+  transform: rotate(-3deg);
+}
+
+[dir="rtl"] .about-collage-cutout {
+  left: auto;
+  right: 0;
+}
+
+[dir="rtl"] .about-collage-card-secondary {
+  left: auto;
+  right: 48px;
+  transform: rotate(3.5deg);
+}
+
+[dir="rtl"] .about-brand-seal {
+  right: auto;
+  left: 16px;
+}
+
+@media (max-width: 640px) {
+  [dir="rtl"] .about-pillar-desc {
+    text-align: right;
+  }
+  [dir="rtl"] .about-collage-card-primary {
+    right: auto;
+    left: 8px;
+  }
+  [dir="rtl"] .about-collage-cutout {
+    left: auto;
+    right: 0;
+  }
+  [dir="rtl"] .about-collage-card-secondary {
+    left: auto;
+    right: 20px;
+  }
+  [dir="rtl"] .about-brand-seal {
+    right: auto;
+    left: 6px;
+  }
+}
+
+/* =========================================================
+   6. NEWSLETTER / CONTACT PAGE
+   ========================================================= */
+[dir="rtl"] .newsletter-ticket {
+  left: auto;
+  right: clamp(22px, 2.4vw, 52px);
+  transform: translateY(-50%) rotate(2.5deg);
+}
+
+[dir="rtl"] .newsletter-page.is-ready:not(.is-entered) .newsletter-ticket {
+  transform: translateY(calc(-50% + 18px)) rotate(2.5deg);
+}
+
+[dir="rtl"] .newsletter-ticket:hover {
+  transform: translateY(calc(-50% - 3px)) rotate(1.5deg);
+}
+
+[dir="rtl"] .ticket-editorial-copy {
+  text-align: right;
+  align-items: flex-start;
+}
+
+[dir="rtl"] .ticket-pill-form {
+  padding: 6px 24px 6px 6px;
+}
+
+[dir="rtl"] .subscribe-btn {
+  margin-left: 0;
+  margin-right: auto;
+  padding: 0 24px 0 16px;
+}
+
+[dir="rtl"] .subscribe-arrow-badge {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .subscribe-btn:hover .subscribe-arrow-badge {
+  transform: translateX(-2px) scaleX(-1);
+}
+
+[dir="rtl"] .hero-pizza-wrap {
+  right: auto;
+  left: -17.5vw;
+  filter: drop-shadow(18px 22px 36px rgba(20, 12, 10, 0.35));
+}
+
+[dir="rtl"] .hungry-cta-block {
+  right: auto;
+  left: clamp(290px, 22.5vw, 410px);
+  align-items: flex-start;
+  text-align: right;
+}
+
+[dir="rtl"] .start-order-btn {
+  padding: 6px 26px 6px 6px;
+}
+
+[dir="rtl"] .start-order-btn .arrow-circle {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .start-order-btn:hover .arrow-circle {
+  transform: scale(1.08) translateX(-2px) scaleX(-1);
+}
+
+@media (max-width: 1399px) and (min-width: 1024px) {
+  [dir="rtl"] .newsletter-ticket {
+    left: auto;
+    right: 24px;
+  }
+  [dir="rtl"] .hungry-cta-block {
+    right: auto;
+    left: clamp(230px, 20vw, 310px);
+  }
+}
+
+@media (max-width: 1023.98px) {
+  [dir="rtl"] .newsletter-ticket {
+    right: auto;
+    left: auto;
+    transform: none;
+  }
+  [dir="rtl"] .newsletter-ticket:hover {
+    transform: none;
+  }
+  [dir="rtl"] .hungry-cta-block {
+    left: auto;
+    right: auto;
+    text-align: center;
+    align-items: center;
+  }
+  [dir="rtl"] .hero-pizza-wrap {
+    left: auto;
+    right: auto;
+  }
+}
+
+@media (max-width: 479.98px) {
+  [dir="rtl"] .ticket-pill-form {
+    padding-left: 6px;
+    padding-right: 16px;
+  }
+  [dir="rtl"] .subscribe-btn {
+    padding: 0 16px 0 12px;
+  }
+}
+
+@media (max-width: 379.98px) {
+  [dir="rtl"] .subscribe-btn {
+    margin-right: 0;
+  }
+}
+
+/* =========================================================
+   7. CART DRAWER (SLIDES FROM LEFT IN RTL)
+   ========================================================= */
+[dir="rtl"] .cart-drawer {
+  right: auto;
+  left: 0;
+  border-radius: 0 26px 26px 0;
+  box-shadow: 18px 0 48px rgba(13, 11, 10, 0.34);
+  transform: translate3d(-102%, 0, 0);
+}
+
+[dir="rtl"] .cart-drawer.is-open {
+  transform: translate3d(0, 0, 0);
+}
+
+[dir="rtl"] .cart-drawer-body {
+  padding: 4px 0 4px 4px;
+}
+
+[dir="rtl"] .cart-empty-cta {
+  padding: 10px 22px 10px 11px;
+}
+
+[dir="rtl"] .cart-cta-arrow {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .cart-empty-cta:hover .cart-cta-arrow {
+  transform: translateX(-2px) scaleX(-1);
+}
+
+@keyframes cartItemSlideInRtl {
+  0% {
+    opacity: 0;
+    transform: translate3d(-42px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+[dir="rtl"] .cart-drawer.is-open.is-animating-items .cart-item {
+  animation-name: cartItemSlideInRtl;
+}
+
+[dir="rtl"] .cart-item.is-removing .cart-item-inner {
+  transform: translate3d(-46px, 0, 0);
+}
+
+/* =========================================================
+   8. MENU PAGE & QUICK VIEW MODAL
+   ========================================================= */
+[dir="rtl"] .menu-hero-copy,
+[dir="rtl"] .menu-card-body {
+  text-align: right;
+}
+
+[dir="rtl"] .menu-filter-tab .tab-count {
+  margin-left: 0;
+  margin-right: 3px;
+}
+
+[dir="rtl"] .menu-card-badge {
+  left: auto;
+  right: 0;
+}
+
+[dir="rtl"] .menu-qv-btn {
+  right: auto;
+  left: 0;
+}
+
+[dir="rtl"] .qv-badge {
+  left: auto;
+  right: 20px;
+}
+
+[dir="rtl"] .qv-details-pane {
+  text-align: right;
+}
+
+[dir="rtl"] .qv-close-btn {
+  right: auto;
+  left: 18px;
+}
+
+[dir="rtl"] .qv-scroll-content {
+  padding-right: 0;
+  padding-left: 24px;
+}
+
+[dir="rtl"] .qv-add-btn {
+  padding: 6px 20px 6px 8px;
+}
+
+@media (max-width: 780px) {
+  [dir="rtl"] .qv-badge {
+    left: auto;
+    right: 14px;
+  }
+  [dir="rtl"] .qv-close-btn {
+    right: auto;
+    left: 14px;
+  }
+}
+
+/* =========================================================
+   9. CHECKOUT PAGE
+   ========================================================= */
+[dir="rtl"] .checkout-hero,
+[dir="rtl"] .checkout-recovery-card {
+  text-align: right;
+}
+
+[dir="rtl"] .fulfillment-pill-slider {
+  left: auto;
+  right: 5px;
+}
+
+[dir="rtl"] .fulfillment-toggle.is-pickup .fulfillment-pill-slider {
+  transform: translate3d(-100%, 0, 0);
+}
+
+[dir="rtl"] .checkout-summary-item.is-removing .checkout-summary-item-inner {
+  transform: translate3d(-24px, 0, 0);
+}
+
+[dir="rtl"] .checkout-add-more-link .add-more-arrow {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .checkout-add-more-link:hover .add-more-arrow {
+  transform: translateX(-4px) scaleX(-1);
+}
+
+[dir="rtl"] .checkout-empty-cta {
+  padding: 11px 26px 11px 11px;
+}
+
+[dir="rtl"] .checkout-empty-cta-arrow {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .checkout-empty-cta:hover .checkout-empty-cta-arrow {
+  transform: translateX(-2px) scaleX(-1);
+}
+
+/* =========================================================
+   10. ORDER CONFIRMATION PAGE
+   ========================================================= */
+[dir="rtl"] .confirm-starburst-wrap {
+  right: auto;
+  left: 8px;
+}
+
+[dir="rtl"] .confirm-btn-primary,
+[dir="rtl"] .confirm-btn-secondary {
+  padding: 8px 20px 8px 8px;
+}
+
+[dir="rtl"] .confirm-btn-primary .confirm-btn-circle,
+[dir="rtl"] .confirm-btn-secondary .confirm-btn-circle {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .confirm-btn-primary:hover .confirm-btn-circle {
+  transform: scale(1.08) translateX(-2px) scaleX(-1);
+}
+
+[dir="rtl"] .confirm-btn-secondary:hover .confirm-btn-circle {
+  transform: translateX(-2px) scaleX(-1);
+}
+
+@media (max-width: 640px) {
+  [dir="rtl"] .confirm-starburst-wrap {
+    left: auto;
+    right: auto;
+  }
+}
+
+/* =========================================================
+   11. PRODUCT DETAIL PAGE (PDP)
+   ========================================================= */
+[dir="rtl"] .pdp-showcase-badge {
+  left: auto;
+  right: 24px;
+}
+
+[dir="rtl"] .pdp-info-col,
+[dir="rtl"] .pdp-upsell-header {
+  text-align: right;
+}
+
+[dir="rtl"] .pdp-back-arrow {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .pdp-back-link:hover .pdp-back-arrow {
+  transform: translateX(3px) scaleX(-1);
+}
+
+[dir="rtl"] .pdp-add-btn {
+  padding: 8px 24px 8px 8px;
+}
