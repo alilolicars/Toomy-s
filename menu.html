@@ -6,141 +6,73 @@
   <title>The Menu — Toomy's | Asyut's Ultimate Burger &amp; Pizza Spot</title>
 
   <!-- Google Fonts: Fredoka (Rounded Display), Plus Jakarta Sans, Montserrat, Cormorant Garamond & Archivo Black -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cormorant+Garamond:wght@400;500;600&family=Fredoka:wght@600;700&family=Montserrat:wght@800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cormorant+Garamond:wght@400;500;600&family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Rubik:wght@700;800;900&display=swap"
     rel="stylesheet"
   />
-
+  <link href="https://fonts.googleapis.com/css2?family=Yellowtail&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body class="menu-page-body">
 
-  <!-- 1. FIXED TOP HEADER (SHARED ACROSS ALL PAGES) -->
-  <header class="site-header" id="siteHeader">
-    <a href="index.html#home" class="brand-mini" aria-label="Toomy's Home">
-      <img
-        src="assets/logo-small.webp"
-        alt="Toomy's"
-        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';"
-      />
-      <span class="brand-mini-fallback" style="display: none;">Toomy's</span>
+    <!-- 1. FLOATING PILL NAVBAR -->
+  <header class="floating-navbar" id="siteNavbar">
+    <!-- Left — Brand Logo: Custom red script wordmark Toomy's (#E3262E, linking to index.html) -->
+    <a href="index.html" class="nav-brand" aria-label="Toomy's Home">
+      <img src="assets/logo-small.webp" alt="Toomy's" class="nav-brand-img" />
     </a>
 
-    <div class="header-actions">
+    <!-- Center — Nav Links (gap: 32px, 14.5px, font-weight: 700): Home, Menu, About Us, Contact Us -->
+    <nav class="nav-center-links" aria-label="Main Navigation">
+      <a href="index.html" class="nav-link" data-page="home">Home</a>
+      <a href="menu.html" class="nav-link is-active" aria-current="page" data-page="menu">Menu</a>
+      <a href="about.html" class="nav-link" data-page="about">About Us</a>
+      <a href="newsletter.html" class="nav-link" data-page="contact">Contact Us</a>
+    </nav>
+
+    <!-- Right — Action Cluster (gap: 8px) -->
+    <div class="nav-action-cluster">
       <button
-        class="cart-toggle"
+        class="nav-cart-pill cart-toggle"
         id="cartToggle"
         type="button"
         aria-expanded="false"
         aria-controls="cartDrawer"
         aria-label="Open Cart"
       >
-        <span class="cart-toggle-label">CART</span>
-        <span class="cart-toggle-badge" id="cartCountBadge">0</span>
+        <span class="cart-pill-label">Cart</span>
+        <span class="cart-pill-badge cart-toggle-badge" id="cartCountBadge">0</span>
       </button>
 
       <button
-        class="menu-toggle"
-        id="menuToggle"
+        class="nav-hamburger-btn"
+        id="mobileMenuBtn"
         type="button"
         aria-expanded="false"
-        aria-controls="navOverlay"
+        aria-controls="mobileTakeover"
+        aria-label="Toggle navigation menu"
       >
-        <span class="menu-toggle-icon">+</span>
-        <span class="menu-toggle-label">MENU</span>
+        <span class="hamburger-bar hamburger-bar-1" aria-hidden="true"></span>
+        <span class="hamburger-bar hamburger-bar-2" aria-hidden="true"></span>
       </button>
     </div>
   </header>
 
-  <!-- 2. FULL-SCREEN DRAWER MENU (IDENTICAL TO HOME, ABOUT & NEWSLETTER) -->
-  <div class="nav-overlay" id="navOverlay" aria-hidden="true">
-    <div class="nav-overlay-inner">
-      <div class="nav-top-bar nav-stagger" style="--stagger-index: 0;">
-        <div class="lang-switcher" role="group" aria-label="Language Switcher">
-          <button type="button" class="lang-btn" data-lang="ar">AR</button>
-          <span class="lang-divider" aria-hidden="true">|</span>
-          <button type="button" class="lang-btn is-active" data-lang="en">EN</button>
-        </div>
-
-        <a href="index.html#home" class="nav-center-logo" aria-label="Toomy's Home">
-          <img
-            src="assets/logo-main.webp"
-            alt="Toomy's"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-          />
-          <span class="drawer-logo-fallback" style="display: none;">Toomy's</span>
-        </a>
-
-        <div class="nav-top-spacer" aria-hidden="true"></div>
-      </div>
-
-      <ul class="nav-rows" aria-label="Primary Navigation">
-        <li class="nav-row nav-stagger" style="--stagger-index: 1;">
-          <div class="nav-row-curtain" aria-hidden="true"></div>
-          <a href="index.html#home" class="nav-row-link pos-home">
-            <span class="nav-row-label">HOME</span>
-          </a>
-        </li>
-
-        <li class="nav-row nav-stagger" style="--stagger-index: 2;">
-          <div class="nav-row-curtain" aria-hidden="true"></div>
-          <a href="menu.html" class="nav-row-link pos-menu" aria-current="page">
-            <span class="nav-row-label">MENU</span>
-            <sup class="nav-row-count">(24)</sup>
-          </a>
-        </li>
-
-        <li class="nav-row nav-stagger" style="--stagger-index: 3;">
-          <div class="nav-row-curtain" aria-hidden="true"></div>
-          <a href="about.html" class="nav-row-link pos-about">
-            <span class="nav-row-label">ABOUT US</span>
-          </a>
-        </li>
-
-        <li class="nav-row nav-stagger" style="--stagger-index: 4;">
-          <div class="nav-row-curtain" aria-hidden="true"></div>
-          <a href="newsletter.html" class="nav-row-link pos-contact">
-            <span class="nav-row-label">CONTACT US</span>
-          </a>
-        </li>
-      </ul>
-
-      <div class="nav-bottom-bar nav-stagger" style="--stagger-index: 5;">
-        <a href="#privacy" class="nav-legal-link">PRIVACY POLICY</a>
-
-        <div class="nav-socials">
-          <a
-            href="https://www.facebook.com/toomyseg"
-            target="_blank"
-            rel="noopener"
-            class="social-icon"
-            aria-label="Facebook"
-          >
-            <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor">
-              <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z"/>
-            </svg>
-          </a>
-          <a
-            href="https://www.instagram.com/"
-            target="_blank"
-            rel="noopener"
-            class="social-icon"
-            aria-label="Instagram"
-          >
-            <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor">
-              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-            </svg>
-          </a>
-        </div>
-
-        <a href="#terms" class="nav-legal-link">TERMS &amp; CONDITIONS</a>
-      </div>
+  <!-- 2. FULL-SCREEN RED TAKEOVER SHEET (< 768px) -->
+  <div class="mobile-takeover" id="mobileTakeover" aria-hidden="true">
+    <div class="mobile-takeover-inner">
+      <nav class="mobile-takeover-links" aria-label="Mobile Navigation">
+        <a href="index.html" class="mobile-takeover-link" data-page="home">Home</a>
+        <a href="menu.html" class="mobile-takeover-link is-active" aria-current="page" data-page="menu">Menu</a>
+        <a href="about.html" class="mobile-takeover-link" data-page="about">About Us</a>
+        <a href="newsletter.html" class="mobile-takeover-link" data-page="contact">Contact Us</a>
+      </nav>
+      <p class="mobile-takeover-tagline">Don't waste the good taste</p>
     </div>
   </div>
 
-  <!-- 3. FULL MENU MAIN CANVAS (#F5EFE6) -->
   <main class="menu-page-main" id="menuTop">
     <div class="menu-shell">
 
@@ -315,7 +247,7 @@
     <div class="footer-top-group">
       <a href="index.html#home" class="footer-logo" aria-label="Toomy's Home">
         <img
-          src="assets/logo-main.webp"
+          src="assets/logo-small.webp"
           alt="Toomy's"
           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
         />

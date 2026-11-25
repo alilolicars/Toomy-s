@@ -1,103 +1,135 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-  /* =========================================
-     1. FULL-SCREEN MENU DRAWER + DIRECTION-AWARE ROWS
+    /* =========================================
+     1. FLOATING PILL NAVBAR & MOBILE TAKEOVER CONTROLLER
      ========================================= */
-  const menuToggle = document.getElementById("menuToggle");
-  const menuToggleText = menuToggle?.querySelector(".menu-toggle-text");
-  const navOverlay = document.getElementById("navOverlay");
-  const navCloseLinks = document.querySelectorAll(".nav-row-link, .nav-center-logo");
-  const brandMini = document.querySelector(".brand-mini");
-  let closeTimer = null;
+  const navbar = document.querySelector(".floating-navbar");
+  const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+  const mobileTakeover = document.getElementById("mobileTakeover");
+  const mobileNavLinks = document.querySelectorAll(".mobile-takeover-link");
+  const stickyFilterWrap = document.getElementById("menuFilterWrap");
 
-  function setMenuState(isOpen) {
-    if (!menuToggle || !navOverlay) return;
+  let isMobileMenuOpen = false;
+  let lastScrollY = window.scrollY;
 
-    clearTimeout(closeTimer);
-
-    menuToggle.setAttribute("aria-expanded", String(isOpen));
-    navOverlay.setAttribute("aria-hidden", String(!isOpen));
-    document.body.classList.toggle("is-menu-open", isOpen);
-
-    if (isOpen) {
-      navOverlay.classList.remove("is-closing");
-      navOverlay.classList.add("is-open");
-      document.body.style.overflow = "hidden";
-    } else {
-      // Keep items sharp (.is-closing) while the entire overlay slides upward
-      navOverlay.classList.add("is-closing");
-      navOverlay.classList.remove("is-open");
-      document.body.style.overflow = "";
-
-      // Once upward curtain slide finishes (650ms), reset .is-closing so next open blurs & cascades
-      closeTimer = setTimeout(() => {
-        navOverlay.classList.remove("is-closing");
-      }, 650);
+  function setMobileMenuState(isOpen) {
+    isMobileMenuOpen = isOpen;
+    if (mobileMenuBtn) {
+      mobileMenuBtn.setAttribute("aria-expanded", String(isOpen));
+      mobileMenuBtn.classList.toggle("is-active", isOpen);
     }
+    if (mobileTakeover) {
+      mobileTakeover.setAttribute("aria-hidden", String(!isOpen));
+      mobileTakeover.classList.toggle("is-open", isOpen);
+    }
+    document.body.classList.toggle("is-mobile-menu-open", isOpen);
+    document.body.style.overflow = isOpen ? "hidden" : "";
 
-    if (menuToggleText) {
-      menuToggleText.textContent = isOpen ? "CLOSE" : "MENU";
+    // Keep floating navbar visible while mobile takeover is active
+    if (isOpen && navbar) {
+      navbar.classList.remove("is-hidden");
+      if (stickyFilterWrap) stickyFilterWrap.classList.remove("is-top-pinned");
     }
   }
 
-  menuToggle?.addEventListener("click", () => {
-    const currentlyOpen = menuToggle.getAttribute("aria-expanded") === "true";
-    setMenuState(!currentlyOpen);
-  });
+  // Hamburger button toggle
+  if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setMobileMenuState(!isMobileMenuOpen);
+    });
+  }
 
-  navCloseLinks.forEach((link) => {
+  // Close takeover when a link is clicked
+  mobileNavLinks.forEach((link) => {
     link.addEventListener("click", () => {
-      setMenuState(false);
+      setMobileMenuState(false);
     });
   });
 
-  brandMini?.addEventListener("click", (e) => {
-    setMenuState(false);
-    const homeEl = document.getElementById("home");
-    if (homeEl) {
-      e.preventDefault();
-      homeEl.scrollIntoView({ behavior: "smooth" });
-    }
-  });
-
+  // Close takeover on Escape key
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && navOverlay?.classList.contains("is-open")) {
-      setMenuState(false);
+    if (e.key === "Escape" && isMobileMenuOpen) {
+      setMobileMenuState(false);
     }
   });
 
-  // --- Direction-Aware Row Hover Curtain ---
-  const navRows = document.querySelectorAll(".nav-row");
+  // Smart Scroll-Hide / Reveal Animation
+  // - Scroll Down (> 60px): Smoothly slide navbar upward out of view
+  // - Scroll Up: Immediately glide navbar back down into view
+  function handleNavbarScroll() {
+    if (!navbar || isMobileMenuOpen) return;
 
-  navRows.forEach((row) => {
-    const curtain = row.querySelector(".nav-row-curtain");
-    if (!curtain) return;
+    const currentY = window.scrollY;
+    const delta = currentY - lastScrollY;
 
-    row.addEventListener("mouseenter", (e) => {
-      const rect = row.getBoundingClientRect();
-      const enteredFromTop = e.clientY - rect.top < rect.height / 2;
-      curtain.style.transformOrigin = enteredFromTop ? "top center" : "bottom center";
-      row.classList.add("is-hovered");
-    });
+    if (currentY <= 60) {
+      // Near top of page: always reveal navbar
+      navbar.classList.remove("is-hidden");
+      if (stickyFilterWrap) stickyFilterWrap.classList.remove("is-top-pinned");
+    } else if (delta > 5 && currentY > 60) {
+      // Scrolling down past 60px: slide navbar upward
+      navbar.classList.add("is-hidden");
+      if (stickyFilterWrap) stickyFilterWrap.classList.add("is-top-pinned");
+    } else if (delta < -5) {
+      // Scrolling up: immediately glide navbar back down into view
+      navbar.classList.remove("is-hidden");
+      if (stickyFilterWrap) stickyFilterWrap.classList.remove("is-top-pinned");
+    }
 
-    row.addEventListener("mouseleave", (e) => {
-      const rect = row.getBoundingClientRect();
-      const exitedTowardTop = e.clientY - rect.top < rect.height / 2;
-      curtain.style.transformOrigin = exitedTowardTop ? "top center" : "bottom center";
-      row.classList.remove("is-hovered");
+    // Toggle stuck elevation shadow on sticky category pill (menu.html)
+    if (stickyFilterWrap) {
+      const wrapTop = stickyFilterWrap.getBoundingClientRect().top;
+      stickyFilterWrap.classList.toggle("is-stuck", wrapTop <= 94);
+    }
+
+    lastScrollY = Math.max(0, currentY);
+  }
+
+  window.addEventListener("scroll", handleNavbarScroll, { passive: true });
+  handleNavbarScroll();
+
+  // Automatic Active Page Link Highlighting across website
+  const rawPath = window.location.pathname.split("/").pop().toLowerCase();
+  let activePageKey = "home";
+
+  if (rawPath.includes("menu") || rawPath.includes("product")) {
+    activePageKey = "menu";
+  } else if (rawPath.includes("about")) {
+    activePageKey = "about";
+  } else if (rawPath.includes("newsletter")) {
+    activePageKey = "contact";
+  } else if (rawPath.includes("checkout") || rawPath.includes("order-confirmation")) {
+    activePageKey = "none";
+  } else if (!rawPath || rawPath === "index.html" || rawPath === "") {
+    activePageKey = "home";
+  }
+
+  document.querySelectorAll(".floating-navbar .nav-link, .mobile-takeover .mobile-takeover-link").forEach((link) => {
+    const pageAttr = link.getAttribute("data-page");
+    if (pageAttr && pageAttr === activePageKey) {
+      link.classList.add("is-active");
+      link.setAttribute("aria-current", "page");
+    } else if (pageAttr) {
+      link.classList.remove("is-active");
+      link.removeAttribute("aria-current");
+    }
+  });
+
+  // Smooth scroll to top when clicking Home link or Logo on home page
+  const homeTriggers = document.querySelectorAll('.nav-brand, .floating-navbar .nav-link[data-page="home"], .mobile-takeover-link[data-page="home"]');
+  homeTriggers.forEach((trigger) => {
+    trigger.addEventListener("click", (e) => {
+      const isHome = !rawPath || rawPath === "index.html" || rawPath === "";
+      if (isHome) {
+        e.preventDefault();
+        setMobileMenuState(false);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     });
   });
 
-  // --- Language Switcher (AR | EN) Active State ---
-  const langBtns = document.querySelectorAll(".lang-btn");
-  langBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      langBtns.forEach((b) => b.classList.remove("is-active"));
-      btn.classList.add("is-active");
-    });
-  });
-
-    /* =========================================
+/* =========================================
      2. HERO INFINITE CATEGORY MARQUEE (GPU-SMOOTH)
      ========================================= */
   const categoryTrack = document.getElementById("categoryTrack");
@@ -255,36 +287,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
-
-  /* =========================================
-     4. HEADER CONTRAST ON LIGHT SECTIONS
-     ========================================= */
-  const menuStarsSection = document.getElementById("menu");
-
-  function updateHeaderContrast() {
-    if (!menuStarsSection) return;
-    const rect = menuStarsSection.getBoundingClientRect();
-    // Flip header button to dark when the cream section reaches the top navbar (~60px)
-    const isOverLight = rect.top <= 60 && rect.bottom >= 60;
-    document.body.classList.toggle("is-scrolled-light", isOverLight);
-  }
-
-  const footerSection = document.getElementById("contact");
-
-  function updateHeaderContrast() {
-    if (menuStarsSection) {
-      const rect = menuStarsSection.getBoundingClientRect();
-      const isOverLight = rect.top <= 60 && rect.bottom >= 60;
-      document.body.classList.toggle("is-scrolled-light", isOverLight);
-    }
-    if (footerSection) {
-      const footerRect = footerSection.getBoundingClientRect();
-      document.body.classList.toggle("is-over-footer", footerRect.top <= 80);
-    }
-  }
-
-  window.addEventListener("scroll", updateHeaderContrast, { passive: true });
-  updateHeaderContrast();
 
   /* =========================================
      5. FOOTER: DYNAMIC YEAR, BURGER REVEAL & MENU ROUTING
@@ -564,7 +566,7 @@ document.addEventListener("DOMContentLoaded", () => {
       cartDrawer.classList.remove("is-open", "is-animating-items");
       cartBackdrop.classList.remove("is-open");
       if (cartToggleBtn) cartToggleBtn.setAttribute("aria-expanded", "false");
-      if (!document.body.classList.contains("is-menu-open")) {
+      if (!document.body.classList.contains("is-mobile-menu-open")) {
         document.body.style.overflow = "";
       }
     }
@@ -699,7 +701,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Drawer open/close listeners
-    if (cartToggleBtn) cartToggleBtn.addEventListener("click", openCartDrawer);
+    if (cartToggleBtn) {
+      cartToggleBtn.addEventListener("click", () => {
+        if (typeof setMobileMenuState === "function") {
+          setMobileMenuState(false);
+        }
+        openCartDrawer();
+      });
+    }
+
+    // Sync cart across browser tabs / windows in real time
+    window.addEventListener("storage", (e) => {
+      if (e.key === CART_STORAGE_KEY) {
+        cartItems = loadCart();
+        renderCart(false);
+        syncMenuCardButtons();
+      }
+    });
     if (cartCloseBtn) cartCloseBtn.addEventListener("click", closeCartDrawer);
     cartBackdrop.addEventListener("click", closeCartDrawer);
 
@@ -870,10 +888,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const SHARED_MENU_ITEMS = window.MENU_ITEMS || {};
   const SHARED_MENU_LIST = window.MENU_ITEMS_LIST || Object.values(SHARED_MENU_ITEMS);
 
-  document.querySelectorAll(".nav-row-count").forEach((el) => {
-    if (SHARED_MENU_LIST.length > 0) el.textContent = `(${SHARED_MENU_LIST.length})`;
-  });
-
+  
   function getCardThemeClass(item) {
     const raw = (item.cardTheme || item.theme || "red").toLowerCase();
     return raw.startsWith("theme-") ? raw : `theme-${raw}`;
@@ -937,8 +952,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const menuFilterBar = document.getElementById("menuFilterBar");
   const menuFilterWrap = document.getElementById("menuFilterWrap");
   const menuFilterIndicator = document.getElementById("menuFilterIndicator");
-  const siteHeaderEl = document.getElementById("siteHeader");
-
+  
   if (menuProductGrid && menuFilterBar && SHARED_MENU_LIST.length > 0) {
     const VALID_CATS = ["all", "burgers", "chicken", "tenders", "pizza", "basmati", "crispy"];
 
@@ -1060,33 +1074,7 @@ document.addEventListener("DOMContentLoaded", () => {
       moveFilterIndicator(activeTab);
     });
 
-    // Scroll-linked header auto-hide & sticky filter elevation
-    let lastScrollY = window.scrollY;
-    window.addEventListener(
-      "scroll",
-      () => {
-        const currentY = window.scrollY;
-        const delta = currentY - lastScrollY;
-
-        if (menuFilterWrap) {
-          const wrapTop = menuFilterWrap.getBoundingClientRect().top;
-          menuFilterWrap.classList.toggle("is-stuck", wrapTop <= 90);
-        }
-
-        if (siteHeaderEl && !document.body.classList.contains("is-menu-open")) {
-          if (currentY > 140 && delta > 6) {
-            siteHeaderEl.classList.add("is-header-hidden");
-            if (menuFilterWrap) menuFilterWrap.classList.add("is-top-pinned");
-          } else if (delta < -6 || currentY <= 100) {
-            siteHeaderEl.classList.remove("is-header-hidden");
-            if (menuFilterWrap) menuFilterWrap.classList.remove("is-top-pinned");
-          }
-        }
-
-        lastScrollY = currentY;
-      },
-      { passive: true }
-    );
+    // Scroll-linked header auto-hide handled globally by handleNavbarScroll()
   }
   /* =========================================
      14B. QUICK-VIEW MODAL CONTROLLER (menu.html & upsell cards)
@@ -2254,5 +2242,46 @@ document.addEventListener("DOMContentLoaded", () => {
     const initialProductId =
       new URLSearchParams(window.location.search).get("id")?.toLowerCase() || "tenders-meal";
     loadProductById(initialProductId, { updateUrl: false });
+  }
+
+  /* =========================================
+     NEWSLETTER PAGE: TICKET ENTRANCE
+     ========================================= */
+  const newsletterMain = document.getElementById("newsletterMain");
+  if (newsletterMain) {
+    newsletterMain.classList.add("is-ready");
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        newsletterMain.classList.add("is-entered");
+      });
+    });
+  }
+
+  /* =========================================
+     ABOUT US PAGE: SCROLL-TRIGGERED STAGGER
+     ========================================= */
+  const aboutStorySection = document.getElementById("aboutStorySection");
+  if (aboutStorySection) {
+    aboutStorySection.classList.add("is-ready");
+
+    if ("IntersectionObserver" in window) {
+      let aboutObserver;
+      requestAnimationFrame(() => {
+        aboutObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                aboutStorySection.classList.add("is-in-view");
+                if (aboutObserver) aboutObserver.disconnect();
+              }
+            });
+          },
+          { threshold: 0.12 }
+        );
+        aboutObserver.observe(aboutStorySection);
+      });
+    } else {
+      aboutStorySection.classList.add("is-in-view");
+    }
   }
 });
