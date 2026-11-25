@@ -54,10 +54,10 @@
   <div class="mobile-takeover" id="mobileTakeover" aria-hidden="true">
     <div class="mobile-takeover-inner">
       <nav class="mobile-takeover-links" aria-label="Mobile Navigation">
-        <a href="index.html" class="mobile-takeover-link is-active" aria-current="page" data-page="home">Home</a>
-        <a href="menu.html" class="mobile-takeover-link" data-page="menu">Menu</a>
-        <a href="about.html" class="mobile-takeover-link" data-page="about">About Us</a>
-        <a href="newsletter.html" class="mobile-takeover-link" data-page="contact">Contact Us</a>
+        <a href="index.html" class="mobile-takeover-link is-active" aria-current="page" data-page="home">HOME</a>
+        <a href="menu.html" class="mobile-takeover-link" data-page="menu">MENU</a>
+        <a href="about.html" class="mobile-takeover-link" data-page="about">ABOUT US</a>
+        <a href="newsletter.html" class="mobile-takeover-link" data-page="contact">CONTACT US</a>
       </nav>
       <p class="mobile-takeover-tagline">Don't waste the good taste</p>
     </div>
@@ -86,7 +86,12 @@
       </p>
 
       <div class="hero-actions">
-        <a href="menu.html" class="btn-order">Order Now</a>
+        <a href="menu.html" class="btn-order" aria-label="Hungry Yet? Order Now">
+          <span class="btn-order-labels">
+            <span class="btn-order-text btn-order-text-default">Hungry Yet?</span>
+            <span class="btn-order-text btn-order-text-hover" aria-hidden="true">Order Now</span>
+          </span>
+        </a>
       </div>
     </section>
 
@@ -157,7 +162,7 @@
             <span class="eyebrow-dot" aria-hidden="true"></span>
             <span class="eyebrow-text">MOST ORDERED</span>
           </div>
-          <h2 class="menu-stars-heading">Menu Stars</h2>
+          <h2 class="menu-stars-heading">MENU STARS</h2>
         </div>
 
         <a href="menu.html" class="menu-stars-action">
@@ -169,7 +174,7 @@
       <div class="menu-stars-track" id="menuStarsTrack">
 
         <!-- Card 1: Toomy Burger -->
-        <article class="star-card">
+        <article class="star-card" data-item-id="toomy-burger">
           <span class="star-badge">The Original</span>
           <div class="star-visual">
             <img src="assets/products/toomy-burger.webp" alt="Toomy Burger" draggable="false"
@@ -190,7 +195,7 @@
         </article>
 
         <!-- Card 2: Chicken Popcorn Pizza -->
-        <article class="star-card">
+        <article class="star-card" data-item-id="popcorn-chicken-pizza">
           <span class="star-badge">American Style</span>
           <div class="star-visual">
             <img src="assets/products/pizza-popcorn-buffalo.webp" alt="Chicken Popcorn Pizza" draggable="false"
@@ -210,7 +215,7 @@
         </article>
 
         <!-- Card 3: Tenders Meal -->
-        <article class="star-card">
+        <article class="star-card" data-item-id="tenders-meal">
           <span class="star-badge">Maximum Crunch</span>
           <div class="star-visual">
             <img src="assets/products/tenders-meal.webp" alt="Tenders Meal" draggable="false"
@@ -230,7 +235,7 @@
         </article>
 
         <!-- Card 4: Hot Dog Crispy Roll -->
-        <article class="star-card">
+        <article class="star-card" data-item-id="hotdog-crispy-roll">
           <span class="star-badge">Built Crispy.</span>
           <div class="star-visual">
             <img src="assets/products/crispy-roll.webp" alt="Hot Dog Crispy Roll" draggable="false"
@@ -250,7 +255,7 @@
         </article>
 
         <!-- Card 5: Truck Chicken (Empty Top-Left Pill preserved for vertical alignment) -->
-        <article class="star-card">
+        <article class="star-card" data-item-id="truck-chicken">
           <span class="star-badge is-empty" aria-hidden="true">&nbsp;</span>
           <div class="star-visual">
             <img src="assets/products/truck-chicken.webp" alt="Truck Chicken" draggable="false"
@@ -270,7 +275,7 @@
         </article>
 
         <!-- Card 6: Basmati Chicken -->
-        <article class="star-card">
+        <article class="star-card" data-item-id="basmati-chicken">
           <span class="star-badge">Made Better</span>
           <div class="star-visual">
             <img src="assets/products/basmati-chicken.webp" alt="Basmati Chicken" draggable="false"
@@ -353,10 +358,10 @@
         <div class="footer-col">
           <h3 class="footer-col-heading">OUR MENU</h3>
           <ul class="footer-col-list">
-            <li><a href="menu.html?cat=burgers" class="footer-link" data-filter-category="burger">Burger</a></li>
-            <li><a href="menu.html?cat=pizza" class="footer-link" data-filter-category="pizza">Pizza</a></li>
-            <li><a href="menu.html?cat=tenders" class="footer-link" data-filter-category="tenders">Tenders</a></li>
-            <li><a href="menu.html?cat=chicken" class="footer-link" data-filter-category="chicken">Chicken</a></li>
+            <li><a href="menu.html?cat=burgers" class="footer-link">Burger</a></li>
+            <li><a href="menu.html?cat=pizza" class="footer-link">Pizza</a></li>
+            <li><a href="menu.html?cat=tenders" class="footer-link">Tenders</a></li>
+            <li><a href="menu.html?cat=chicken" class="footer-link">Chicken</a></li>
           </ul>
         </div>
 
@@ -379,7 +384,7 @@
         <div class="footer-col">
           <h3 class="footer-col-heading">GET IN TOUCH</h3>
           <ul class="footer-col-list">
-            <li><a href="#menu" class="footer-link">Order Online</a></li>
+            <li><a href="menu.html" class="footer-link">Order Online</a></li>
             <li><a href="newsletter.html" class="footer-link">Contact Us</a></li>
             <li><a href="about.html" class="footer-link">About Us</a></li>
           </ul>
@@ -388,7 +393,7 @@
     </div>
 
     <!-- Subtle Giant Watermark Behind the Burger -->
-    <div class="footer-watermark" aria-hidden="true">TOOMY'S</div>
+    <img src="assets/logo-main.webp" alt="" aria-hidden="true" class="footer-watermark" draggable="false" />
 
     <!-- Bottom Zone: Social Badges + Center Burger + Copyright -->
     <div class="footer-bottom-zone">
@@ -429,6 +434,63 @@
 
   </footer>
 
+  <!-- QUICK-VIEW PRODUCT MODAL (SHARED WITH MENU.HTML) -->
+  <div class="qv-overlay" id="qvOverlay" aria-hidden="true">
+    <div class="qv-dialog" id="qvDialog" role="dialog" aria-modal="true" aria-labelledby="qvTitle">
+      <!-- Left Column (46%): Warm Sand Product Image Showcase -->
+      <div class="qv-showcase-pane">
+        <span class="qv-badge" id="qvBadge">Try It Now</span>
+        <img src="assets/products/toomy-burger.webp" alt="Toomy Burger" class="qv-image" id="qvImage"
+          draggable="false" />
+      </div>
+
+      <!-- Right Column (54%): Details, Ingredient Chips, Options & Purchase Controls -->
+      <div class="qv-details-pane">
+        <button type="button" class="qv-close-btn" id="qvCloseBtn" aria-label="Close Quick View">
+          &#10005;
+        </button>
+
+        <div class="qv-scroll-content">
+          <div class="qv-eyebrow">
+            <span class="qv-eyebrow-dot" aria-hidden="true"></span>
+            <span id="qvCategory">Burgers</span>
+          </div>
+
+          <h2 class="qv-title" id="qvTitle">Toomy Burger</h2>
+
+          <p class="qv-subtitle" id="qvSubtitle">SIGNATURE DOUBLE SMASH</p>
+
+          <p class="qv-desc" id="qvDesc"></p>
+
+          <!-- Included-Items Ingredient Chips -->
+          <div class="qv-chips-row" id="qvChipsRow" aria-label="Included Items"></div>
+
+          <!-- Dynamic Option Selector Groups -->
+          <div class="qv-options-stack" id="qvOptionsStack"></div>
+        </div>
+
+        <!-- Bottom Purchase Row -->
+        <div class="qv-purchase-row">
+          <div class="qv-qty-stepper" role="group" aria-label="Item Quantity">
+            <button type="button" class="qv-qty-btn" id="qvQtyDec" aria-label="Decrease quantity">
+              &minus;
+            </button>
+            <span class="qv-qty-val" id="qvQtyVal">1</span>
+            <button type="button" class="qv-qty-btn" id="qvQtyInc" aria-label="Increase quantity">
+              +
+            </button>
+          </div>
+
+          <button type="button" class="qv-add-btn" id="qvAddBtn">
+            <span class="qv-add-label" id="qvAddLabel">Add to Cart</span>
+            <span class="qv-price-badge" id="qvPriceBadge">185 EGP</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/menu-data.js"></script>
   <script src="js/script.js"></script>
 </body>
 

@@ -242,19 +242,22 @@ document.addEventListener("DOMContentLoaded", () => {
      3. MENU STARS: GRAB-AND-DRAG CARD SLIDER
      ========================================= */
   const starsTrack = document.getElementById("menuStarsTrack");
+  let starsMovedDistance = 0;
 
   if (starsTrack) {
     let isDraggingStars = false;
     let startXStars = 0;
     let startScrollLeftStars = 0;
-    let movedDistance = 0;
 
     starsTrack.addEventListener("mousedown", (e) => {
       // Allow normal clicking on the "+ Add" button without starting a drag
-      if (e.target.closest(".star-add-btn")) return;
+      if (e.target.closest(".star-add-btn")) {
+        starsMovedDistance = 0;
+        return;
+      }
 
       isDraggingStars = true;
-      movedDistance = 0;
+      starsMovedDistance = 0;
       starsTrack.classList.add("is-dragging");
       startXStars = e.pageX - starsTrack.offsetLeft;
       startScrollLeftStars = starsTrack.scrollLeft;
@@ -271,20 +274,8 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       const x = e.pageX - starsTrack.offsetLeft;
       const walk = (x - startXStars) * 1.35;
-      movedDistance = Math.abs(walk);
+      starsMovedDistance = Math.max(starsMovedDistance, Math.abs(walk));
       starsTrack.scrollLeft = startScrollLeftStars - walk;
-    });
-
-    // Optional quick feedback when clicking "+ Add"
-    starsTrack.querySelectorAll(".star-add-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        if (movedDistance > 6) return;
-        const originalText = btn.textContent;
-        btn.textContent = "Added ✓";
-        setTimeout(() => {
-          btn.textContent = originalText;
-        }, 900);
-      });
     });
   }
 
@@ -313,50 +304,6 @@ document.addEventListener("DOMContentLoaded", () => {
     footerBurger.classList.add("is-revealed");
   }
 
-  // 3. Smooth Scroll & Card Center/Highlight when clicking Footer "OUR MENU" Links
-  const footerCategoryLinks = document.querySelectorAll("[data-filter-category]");
-  const categoryKeywordMap = {
-    burger: "burger",
-    pizza: "pizza",
-    tenders: "tenders",
-    sides: "roll", // Scrolls to Hot Dog Crispy Roll / Basmati side items
-  };
-
-  footerCategoryLinks.forEach((link) => {
-    link.addEventListener("click", (e) => {
-      const cat = link.getAttribute("data-filter-category");
-      const menuSection = document.getElementById("menu");
-      const trackEl = document.getElementById("menuStarsTrack");
-      if (!menuSection || !trackEl || !cat) return;
-
-      e.preventDefault();
-      menuSection.scrollIntoView({ behavior: "smooth" });
-
-      const keyword = categoryKeywordMap[cat] || cat;
-      const cards = Array.from(trackEl.querySelectorAll(".star-card"));
-      const targetCard = cards.find((card) =>
-        card.querySelector(".star-title")?.textContent.toLowerCase().includes(keyword)
-      );
-
-      if (targetCard) {
-        setTimeout(() => {
-          const scrollTarget =
-            targetCard.offsetLeft -
-            trackEl.offsetLeft -
-            (trackEl.clientWidth - targetCard.clientWidth) / 2;
-
-          trackEl.scrollTo({
-            left: Math.max(0, scrollTarget),
-            behavior: "smooth",
-          });
-
-          cards.forEach((c) => c.classList.remove("is-highlighted"));
-          targetCard.classList.add("is-highlighted");
-          setTimeout(() => targetCard.classList.remove("is-highlighted"), 1400);
-        }, 450);
-      }
-    });
-  });
   /* =========================================
      CART DRAWER & CARD STEPPER STATE MACHINE
      ========================================= */
@@ -450,50 +397,13 @@ document.addEventListener("DOMContentLoaded", () => {
       el.classList.add(className);
     }
 
-    // Hydrate every ".star-add-btn" with persistent 3-state layers & strip any stale per-element listeners
+    // Menu Stars "+ Add" buttons remain clean static triggers that open Quick View (#qvOverlay)
     function initMenuCardButtons() {
-      document.querySelectorAll(".star-add-btn").forEach((rawBtn) => {
-        const btn = rawBtn.cloneNode(true);
-        rawBtn.replaceWith(btn);
-
-        const defaultLabel = btn.textContent.trim() || "+ ADD";
-        btn.innerHTML = `
-          <span class="star-btn-view star-btn-view-default">${defaultLabel}</span>
-          <span class="star-btn-view star-btn-view-added" aria-hidden="true">Added &#10003;</span>
-          <span class="star-btn-view star-btn-view-stepper">
-            <span class="card-step-btn" data-card-step="dec" role="button" tabindex="0" aria-label="Decrease quantity">&minus;</span>
-            <span class="card-step-qty">1</span>
-            <span class="card-step-btn" data-card-step="inc" role="button" tabindex="0" aria-label="Increase quantity">+</span>
-          </span>
-        `;
-      });
+      // No inline stepper injection on .star-add-btn; Quick View handles option customization
     }
 
-    // Keep Home (.star-card) inline steppers synced; keep Menu (.menu-card) "+ Add" buttons open for option selection
-    function syncMenuCardButtons(changedTitle = null) {
-      document.querySelectorAll(".star-card").forEach((card) => {
-        const title = card.querySelector(".star-title")?.textContent.trim();
-        const btn = card.querySelector(".star-add-btn");
-        if (!title || !btn) return;
-
-        const match = cartItems.find((item) => item.title === title);
-        const qtyEl = btn.querySelector(".card-step-qty");
-
-        if (match && match.qty > 0) {
-          btn.classList.add("is-in-cart");
-          if (qtyEl) {
-            const prevQty = Number(qtyEl.textContent);
-            qtyEl.textContent = match.qty;
-            if (changedTitle === title && prevQty !== match.qty) {
-              triggerPop(qtyEl, "is-popped");
-            }
-          }
-        } else {
-          clearTimeout(btn._addedTimer);
-          btn.classList.remove("is-in-cart", "is-added");
-          if (qtyEl) qtyEl.textContent = "1";
-        }
-      });
+    function syncMenuCardButtons() {
+      // Keep both Home (.star-card) and Menu (.menu-card) "+ Add" buttons open for Quick View option selection
     }
 
     function updateBadge(shouldBump = false) {
@@ -793,10 +703,39 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Unified Card CTA & Inline Stepper Handler ("+ ADD" -> "Added ✓" -> "- 1 +")
+    const STAR_TITLE_TO_ITEM_ID = {
+      "toomy burger": "toomy-burger",
+      "chicken popcorn pizza": "popcorn-chicken-pizza",
+      "popcorn chicken pizza": "popcorn-chicken-pizza",
+      "tenders meal": "tenders-meal",
+      "hot dog crispy roll": "hotdog-crispy-roll",
+      "hotdog crispy roll": "hotdog-crispy-roll",
+      "truck chicken": "truck-chicken",
+      "basmati chicken": "basmati-chicken"
+    };
+
+    function resolveStarCardItemId(card) {
+      if (!card) return null;
+      const explicitId = card.dataset.itemId || card.dataset.id;
+      const itemsDict = window.MENU_ITEMS || {};
+      if (explicitId && itemsDict[explicitId]) return explicitId;
+
+      const rawTitle = (card.querySelector(".star-title")?.textContent || "")
+        .trim()
+        .toLowerCase();
+      if (rawTitle && STAR_TITLE_TO_ITEM_ID[rawTitle]) {
+        return STAR_TITLE_TO_ITEM_ID[rawTitle];
+      }
+
+      const matched = Object.values(itemsDict).find(
+        (entry) => (entry.title || "").trim().toLowerCase() === rawTitle
+      );
+      return matched ? matched.id : explicitId || null;
+    }
+
     // Unified Card CTA Handler:
     // - Menu & Upsell cards (".menu-card-cta"): open Quick View modal to choose options first
-    // - Home Menu Stars (".star-add-btn"): quick-add with inline "- 1 +" stepper
+    // - Home Menu Stars (".star-add-btn" & card click without drag): open Quick View modal (#qvOverlay)
     document.addEventListener("click", (e) => {
       const menuAddBtn = e.target.closest(".menu-card-cta");
       if (menuAddBtn) {
@@ -811,69 +750,28 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const addBtn = e.target.closest(".star-add-btn");
-      if (!addBtn) return;
-      e.stopPropagation();
-
-      const card = addBtn.closest(".star-card");
-      if (!card) return;
-
-      // ...keep your existing Home ".star-add-btn" logic below this line...
-
-      const title =
-        card.querySelector(".star-title, .menu-card-title")?.textContent.trim() ||
-        "Toomy's Special";
-      const priceText =
-        card.querySelector(".star-price, .menu-card-price")?.textContent || "0";
-      const price = parseFloat(priceText.replace(/[^0-9.]/g, "")) || 0;
-      const image =
-        card.querySelector(".star-visual img, .menu-card-img")?.getAttribute("src") ||
-        "assets/logo-small.png";
-      const note = card.querySelector(".star-note, .menu-card-sub")?.textContent.trim();
-      const sub = note ? note : "Regular";
-
-      // Check if user clicked "-" or "+" inside the inline stepper
-      const stepTrigger = e.target.closest("[data-card-step]");
-      if (stepTrigger) {
-        const direction = stepTrigger.dataset.cardStep;
-        const itemIdx = cartItems.findIndex((item) => item.title === title);
-        if (itemIdx === -1) return;
-
-        if (direction === "inc") {
-          cartItems[itemIdx].qty += 1;
-        } else if (direction === "dec") {
-          if (cartItems[itemIdx].qty > 1) {
-            cartItems[itemIdx].qty -= 1;
-          } else {
-            cartItems.splice(itemIdx, 1);
-          }
+      if (addBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const card = addBtn.closest(".star-card");
+        const itemId = resolveStarCardItemId(card);
+        if (itemId && typeof window.openToomysQuickView === "function") {
+          window.openToomysQuickView(itemId);
         }
-
-        saveCart(cartItems);
-        renderCart(false);
-        updateBadge(true);
-        syncMenuCardButtons(title);
         return;
       }
 
-      // Otherwise user clicked "+ ADD" (or clicked during the brief "Added ✓" phase)
-      const existing = cartItems.find((item) => item.title === title);
-      if (existing) {
-        existing.qty += 1;
-      } else {
-        cartItems.push({ title, price, image, sub, qty: 1 });
+      const starCard = e.target.closest(".star-card");
+      if (starCard) {
+        if (starsMovedDistance > 6) {
+          starsMovedDistance = 0;
+          return;
+        }
+        const itemId = resolveStarCardItemId(starCard);
+        if (itemId && typeof window.openToomysQuickView === "function") {
+          window.openToomysQuickView(itemId);
+        }
       }
-
-      saveCart(cartItems);
-      renderCart(false);
-      updateBadge(true);
-      syncMenuCardButtons(title);
-
-      // Show crisp "Added ✓" confirmation for 1.1s, then reveal the "- 1 +" stepper
-      addBtn.classList.add("is-added");
-      clearTimeout(addBtn._addedTimer);
-      addBtn._addedTimer = setTimeout(() => {
-        addBtn.classList.remove("is-added");
-      }, 1100);
     });
 
     // Initialize card buttons, sync any saved cart quantities, and render drawer
@@ -1251,10 +1149,16 @@ document.addEventListener("DOMContentLoaded", () => {
       renderQvOptions();
       updateQvPrice();
 
+      const qvScrollContentEl = qvOverlay.querySelector(".qv-scroll-content");
+      const qvDetailsPaneEl = qvOverlay.querySelector(".qv-details-pane");
+      if (qvScrollContentEl) qvScrollContentEl.scrollTop = 0;
+      if (qvDetailsPaneEl) qvDetailsPaneEl.scrollTop = 0;
+
       qvOverlay.classList.remove("is-closing");
       void qvOverlay.offsetWidth;
       qvOverlay.classList.add("is-open");
       qvOverlay.setAttribute("aria-hidden", "false");
+      document.body.classList.add("is-qv-open");
       document.body.style.overflow = "hidden";
     }
 
@@ -1263,11 +1167,13 @@ document.addEventListener("DOMContentLoaded", () => {
       qvOverlay.classList.add("is-closing");
       qvOverlay.classList.remove("is-open");
       qvOverlay.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("is-qv-open");
 
       clearTimeout(qvCloseTimer);
       qvCloseTimer = setTimeout(() => {
         qvOverlay.classList.remove("is-closing");
         if (
+          !document.body.classList.contains("is-mobile-menu-open") &&
           !document.body.classList.contains("is-menu-open") &&
           !document.getElementById("cartDrawer")?.classList.contains("is-open")
         ) {
@@ -1277,6 +1183,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     window.openToomysQuickView = openQuickViewModal;
+    window.openQuickView = openQuickViewModal;
 
     // Option selection & live price update
     qvOptionsStack.addEventListener("click", (e) => {

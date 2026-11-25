@@ -116,7 +116,7 @@ img {
   max-width: 1120px;
   height: 60px;
   border-radius: 9999px;
-  z-index: 50;
+  z-index: 1000;
 
   background-color: #FBF6EE;
   border: 1px solid rgba(30, 24, 21, 0.06);
@@ -325,7 +325,7 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
   position: fixed;
   inset: 0;
   background-color: #E3262E;
-  z-index: 45;
+  z-index: 900;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -335,6 +335,19 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 .mobile-takeover.is-open {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
+}
+
+body.is-mobile-menu-open {
+  overflow: hidden;
+}
+
+body.is-mobile-menu-open main.hero {
+  pointer-events: none;
+}
+
+body.is-mobile-menu-open .floating-navbar,
+body.is-mobile-menu-open .mobile-takeover {
   pointer-events: auto;
 }
 
@@ -360,9 +373,10 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 }
 
 .mobile-takeover-link {
-  font-family: var(--font-body);
+  font-family: "Rubik", "Plus Jakarta Sans", sans-serif;
   font-size: 36px;
-  font-weight: 700;
+  font-weight: 900;
+  letter-spacing: -0.02em;
   line-height: 1.25;
   color: #FFFFFF;
   text-decoration: none;
@@ -510,7 +524,7 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
    ========================================= */
 .hero-center {
   position: relative;
-  z-index: 50;
+  z-index: 2;
   flex: 1;
   padding: clamp(3.5rem, 11vh, 7.5rem) var(--gutter) 0; /* Pushes logo + slogan lower */
   display: flex;
@@ -543,11 +557,11 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 
 .hero-slogan {
   max-width: 560px;
-  font-family: var(--font-rounded);
+  font-family: "Rubik", "Plus Jakarta Sans", sans-serif;
   font-size: clamp(1.25rem, 2vw, 1.65rem);
-  font-weight: 400;
+  font-weight: 700;
   line-height: 1.3;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
   color: rgba(248, 245, 240, 0.92);
   margin-bottom: 0; /* Removed fixed margin so auto-centering handles the gap */
   animation: fadeSlideUp 0.8s var(--ease-out-expo) 0.12s both;
@@ -574,33 +588,73 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
   border-radius: 999px;
   border: 1.5px solid #ffffff;
   overflow: hidden;
-  z-index: 1;
   transition:
-    color 0.35s var(--ease-out-expo),
     transform 0.3s var(--ease-out-expo),
     box-shadow 0.35s ease;
 }
 
-/* Smooth sliding white fill layer */
+/* Smooth sliding white fill layer on z-index: 1 */
 .btn-order::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #ffffff 0%, var(--color-bg-canvas) 100%);
+  background-color: #ffffff;
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform 0.38s var(--ease-out-expo);
-  z-index: -1;
+  z-index: 1;
+  pointer-events: none;
 }
 
-.btn-order:hover {
-  color: var(--bg-base); /* Dark text on white fill */
+/* Dual-label CSS Grid cell on z-index: 2 (zero width jitter) */
+.btn-order-labels {
+  position: relative;
+  z-index: 2;
+  display: inline-grid;
+  place-items: center;
+}
+
+.btn-order-text {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+  transition:
+    opacity 250ms ease,
+    transform 250ms ease;
+}
+
+.btn-order-text-default {
+  color: #ffffff;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.btn-order-text-hover {
+  color: #1e1815;
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.btn-order:hover,
+.btn-order:focus-visible {
   transform: translateY(-2px);
   box-shadow: 0 12px 28px rgba(255, 255, 255, 0.22);
 }
 
-.btn-order:hover::before {
+.btn-order:hover::before,
+.btn-order:focus-visible::before {
   transform: scaleX(1);
+}
+
+.btn-order:hover .btn-order-text-default,
+.btn-order:focus-visible .btn-order-text-default {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.btn-order:hover .btn-order-text-hover,
+.btn-order:focus-visible .btn-order-text-hover {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .btn-order:active {
@@ -842,9 +896,9 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 
 .menu-stars-heading {
   color: var(--color-espresso);
-  font-family: var(--font-display); letter-spacing: var(--heading-letter-spacing);
+  font-family: "Rubik", "Plus Jakarta Sans", sans-serif;
   font-size: clamp(40px, 4vw, 60px);
-  font-weight: 400;
+  font-weight: 900;
   line-height: 1.02;
   letter-spacing: -0.03em;
 }
@@ -1361,6 +1415,7 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
   justify-content: space-between;
   align-items: center;
   overflow: hidden;
+  isolation: isolate;
   padding-top: clamp(44px, 6vh, 64px);
 }
 
@@ -1505,16 +1560,16 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 /* --- Oversized Subtle Brand Watermark Behind the Burger --- */
 .footer-watermark {
   position: absolute;
-  bottom: 14vh;
   left: 50%;
+  bottom: clamp(12px, 2.5vw, 36px);
   transform: translateX(-50%);
-  font-family: var(--font-display); letter-spacing: var(--heading-letter-spacing);
-  font-size: clamp(5.5rem, 17vw, 15rem);
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  line-height: 0.85;
-  color: rgba(255, 255, 255, 0.045);
-  white-space: nowrap;
+  width: clamp(320px, 74vw, 1120px);
+  max-width: none;
+  height: auto;
+  object-fit: contain;
+  filter: brightness(0);
+  opacity: 0.16;
+  mix-blend-mode: multiply;
   pointer-events: none;
   user-select: none;
   z-index: 1;
@@ -1529,11 +1584,11 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
   align-items: flex-end;
   padding: 0 3vw;
   margin-top: auto;
-  z-index: 2;
 }
 
 /* Tactile Circular Social Badges */
 .footer-socials {
+  position: relative;
   justify-self: start;
   display: inline-flex;
   align-items: center;
@@ -1568,6 +1623,8 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 
 /* Center-Bottom Burger Visual */
 .footer-burger-wrap {
+  position: relative;
+  z-index: 2;
   justify-self: center;
   width: clamp(380px, 44vw, 620px);
   display: flex;
@@ -1599,6 +1656,7 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 
 /* Bottom-Right Copyright */
 .footer-copyright {
+  position: relative;
   justify-self: end;
   padding-bottom: 34px;
   font-family: var(--font-body);
@@ -2095,18 +2153,18 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 /* 2. Upper-Left Zone — Brand Red Scalloped VIP Newsletter Ticket */
 .newsletter-ticket {
   position: absolute;
-  top: 53%;
-  left: clamp(48px, 8vw, 130px);
-  width: clamp(560px, 43vw, 640px);
-  min-height: 370px;
-  padding: 40px 36px 34px;
+  top: 50%;
+  left: clamp(22px, 2.4vw, 52px);
+  width: clamp(580px, 44vw, 720px);
+  min-height: 416px;
+  padding: 44px 40px 38px;
   transform: translateY(-50%) rotate(-2.5deg);
   z-index: 10;
   background-color: #E3262E;
-  border-radius: 24px;
+  border-radius: 26px;
   box-shadow:
-    0 24px 52px rgba(30, 24, 21, 0.18),
-    0 8px 20px rgba(30, 24, 21, 0.1);
+    0 26px 56px rgba(30, 24, 21, 0.19),
+    0 8px 22px rgba(30, 24, 21, 0.11);
   display: flex;
   flex-direction: column;
   transition:
@@ -2114,14 +2172,14 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
     box-shadow 280ms cubic-bezier(0.22, 1, 0.36, 1),
     opacity 340ms cubic-bezier(0.22, 1, 0.36, 1);
 
-  /* Two die-cut semicircular notches (14px radius) locked to dashed perforation line (34px bottom pad + 58px pill + 22px margin = 114px) */
+  /* Two die-cut semicircular notches (15px radius) locked to perforation line (38px bottom pad + 62px pill + 26px margin = 126px) */
   -webkit-mask-image:
-    radial-gradient(circle 14px at 0 calc(100% - 114px), transparent 13.5px, #000 14px),
-    radial-gradient(circle 14px at 100% calc(100% - 114px), transparent 13.5px, #000 14px);
+    radial-gradient(circle 15px at 0 calc(100% - 126px), transparent 14.5px, #000 15px),
+    radial-gradient(circle 15px at 100% calc(100% - 126px), transparent 14.5px, #000 15px);
   -webkit-mask-composite: source-in;
   mask-image:
-    radial-gradient(circle 14px at 0 calc(100% - 114px), transparent 13.5px, #000 14px),
-    radial-gradient(circle 14px at 100% calc(100% - 114px), transparent 13.5px, #000 14px);
+    radial-gradient(circle 15px at 0 calc(100% - 126px), transparent 14.5px, #000 15px),
+    radial-gradient(circle 15px at 100% calc(100% - 126px), transparent 14.5px, #000 15px);
   mask-composite: intersect;
 }
 
@@ -2133,8 +2191,8 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 .newsletter-ticket:hover {
   transform: translateY(calc(-50% - 3px)) rotate(-1.5deg);
   box-shadow:
-    0 30px 60px rgba(30, 24, 21, 0.22),
-    0 10px 24px rgba(30, 24, 21, 0.12);
+    0 32px 64px rgba(30, 24, 21, 0.23),
+    0 10px 26px rgba(30, 24, 21, 0.13);
 }
 
 /* Upper Ticket Body: Left Stamp Column + Right-Aligned Copy Block */
@@ -2143,7 +2201,7 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 22px;
+  gap: 24px;
   padding: 0;
 }
 
@@ -2152,15 +2210,15 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   flex-shrink: 0;
   user-select: none;
 }
 
 .ticket-stamp {
   position: relative;
-  width: 106px;
-  height: 106px;
+  width: 116px;
+  height: 116px;
   border-radius: 50%;
   background-color: #F5B727;
   box-shadow:
@@ -2176,7 +2234,7 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 .ticket-stamp-text {
   display: block;
   font-family: var(--font-body);
-  font-size: 13.5px;
+  font-size: 14.5px;
   font-weight: 900;
   line-height: 1.12;
   letter-spacing: 0.03em;
@@ -2189,12 +2247,12 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 4px 11px;
+  padding: 5px 13px;
   border-radius: 9999px;
   background-color: rgba(255, 255, 255, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.34);
   font-family: var(--font-body);
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -2215,19 +2273,19 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 .ticket-eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   font-family: var(--font-body);
-  font-size: 11.5px;
+  font-size: 12.5px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #F5B727;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .ticket-eyebrow-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background-color: #F5B727;
   flex-shrink: 0;
@@ -2235,28 +2293,28 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 
 .ticket-headline {
   font-family: var(--font-display);
-  font-size: clamp(27px, 2.35vw, 33px);
+  font-size: clamp(30px, 2.6vw, 38px);
   font-weight: 900;
   line-height: 1.03;
   letter-spacing: -0.02em;
   text-transform: uppercase;
   color: #FFFFFF;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .ticket-desc {
-  max-width: 390px;
+  max-width: 430px;
   font-family: var(--font-body);
-  font-size: 13.5px;
+  font-size: 14.5px;
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.52;
   color: rgba(255, 255, 255, 0.92);
 }
 
 /* Subtle Translucent White Dashed Perforation Line Linking Side Notches */
 .ticket-perforation-line {
-  width: calc(100% + 36px);
-  margin: 26px -18px 22px;
+  width: calc(100% + 44px);
+  margin: 30px -22px 26px;
   border-top: 1.5px dashed rgba(255, 255, 255, 0.45);
 }
 
@@ -2268,14 +2326,14 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 
 .ticket-pill-form {
   width: 100%;
-  height: 58px;
+  height: 62px;
   background-color: #FFFFFF;
   border-radius: 9999px;
-  padding: 6px 6px 6px 22px;
+  padding: 6px 6px 6px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   box-shadow: 0 8px 22px rgba(30, 24, 21, 0.14);
 }
 
@@ -2287,7 +2345,7 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
   background: transparent;
   padding: 0;
   font-family: var(--font-body);
-  font-size: 14.5px;
+  font-size: 15.5px;
   font-weight: 500;
   letter-spacing: 0.02em;
   color: #1E1815;
@@ -2300,14 +2358,14 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 
 .subscribe-btn {
   margin-left: auto;
-  height: 46px;
-  padding: 0 14px 0 22px;
+  height: 50px;
+  padding: 0 16px 0 24px;
   border: none;
   border-radius: 9999px;
   background-color: #E3262E;
   color: #FFFFFF;
   font-family: var(--font-body);
-  font-size: 12.5px;
+  font-size: 13.5px;
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -2330,12 +2388,12 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 }
 
 .subscribe-arrow-badge {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background-color: #FFFFFF;
   color: #E3262E;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 900;
   line-height: 1;
   display: inline-flex;
@@ -2353,9 +2411,9 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -24px;
+  bottom: -26px;
   font-family: var(--font-body);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.2;
   text-align: center;
@@ -2419,8 +2477,8 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 
 .hungry-cta-block {
   position: absolute;
-  bottom: 64px;
-  right: clamp(340px, 26vw, 450px);
+  bottom: 56px;
+  right: clamp(290px, 22.5vw, 410px);
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -2501,19 +2559,21 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
   transform: scale(1.08) translateX(2px);
 }
 
-/* Laptop / Compact Desktop Bridge (1024px – 1359px) */
-@media (max-width: 1359px) and (min-width: 1024px) {
+/* Laptop / Compact Desktop Bridge (1024px – 1399px) */
+@media (max-width: 1399px) and (min-width: 1024px) {
   .newsletter-ticket {
-    top: 53%;
-    left: 40px;
-    width: clamp(490px, 43vw, 560px);
-    padding: 36px 30px 30px;
+    top: 49%;
+    left: 24px;
+    width: clamp(500px, 43vw, 590px);
+    min-height: 385px;
+    padding: 36px 32px 32px;
+    /* 32px bottom pad + 58px pill + 22px perforation bottom margin = 112px */
     -webkit-mask-image:
-      radial-gradient(circle 14px at 0 calc(100% - 110px), transparent 13.5px, #000 14px),
-      radial-gradient(circle 14px at 100% calc(100% - 110px), transparent 13.5px, #000 14px);
+      radial-gradient(circle 14px at 0 calc(100% - 112px), transparent 13.5px, #000 14px),
+      radial-gradient(circle 14px at 100% calc(100% - 112px), transparent 13.5px, #000 14px);
     mask-image:
-      radial-gradient(circle 14px at 0 calc(100% - 110px), transparent 13.5px, #000 14px),
-      radial-gradient(circle 14px at 100% calc(100% - 110px), transparent 13.5px, #000 14px);
+      radial-gradient(circle 14px at 0 calc(100% - 112px), transparent 13.5px, #000 14px),
+      radial-gradient(circle 14px at 100% calc(100% - 112px), transparent 13.5px, #000 14px);
   }
 
   .ticket-upper-body {
@@ -2521,17 +2581,30 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
   }
 
   .ticket-stamp {
-    width: 94px;
-    height: 94px;
+    width: 100px;
+    height: 100px;
   }
 
   .ticket-headline {
-    font-size: 26px;
+    font-size: clamp(26px, 2.3vw, 31px);
+  }
+
+  .ticket-perforation-line {
+    width: calc(100% + 36px);
+    margin: 26px -18px 22px;
+  }
+
+  .ticket-pill-form {
+    height: 58px;
+  }
+
+  .subscribe-btn {
+    height: 46px;
   }
 
   .hungry-cta-block {
-    bottom: 52px;
-    right: clamp(280px, 24vw, 350px);
+    bottom: 48px;
+    right: clamp(230px, 20vw, 310px);
   }
 
   .hungry-eyebrow {
@@ -2758,7 +2831,7 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
   background-color: rgba(13, 11, 10, 0.54);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
-  z-index: 140;
+  z-index: 1100;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -2785,7 +2858,7 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
   font-family: var(--font-body);
   border-radius: 26px 0 0 26px;
   box-shadow: -18px 0 48px rgba(13, 11, 10, 0.34);
-  z-index: 150;
+  z-index: 1150;
   display: flex;
   flex-direction: column;
   padding: 24px 26px 26px;
@@ -3356,9 +3429,9 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 }
 
 .menu-hero-title {
-  font-family: "Fredoka", "Plus Jakarta Sans", sans-serif;
+  font-family: "Rubik", "Plus Jakarta Sans", sans-serif;
   font-size: clamp(3.6rem, 7.2vw, 6.6rem); /* ~88px–106px on desktop */
-  font-weight: 700;
+  font-weight: 900;
   line-height: 0.95;
   letter-spacing: -0.03em;
   color: #e3262e;
@@ -3878,7 +3951,7 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 .qv-overlay {
   position: fixed;
   inset: 0;
-  z-index: 160;
+  z-index: 1200;
   background-color: rgba(20, 16, 14, 0.58);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
@@ -4310,26 +4383,77 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
 @media (max-width: 780px) {
   .qv-overlay {
     padding: 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
   }
 
   .qv-dialog {
-    grid-template-columns: 1fr;
+    position: relative;
+    width: 100%;
     min-height: 0;
+    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .qv-showcase-pane {
-    padding: 24px 20px;
-    min-height: 210px;
+    max-height: 190px;
+    min-height: 0;
+    flex-shrink: 0;
+    padding: 16px 20px;
+  }
+
+  .qv-badge {
+    top: 14px;
+    left: 14px;
+  }
+
+  .qv-close-btn {
+    top: 14px;
+    right: 14px;
+    z-index: 6;
   }
 
   .qv-image {
-    width: 65%;
-    max-width: 210px;
-    max-height: 180px;
+    width: 62%;
+    max-width: 195px;
+    max-height: 152px;
   }
 
   .qv-details-pane {
-    padding: 24px 22px 22px;
+    position: static;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .qv-scroll-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    padding: 20px 20px 18px;
+  }
+
+  .qv-purchase-row {
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    width: 100%;
+    background: #f5efe6;
+    border-top: 1px solid rgba(30, 24, 21, 0.1);
+    padding: 14px 20px;
+    margin-top: 0;
   }
 }
 
@@ -5326,7 +5450,7 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
   background-color: rgba(13, 11, 10, 0.54);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
-  z-index: 160;
+  z-index: 1200;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -5351,7 +5475,7 @@ body.is-mobile-menu-open .nav-hamburger-btn .hamburger-bar-2 {
   border-radius: 26px;
   padding: 24px;
   box-shadow: 0 24px 60px rgba(13, 11, 10, 0.32);
-  z-index: 170;
+  z-index: 1250;
   display: flex;
   flex-direction: column;
   opacity: 0;
