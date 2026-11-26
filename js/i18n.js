@@ -299,6 +299,7 @@
     ['[data-app-id="scratch"] .ios-app-label', "اكشط واكسب"],
     ['[data-app-id="photos"] .ios-app-label', "الصور"],
     ['[data-app-id="reviews"] .ios-app-label', "التقييمات"],
+    ['[data-app-id="squad"] .ios-app-label', "حاسبة الشلّة"],
     ['[data-app-id="menu"] .ios-app-label', "المنيو"],
     ['[data-app-id="instagram"] .ios-app-label', "إنستجرام"],
     ['[data-app-id="facebook"] .ios-app-label', "فيسبوك"],
@@ -379,6 +380,24 @@
     [".ios-reviews-bar-title", "التقييمات"],
     [".reviews-score-out", "من 5"],
     [".reviews-google-cta-label", "قيّمنا على جوجل مابس"],
+
+    /* Tablet — iOS Notification Banner */
+    [".ios-notif-app", "توميز"],
+    [".ios-notif-time", "دلوقتي"],
+    [".ios-notif-dismiss", { "aria-label": "اقفل الإشعار" }],
+
+    /* Tablet — Squad / Feast Calculator */
+    [".ios-squad", { "aria-label": "حاسبة الشلّة والعزومة" }],
+    [".ios-squad-bar-title", "حاسبة الشلّة"],
+    ["[data-squad-shuffle]", { "aria-label": "بدّل الاقتراح" }],
+    [".squad-people-label", "عدد الصحاب كام؟"],
+    ['[data-hunger="chill"]', "ع الخفيف 🙂"],
+    ['[data-hunger="hungry"]', "جعانين 🍔"],
+    ['[data-hunger="starving"]', "جعانين موت 🔥"],
+    [".squad-split-label", "على الفرد الواحد"],
+    [".squad-total-label", "إجمالي العزومة"],
+    ["[data-squad-add-label]", "ضيف أوردر الشلّة كله للسلة"],
+    ["[data-squad-checkout]", "روح لصفحة الدفع &larr;"],
 
     /* ---------- CHECKOUT PAGE ---------- */
     [".checkout-eyebrow span:not(.checkout-eyebrow-dot)", "خلاص قرّبنا"],
@@ -541,6 +560,7 @@
     });
 
     var page = (window.location.pathname.split("/").pop() || "index.html").replace(/\.html?$/i, "") || "index";
+    if (page.toLowerCase() === "toomy-s") page = "index";
     if (PAGE_TITLES[page]) document.title = PAGE_TITLES[page];
   }
 

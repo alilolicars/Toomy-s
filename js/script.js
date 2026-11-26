@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const homeTriggers = document.querySelectorAll('.nav-brand, .floating-navbar .nav-link[data-page="home"], .mobile-takeover-link[data-page="home"]');
   homeTriggers.forEach((trigger) => {
     trigger.addEventListener("click", (e) => {
-      const isHome = !rawPath || rawPath === "index.html" || rawPath === "";
+      const isHome = !rawPath || rawPath === "index.html" || rawPath === "" || rawPath === "toomy-s";
       if (isHome) {
         e.preventDefault();
         setMobileMenuState(false);
@@ -2543,6 +2543,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const screen = tablet.querySelector(".tablet-screen");
     const views = screen.querySelectorAll(".ios-view");
     const mapFrame = screen.querySelector(".ios-maps-frame");
+    const SCRATCH_REWARD_KEY = "toomys_scratch_reward_v1";
+    const NEWSLETTER_LEADS_KEY = "toomys_newsletter_leads_v1";
     const isAr = Boolean(window.TOOMYS_I18N && window.TOOMYS_I18N.isAr);
     const t = (en, ar) => (isAr ? ar : en);
 
@@ -2661,6 +2663,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (name !== "photos") closePhotoLightbox();
+      if (name !== "home") dismissNotification();
 
       screen.dataset.activeApp = name;
       views.forEach((v) => {
@@ -2673,6 +2676,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (name === "scratch") initScratchApp();
       if (name === "photos") initPhotosApp();
       if (name === "reviews") initReviewsApp();
+      if (name === "squad") initSquadApp();
     }
 
     /* ---------- WhatsApp-style chat ---------- */
@@ -3560,13 +3564,337 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    /* ---------- Live clock + open status (Cairo time) ---------- */
+    /* ---------- iOS Notification Banner ---------- */
+    const notifBanner = screen.querySelector("[data-ios-notif]");
+    const notifActionBtn = screen.querySelector("[data-ios-notif-action]");
+    const notifMsgEl = screen.querySelector("[data-ios-notif-msg]");
+    const notifDismissBtn = screen.querySelector("[data-ios-notif-dismiss]");
+    let notifHideTimer = null;
+    let activeNotifAction = null;
+
+    function dismissNotification() {
+      if (!notifBanner) return;
+      clearTimeout(notifHideTimer);
+      notifBanner.classList.remove("is-visible");
+      notifBanner.setAttribute("aria-hidden", "true");
+      clearTimeout(notifBanner._hideTimer);
+      notifBanner._hideTimer = setTimeout(() => {
+        if (!notifBanner.classList.contains("is-visible")) notifBanner.hidden = true;
+      }, 480);
+    }
+
+    function pickNotification() {
+      const cartItems = getCartItemsSafe();
+      if (cartItems.length > 0) {
+        return {
+          action: "cart",
+          msg: isAr
+            ? "🛒 صينيتك مستنياك.. كمّل أوردرك قبل ما يبرد!"
+            : "🛒 Your tray is waiting — finish your order while it's hot!"
+        };
+      }
+      let reward = null;
+      try {
+        reward = JSON.parse(localStorage.getItem(SCRATCH_REWARD_KEY));
+      } catch {}
+      if (!reward || !reward.unlocked) {
+        return {
+          action: "scratch",
+          msg: isAr
+            ? "🎁 ليك هدية في اكشط واكسب! اضغط وجرّب حظك"
+            : "🎁 You've got a prize waiting in Scratch & Win! Tap to play"
+        };
+      }
+      return {
+        action: "squad",
+        msg: isAr
+          ? "🧮 طالع مع صحابك؟ جرّب حاسبة الشلّة وقسّم الأوردر بضغطة!"
+          : "🧮 Ordering with friends? Try Squad Calc to split the feast!"
+      };
+    }
+
+    function showNotification() {
+      if (!notifBanner || !notifMsgEl) return;
+      if (screen.dataset.activeApp !== "home" || isJiggling) return;
+      const payload = pickNotification();
+      activeNotifAction = payload.action;
+      notifMsgEl.textContent = payload.msg;
+      clearTimeout(notifBanner._hideTimer);
+      notifBanner.hidden = false;
+      notifBanner.setAttribute("aria-hidden", "false");
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          notifBanner.classList.add("is-visible");
+        });
+      });
+      clearTimeout(notifHideTimer);
+      notifHideTimer = setTimeout(dismissNotification, 6800);
+    }
+
+    if (notifBanner) {
+      notifBanner.addEventListener("mouseenter", () => clearTimeout(notifHideTimer));
+      notifBanner.addEventListener("mouseleave", () => {
+        if (notifBanner.classList.contains("is-visible")) {
+          clearTimeout(notifHideTimer);
+          notifHideTimer = setTimeout(dismissNotification, 3200);
+        }
+      });
+    }
+
+    if (notifDismissBtn) {
+      notifDismissBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dismissNotification();
+      });
+    }
+
+    if (notifActionBtn) {
+      notifActionBtn.addEventListener("click", () => {
+        const act = activeNotifAction;
+        dismissNotification();
+        if (act === "cart") {
+          const cartBtn = document.getElementById("cartToggle");
+          if (cartBtn) cartBtn.click();
+          else window.location.href = "checkout.html";
+        } else if (act) {
+          const origin = screen.querySelector(`[data-app-id="${act}"]`);
+          setApp(act, origin);
+        }
+      });
+    }
+
+    if (notifBanner && "IntersectionObserver" in window) {
+      let notifTriggered = false;
+      const notifObs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && !notifTriggered) {
+              notifTriggered = true;
+              notifObs.disconnect();
+              setTimeout(showNotification, 900);
+            }
+          });
+        },
+        { threshold: 0.35 }
+      );
+      notifObs.observe(tablet);
+    }
+
+    /* ---------- Squad / Feast Calculator app ---------- */
+    const squadCountEl = screen.querySelector("[data-squad-count]");
+    const squadDecBtn = screen.querySelector("[data-squad-dec]");
+    const squadIncBtn = screen.querySelector("[data-squad-inc]");
+    const squadHungerWrap = screen.querySelector("[data-squad-hunger]");
+    const squadShuffleBtn = screen.querySelector("[data-squad-shuffle]");
+    const squadPerPersonEl = screen.querySelector("[data-squad-per-person]");
+    const squadTotalEl = screen.querySelector("[data-squad-total]");
+    const squadItemsEl = screen.querySelector("[data-squad-items]");
+    const squadAddAllBtn = screen.querySelector("[data-squad-add-all]");
+    const squadAddLabelEl = screen.querySelector("[data-squad-add-label]");
+    const squadAddTotalEl = screen.querySelector("[data-squad-add-total]");
+    const squadCheckoutLink = screen.querySelector("[data-squad-checkout]");
+
+    let squadCount = 4;
+    let squadHunger = "hungry";
+    let squadVariant = 0;
+    let currentSquadPlan = [];
+
+    function formatSquadPrice(val) {
+      return `${Number(val).toLocaleString("en-US")} ${isAr ? "جنيه" : "EGP"}`;
+    }
+
+    function buildSquadFeast(people, hunger, variant) {
+      const dict = window.MENU_ITEMS || {};
+      const mains = [
+        "toomy-burger",
+        "juicy-jack-burger",
+        "cheesy-burger-boom",
+        "truck-chicken",
+        "buffalo-chicken",
+        "ranch-chicken",
+        "pepperonzi-burger",
+        "truck-burger"
+      ].filter((id) => dict[id]);
+      const pizzas = ["popcorn-chicken-pizza", "steak-pizza", "sea-ranch-pizza"].filter((id) => dict[id]);
+      const sharers = ["tenders-meal", "hotdog-crispy-roll", "basmati-chicken", "basmati-steak"].filter(
+        (id) => dict[id]
+      );
+
+      if (mains.length === 0) return [];
+
+      const counts = new Map();
+      const addOne = (id) => {
+        if (!id || !dict[id]) return;
+        counts.set(id, (counts.get(id) || 0) + 1);
+      };
+
+      const mainTarget = hunger === "chill" ? Math.max(1, Math.ceil(people * 0.55)) : people;
+      for (let i = 0; i < mainTarget; i++) {
+        addOne(mains[(i + variant) % mains.length]);
+      }
+
+      if (hunger === "chill") {
+        const extra = Math.max(1, Math.floor(people / 3));
+        for (let i = 0; i < extra; i++) {
+          const pool = pizzas.length ? pizzas : sharers;
+          addOne(pool[(i + variant) % pool.length]);
+        }
+      } else if (hunger === "hungry") {
+        const shareCount = Math.max(1, Math.floor(people / 3));
+        for (let i = 0; i < shareCount; i++) {
+          const pool = i % 2 === 0 && pizzas.length ? pizzas : sharers;
+          addOne(pool[(i + variant) % pool.length]);
+        }
+      } else {
+        const pizzaCount = Math.max(1, Math.ceil(people / 2.5));
+        for (let i = 0; i < pizzaCount && pizzas.length; i++) {
+          addOne(pizzas[(i + variant) % pizzas.length]);
+        }
+        const shareCount = Math.max(1, Math.floor(people / 2));
+        for (let i = 0; i < shareCount && sharers.length; i++) {
+          addOne(sharers[(i + variant) % sharers.length]);
+        }
+      }
+
+      return Array.from(counts.entries()).map(([id, qty]) => ({
+        item: dict[id],
+        qty
+      }));
+    }
+
+    function renderSquadApp() {
+      currentSquadPlan = buildSquadFeast(squadCount, squadHunger, squadVariant);
+      const total = currentSquadPlan.reduce((sum, entry) => sum + entry.item.basePrice * entry.qty, 0);
+      const perPerson = Math.ceil(total / squadCount);
+
+      if (squadCountEl) squadCountEl.textContent = String(squadCount);
+      if (squadPerPersonEl) squadPerPersonEl.textContent = formatSquadPrice(perPerson);
+      if (squadTotalEl) squadTotalEl.textContent = formatSquadPrice(total);
+      if (squadAddTotalEl) squadAddTotalEl.textContent = formatSquadPrice(total);
+
+      if (squadAddAllBtn) squadAddAllBtn.classList.remove("is-added");
+      if (squadAddLabelEl) {
+        squadAddLabelEl.textContent = t("Add Entire Feast to Cart", "ضيف أوردر الشلّة كله للسلة");
+      }
+
+      if (squadItemsEl) {
+        squadItemsEl.innerHTML = currentSquadPlan
+          .map(
+            ({ item, qty }) => `
+            <li class="squad-item-row">
+              <span class="squad-item-thumb">
+                <img src="${item.image}" alt="${item.title}" loading="lazy" decoding="async" />
+              </span>
+              <span class="squad-item-qty" dir="ltr">${qty}&times;</span>
+              <span class="squad-item-title">${item.title}</span>
+              <span class="squad-item-price">${formatSquadPrice(item.basePrice * qty)}</span>
+            </li>
+          `
+          )
+          .join("");
+      }
+    }
+
+    function initSquadApp() {
+      renderSquadApp();
+    }
+
+    if (squadDecBtn) {
+      squadDecBtn.addEventListener("click", () => {
+        if (squadCount <= 2) return;
+        squadCount -= 1;
+        renderSquadApp();
+      });
+    }
+
+    if (squadIncBtn) {
+      squadIncBtn.addEventListener("click", () => {
+        if (squadCount >= 10) return;
+        squadCount += 1;
+        renderSquadApp();
+      });
+    }
+
+    if (squadHungerWrap) {
+      squadHungerWrap.addEventListener("click", (e) => {
+        const pill = e.target.closest("[data-hunger]");
+        if (!pill || pill.dataset.hunger === squadHunger) return;
+        squadHunger = pill.dataset.hunger;
+        squadHungerWrap.querySelectorAll("[data-hunger]").forEach((btn) => {
+          const active = btn.dataset.hunger === squadHunger;
+          btn.classList.toggle("is-active", active);
+          btn.setAttribute("aria-checked", active ? "true" : "false");
+        });
+        renderSquadApp();
+      });
+    }
+
+    if (squadShuffleBtn) {
+      squadShuffleBtn.addEventListener("click", () => {
+        squadVariant += 1;
+        renderSquadApp();
+      });
+    }
+
+    if (squadAddAllBtn) {
+      squadAddAllBtn.addEventListener("click", () => {
+        if (currentSquadPlan.length === 0) return;
+        const cart = getCartItemsSafe();
+        const defaultSub = t("Standard", "عادي");
+
+        currentSquadPlan.forEach(({ item, qty }) => {
+          const existing = cart.find((c) => c.title === item.title && c.sub === defaultSub);
+          if (existing) {
+            existing.qty += qty;
+          } else {
+            cart.push({
+              title: item.title,
+              price: item.basePrice,
+              image: item.image,
+              sub: defaultSub,
+              qty
+            });
+          }
+        });
+
+        try {
+          localStorage.setItem("toomys_cart_v1", JSON.stringify(cart));
+        } catch {}
+
+        const totalCount = cart.reduce((sum, i) => sum + (i.qty || 1), 0);
+        const badgeEl = document.getElementById("cartCountBadge");
+        const toggleEl = document.getElementById("cartToggle");
+        if (badgeEl) {
+          badgeEl.textContent = totalCount;
+          badgeEl.classList.add("has-items");
+          badgeEl.classList.remove("is-bumped");
+          void badgeEl.offsetWidth;
+          badgeEl.classList.add("is-bumped");
+          setTimeout(() => badgeEl.classList.remove("is-bumped"), 320);
+        }
+        if (toggleEl) {
+          toggleEl.classList.add("has-items");
+          toggleEl.classList.remove("is-pulsing");
+          void toggleEl.offsetWidth;
+          toggleEl.classList.add("is-pulsing");
+        }
+
+        window.dispatchEvent(new CustomEvent("toomys:cart-sync"));
+
+        squadAddAllBtn.classList.add("is-added");
+        if (squadAddLabelEl) squadAddLabelEl.textContent = t("Added to Cart ✓", "اتضاف للسلة ✓");
+        if (squadCheckoutLink) squadCheckoutLink.hidden = false;
+      });
+    }
+
+    /* ---------- Live clock + open status + countdown (Cairo time) ---------- */
     const timeEls = screen.querySelectorAll("[data-ios-time]");
     const dateEls = screen.querySelectorAll("[data-ios-date]");
     const statusEls = screen.querySelectorAll("[data-open-status-text]");
     const statusWrap = screen.querySelectorAll("[data-open-status]");
     const locale = isAr ? "ar-EG-u-nu-latn" : "en-US";
     const TZ = "Africa/Cairo";
+    const pad2 = (n) => String(n).padStart(2, "0");
 
     function tick() {
       const now = new Date();
@@ -3585,19 +3913,39 @@ document.addEventListener("DOMContentLoaded", () => {
         timeZone: TZ
       }).format(now);
 
-      const hour = Number(
-        new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone: TZ }).format(now)
-      );
+      const hmsParts = new Intl.DateTimeFormat("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+        hourCycle: "h23",
+        timeZone: TZ
+      }).formatToParts(now);
+
+      const getPart = (type) => Number(hmsParts.find((p) => p.type === type)?.value || 0);
+      const hour = getPart("hour");
+      const minute = getPart("minute");
+      const second = getPart("second");
 
       // Open daily 2:00 PM – 2:00 AM
       const isOpen = hour >= 14 || hour < 2;
+      let countdownStr = "";
+      if (!isOpen) {
+        const rem = Math.max(0, 14 * 3600 - (hour * 3600 + minute * 60 + second));
+        const hh = pad2(Math.floor(rem / 3600));
+        const mm = pad2(Math.floor((rem % 3600) / 60));
+        const ss = pad2(rem % 60);
+        countdownStr = `${hh}:${mm}:${ss}`;
+      }
 
       timeEls.forEach((el) => (el.textContent = timeText));
       dateEls.forEach((el) => (el.textContent = dateText));
       statusEls.forEach((el) => {
-        el.textContent = isOpen
-          ? t("Open now", "فاتحين دلوقتي")
-          : t("Closed · opens 2 PM", "مقفولين · بنفتح 2 الضهر");
+        if (isOpen) {
+          el.textContent = t("Open now", "فاتحين دلوقتي");
+        } else {
+          const prefix = t("Opens in ", "بنفتح كمان ");
+          el.innerHTML = `${prefix}<span class="ios-countdown-digits" dir="ltr">${countdownStr}</span>`;
+        }
         el.classList.toggle("is-closed", !isOpen);
       });
       statusWrap.forEach((el) => el.classList.toggle("is-closed", !isOpen));
@@ -3605,7 +3953,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setApp("home");
     tick();
-    setInterval(tick, 30000);
+    setInterval(tick, 1000);
   }
 
   if (document.readyState === "loading") {

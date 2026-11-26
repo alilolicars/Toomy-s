@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — Page Not Found | Toomy's</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@500;700;800&family=Rubik:wght@800;900&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background-color: #f5efe6;
+      color: #1e1815;
+      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      text-align: center;
+    }
+    [dir="rtl"] body { font-family: "Cairo", system-ui, sans-serif; }
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 40px 28px;
+      border: 1px solid rgba(30, 24, 21, 0.08);
+      box-shadow: 0 18px 46px rgba(30, 24, 21, 0.09);
+    }
+    .code {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      background: #f5b727;
+      color: #1e1815;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    [dir="rtl"] .code { letter-spacing: 0; }
+    h1 {
+      font-family: "Rubik", sans-serif;
+      font-size: clamp(2rem, 6vw, 2.8rem);
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 12px;
+    }
+    [dir="rtl"] h1 { font-family: "Cairo", sans-serif; line-height: 1.25; }
+    p {
+      color: #5a504a;
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 26px;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 46px;
+      padding: 0 24px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: transform 180ms ease, background-color 180ms ease;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: #e3262e; color: #ffffff; box-shadow: 0 8px 20px rgba(227, 38, 46, 0.25); }
+    .btn-secondary { background: #1e1815; color: #ffffff; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <span class="code" id="badge404">404 &bull; Wrong Turn</span>
+    <h1 id="title404">Nothing grilling here!</h1>
+    <p id="desc404">The page you're looking for moved or doesn't exist. Head back to the menu and grab something crispy.</p>
+    <div class="actions">
+      <a href="./index.html" class="btn btn-primary" id="home404">Back Home</a>
+      <a href="./menu.html" class="btn btn-secondary" id="menu404">Browse Menu</a>
+    </div>
+  </main>
+  <script>
+    (function () {
+      var saved = "";
+      try { saved = localStorage.getItem("toomys_lang") || ""; } catch (e) {}
+      var isAr = saved ? saved === "ar" : /^ar\b/i.test(navigator.language || "");
+      var base = /^\/toomy-s(?:\/|$)/i.test(location.pathname) ? "/Toomy-s/" : "./";
+
+      document.getElementById("home404").href = base + "index.html";
+      document.getElementById("menu404").href = base + "menu.html";
+
+      if (isAr) {
+        document.documentElement.lang = "ar-EG";
+        document.documentElement.dir = "rtl";
+        document.title = "404 — الصفحة مش موجودة | توميز";
+        document.getElementById("badge404").textContent = "404 • لفة غلط";
+        document.getElementById("title404").textContent = "مفيش أكل هنا!";
+        document.getElementById("desc404").textContent = "الصفحة اللي بتدور عليها اتنقلت أو مش موجودة. ارجع للمنيو واختارلك حاجة مقرمشة.";
+        document.getElementById("home404").textContent = "ارجع للرئيسية";
+        document.getElementById("menu404").textContent = "شوف المنيو";
+      }
+    })();
+  </script>
+</body>
+</html>

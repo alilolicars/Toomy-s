@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contact Us — Toomy's | Asyut's Ultimate Burger &amp; Pizza Spot</title>
+  <link rel="icon" type="image/webp" href="assets/logo-small.webp" />
+  <meta name="description" content="Toomy's — Asyut's ultimate smashed burger, crispy chicken, tenders, and loaded pizza spot in Abrag El Nasr." />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Contact Us — Toomy's | Asyut's Ultimate Burger &amp; Pizza Spot" />
+  <meta property="og:description" content="Toomy's — Asyut's ultimate smashed burger, crispy chicken, tenders, and loaded pizza spot in Abrag El Nasr." />
+  <meta property="og:image" content="https://alilolicars.github.io/Toomy-s/assets/hero-bg.webp" />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -99,6 +105,27 @@
                     </span>
                   </div>
 
+                  <!-- Live iOS Notification Banner -->
+                  <div class="ios-notif-banner" data-ios-notif hidden aria-hidden="true" role="status" aria-live="polite">
+                    <button type="button" class="ios-notif-body" data-ios-notif-action>
+                      <span class="ios-notif-icon" data-ios-notif-icon aria-hidden="true">
+                        <img src="assets/logo-small.webp" alt="" />
+                      </span>
+                      <span class="ios-notif-content">
+                        <span class="ios-notif-top">
+                          <span class="ios-notif-app" data-ios-notif-app>Toomy's</span>
+                          <span class="ios-notif-time" data-ios-notif-time>now</span>
+                        </span>
+                        <span class="ios-notif-msg" data-ios-notif-msg></span>
+                      </span>
+                    </button>
+                    <button type="button" class="ios-notif-dismiss" data-ios-notif-dismiss aria-label="Dismiss notification">
+                      <svg viewBox="0 0 12 12" aria-hidden="true">
+                        <path d="M2.5 2.5l7 7M9.5 2.5l-7 7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+                  </div>
+
                   <!-- ========== HOME SCREEN ========== -->
                   <section class="ios-view ios-home" data-view="home" aria-label="Tablet home screen">
                     <div class="ios-widgets">
@@ -185,6 +212,22 @@
                           <svg viewBox="0 0 24 24"><path d="M12 3.2l2.6 5.4 5.9.8-4.3 4.2 1 5.9L12 16.7l-5.2 2.8 1-5.9-4.3-4.2 5.9-.8L12 3.2z" fill="currentColor"/></svg>
                         </span>
                         <span class="ios-app-label">Reviews</span>
+                      </button>
+
+                      <button type="button" class="ios-app" data-app-id="squad" data-open-app="squad">
+                        <span class="ios-icon ios-icon-squad" aria-hidden="true">
+                          <svg viewBox="0 0 24 24">
+                            <rect x="4" y="3" width="16" height="18" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.9"/>
+                            <rect x="7" y="6" width="10" height="3.5" rx="1" fill="currentColor"/>
+                            <circle cx="8.5" cy="13" r="1.25" fill="currentColor"/>
+                            <circle cx="12" cy="13" r="1.25" fill="currentColor"/>
+                            <circle cx="15.5" cy="13" r="1.25" fill="#f5b727"/>
+                            <circle cx="8.5" cy="17" r="1.25" fill="currentColor"/>
+                            <circle cx="12" cy="17" r="1.25" fill="currentColor"/>
+                            <circle cx="15.5" cy="17" r="1.25" fill="#f5b727"/>
+                          </svg>
+                        </span>
+                        <span class="ios-app-label">Squad Calc</span>
                       </button>
 
                       <a href="menu.html" class="ios-app" data-app-id="menu">
@@ -530,6 +573,66 @@
                     </div>
                   </section>
 
+                  <!-- ========== SQUAD / FEAST CALCULATOR APP ========== -->
+                  <section class="ios-view ios-squad" data-view="squad" aria-label="Squad Feast Calculator" inert>
+                    <div class="ios-app-bar">
+                      <button type="button" class="ios-back" data-go-home>
+                        <svg viewBox="0 0 12 20" aria-hidden="true"><path d="M10 2L2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span class="ios-back-label">Home</span>
+                      </button>
+                      <span class="ios-app-bar-title ios-squad-bar-title">Squad Calc</span>
+                      <button type="button" class="squad-shuffle-btn" data-squad-shuffle aria-label="Shuffle combo">&#127922;</button>
+                    </div>
+
+                    <div class="squad-scroll">
+                      <div class="squad-controls-card">
+                        <div class="squad-size-row">
+                          <span class="squad-control-label squad-people-label">How many friends?</span>
+                          <div class="squad-stepper" role="group" aria-label="Number of people" dir="ltr">
+                            <button type="button" class="squad-step-btn" data-squad-dec aria-label="Fewer people">
+                              <svg viewBox="0 0 12 12" aria-hidden="true">
+                                <path d="M2.5 6h7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+                              </svg>
+                            </button>
+                            <span class="squad-count-val" data-squad-count dir="ltr">4</span>
+                            <button type="button" class="squad-step-btn" data-squad-inc aria-label="More people">
+                              <svg viewBox="0 0 12 12" aria-hidden="true">
+                                <path d="M2.5 6h7M6 2.5v7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+
+                        <div class="squad-hunger-pills" role="radiogroup" aria-label="Hunger level" data-squad-hunger>
+                          <button type="button" class="squad-hunger-pill" data-hunger="chill" role="radio" aria-checked="false">Light</button>
+                          <button type="button" class="squad-hunger-pill is-active" data-hunger="hungry" role="radio" aria-checked="true">Hungry</button>
+                          <button type="button" class="squad-hunger-pill" data-hunger="starving" role="radio" aria-checked="false">Starving</button>
+                        </div>
+                      </div>
+
+                      <div class="squad-split-banner">
+                        <div class="squad-split-main">
+                          <span class="squad-split-label">Per person</span>
+                          <strong class="squad-split-price" data-squad-per-person>0 EGP</strong>
+                        </div>
+                        <div class="squad-split-total">
+                          <span class="squad-total-label">Feast Total</span>
+                          <span class="squad-total-val" data-squad-total>0 EGP</span>
+                        </div>
+                      </div>
+
+                      <ul class="squad-items-list" data-squad-items></ul>
+
+                      <div class="squad-footer-cta">
+                        <button type="button" class="squad-add-all-btn" data-squad-add-all>
+                          <span class="squad-add-all-label" data-squad-add-label>Add Entire Feast to Cart</span>
+                          <span class="squad-add-all-badge" data-squad-add-total>0 EGP</span>
+                        </button>
+                        <a href="checkout.html" class="squad-checkout-link" data-squad-checkout hidden>Go to Checkout &rarr;</a>
+                      </div>
+                    </div>
+                  </section>
+
                   <button type="button" class="ios-home-bar" data-go-home aria-label="Go to home screen"><span></span></button>
                 </div>
               </div>
@@ -754,6 +857,7 @@
     </div>
   </footer>
 
+  <script src="js/menu-data.js"></script>
   <script src="js/script.js"></script>
   <script>
     // Interactive subscription feedback for Egyptian mobile numbers

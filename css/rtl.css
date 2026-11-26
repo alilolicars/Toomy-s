@@ -725,3 +725,27 @@
 [dir="rtl"] .checkout-promo-input {
   text-align: right;
 }
+
+/* =========================================================
+   13. TABLET NOTIFICATION BANNER & SQUAD CALC RTL POLISH
+   ========================================================= */
+[dir="rtl"] .ios-notif-banner,
+[dir="rtl"] .ios-notif-app,
+[dir="rtl"] .ios-notif-msg,
+[dir="rtl"] .squad-scroll,
+[dir="rtl"] .squad-split-banner,
+[dir="rtl"] .squad-add-all-btn,
+[dir="rtl"] .squad-hunger-pill,
+[dir="rtl"] .squad-item-title,
+[dir="rtl"] .squad-checkout-link {
+  font-family: var(--font-body);
+  letter-spacing: 0 !important;
+}
+
+[dir="rtl"] .ios-notif-body {
+  text-align: right;
+}
+
+[dir="rtl"] .squad-add-all-btn {
+  padding: 0 calc(16 * var(--px)) 0 calc(6 * var(--px));
+}
