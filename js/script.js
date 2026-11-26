@@ -1334,6 +1334,14 @@ document.addEventListener("DOMContentLoaded", () => {
      ========================================= */
   const LAST_ORDER_KEY = "toomys_last_order_v1";
   const ORDERS_HISTORY_KEY = "toomys_orders_history_v1";
+  const SCRATCH_REWARD_KEY = "toomys_scratch_reward_v1";
+  const NEWSLETTER_LEADS_KEY = "toomys_newsletter_leads_v1";
+  const TOOMYS_PROMO_CODES = {
+    TOOMY15: { type: "percent", value: 15, labelEn: "15% OFF", labelAr: "خصم 15%" },
+    TOOMY10: { type: "percent", value: 10, labelEn: "10% OFF", labelAr: "خصم 10%" },
+    TOOMY25: { type: "fixed", value: 25, labelEn: "25 EGP OFF", labelAr: "خصم 25 جنيه" },
+    FREEFRIES: { type: "freebie", value: 0, labelEn: "Free Golden Fries 🍟", labelAr: "بطاطس دهبي ببلاش 🍟" }
+  };
 
   function generateOrderCode() {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -1361,9 +1369,46 @@ document.addEventListener("DOMContentLoaded", () => {
     const checkoutSubmitTotal = document.getElementById("checkoutSubmitTotal");
     const checkoutSubmitBtn = document.getElementById("checkoutSubmitBtn");
     const checkoutFormError = document.getElementById("checkoutFormError");
+    const checkoutPromoInput = document.getElementById("checkoutPromoInput");
+    const checkoutPromoApplyBtn = document.getElementById("checkoutPromoApplyBtn");
+    const checkoutPromoSavedPill = document.getElementById("checkoutPromoSavedPill");
+    const checkoutPromoMsg = document.getElementById("checkoutPromoMsg");
+    const checkoutDiscountRow = document.getElementById("checkoutDiscountRow");
+    const checkoutDiscountLabel = document.getElementById("checkoutDiscountLabel");
+    const checkoutDiscountVal = document.getElementById("checkoutDiscountVal");
 
     let fulfillmentMethod = "delivery"; // "delivery" | "pickup"
     let isEmptyViewActive = false;
+    let appliedPromo = null;
+
+    function getSavedScratchReward() {
+      try {
+        return JSON.parse(localStorage.getItem(SCRATCH_REWARD_KEY));
+      } catch {
+        return null;
+      }
+    }
+
+    function computePromoDiscount(subtotal) {
+      if (!appliedPromo || !TOOMYS_PROMO_CODES[appliedPromo] || subtotal <= 0) return 0;
+      const promo = TOOMYS_PROMO_CODES[appliedPromo];
+      if (promo.type === "percent") return Math.round((subtotal * promo.value) / 100);
+      if (promo.type === "fixed") return Math.min(subtotal, promo.value);
+      return 0;
+    }
+
+    function syncSavedPromoPill() {
+      if (!checkoutPromoSavedPill) return;
+      const reward = getSavedScratchReward();
+      if (reward && reward.unlocked && reward.code && TOOMYS_PROMO_CODES[reward.code] && appliedPromo !== reward.code) {
+        checkoutPromoSavedPill.hidden = false;
+        checkoutPromoSavedPill.textContent = IS_AR
+          ? `عندك كود كسبته: ${reward.code} — اضغط لتطبيقه`
+          : `Tap to apply your prize: ${reward.code}`;
+      } else {
+        checkoutPromoSavedPill.hidden = true;
+      }
+    }
 
     function getCheckoutItems() {
       try {
@@ -1414,10 +1459,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function updateCheckoutTotals() {
       const subtotal = checkoutCart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const discount = computePromoDiscount(subtotal);
       const fee = checkoutCart.length === 0 ? 0 : fulfillmentMethod === "delivery" ? 25 : 0;
-      const grandTotal = subtotal + fee;
+      const grandTotal = Math.max(0, subtotal - discount + fee);
 
       if (checkoutSubtotalVal) checkoutSubtotalVal.textContent = formatPrice(subtotal);
+      if (checkoutDiscountRow) {
+        if (appliedPromo && TOOMYS_PROMO_CODES[appliedPromo]) {
+          checkoutDiscountRow.hidden = false;
+          if (checkoutDiscountLabel) {
+            checkoutDiscountLabel.textContent = `${t("Discount", "الخصم")} (${appliedPromo})`;
+          }
+          if (checkoutDiscountVal) {
+            checkoutDiscountVal.textContent =
+              discount > 0 ? `-${formatPrice(discount)}` : t("Free Fries 🍟", "بطاطس ببلاش 🍟");
+          }
+        } else {
+          checkoutDiscountRow.hidden = true;
+        }
+      }
       if (checkoutFeeLabel) {
         checkoutFeeLabel.textContent =
           fulfillmentMethod === "delivery"
@@ -1429,6 +1489,89 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (checkoutGrandTotalVal) checkoutGrandTotalVal.textContent = formatPrice(grandTotal);
       if (checkoutSubmitTotal) checkoutSubmitTotal.textContent = formatPrice(grandTotal);
+    }
+
+    function applyPromoCode(rawCode) {
+      const code = (rawCode || "").trim().toUpperCase();
+      if (!code) {
+        appliedPromo = null;
+        if (checkoutPromoApplyBtn) {
+          checkoutPromoApplyBtn.classList.remove("is-applied");
+          checkoutPromoApplyBtn.textContent = t("Apply", "تطبيق");
+        }
+        if (checkoutPromoMsg) {
+          checkoutPromoMsg.textContent = "";
+          checkoutPromoMsg.className = "checkout-promo-msg";
+        }
+        updateCheckoutTotals();
+        syncSavedPromoPill();
+        return;
+      }
+
+      const promo = TOOMYS_PROMO_CODES[code];
+      if (!promo) {
+        appliedPromo = null;
+        if (checkoutPromoApplyBtn) {
+          checkoutPromoApplyBtn.classList.remove("is-applied");
+          checkoutPromoApplyBtn.textContent = t("Apply", "تطبيق");
+        }
+        if (checkoutPromoMsg) {
+          checkoutPromoMsg.className = "checkout-promo-msg is-error";
+          checkoutPromoMsg.textContent = t("Hmm, that promo code isn't valid.", "الكود ده مش مظبوط، جرب تاني.");
+        }
+        updateCheckoutTotals();
+        syncSavedPromoPill();
+        return;
+      }
+
+      appliedPromo = code;
+      if (checkoutPromoInput) checkoutPromoInput.value = code;
+      if (checkoutPromoApplyBtn) {
+        checkoutPromoApplyBtn.classList.add("is-applied");
+        checkoutPromoApplyBtn.textContent = t("Remove", "إلغاء");
+      }
+      if (checkoutPromoMsg) {
+        checkoutPromoMsg.className = "checkout-promo-msg is-success";
+        checkoutPromoMsg.textContent = IS_AR
+          ? `تمام! اتفعّل كود ${code} (${promo.labelAr})`
+          : `Applied ${code} — ${promo.labelEn}!`;
+      }
+      updateCheckoutTotals();
+      syncSavedPromoPill();
+    }
+
+    if (checkoutPromoApplyBtn && checkoutPromoInput) {
+      checkoutPromoApplyBtn.addEventListener("click", () => {
+        const typed = checkoutPromoInput.value.trim().toUpperCase();
+        if (appliedPromo && checkoutPromoApplyBtn.classList.contains("is-applied") && typed === appliedPromo) {
+          checkoutPromoInput.value = "";
+          applyPromoCode("");
+          return;
+        }
+        applyPromoCode(typed);
+      });
+
+      checkoutPromoInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          applyPromoCode(checkoutPromoInput.value);
+        }
+      });
+
+      checkoutPromoInput.addEventListener("input", () => {
+        const typed = checkoutPromoInput.value.trim().toUpperCase();
+        if (appliedPromo && typed !== appliedPromo) {
+          checkoutPromoApplyBtn.classList.remove("is-applied");
+          checkoutPromoApplyBtn.textContent = t("Apply", "تطبيق");
+        }
+      });
+    }
+
+    if (checkoutPromoSavedPill) {
+      checkoutPromoSavedPill.addEventListener("click", () => {
+        const reward = getSavedScratchReward();
+        if (reward && reward.code) applyPromoCode(reward.code);
+      });
     }
 
     function renderCheckoutSummary({ isInitial = false } = {}) {
@@ -1643,7 +1786,9 @@ document.addEventListener("DOMContentLoaded", () => {
       checkoutSubmitBtn.classList.add("is-submitting");
 
       const subtotal = checkoutCart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const discount = computePromoDiscount(subtotal);
       const fee = fulfillmentMethod === "delivery" ? 25 : 0;
+      const appliedInfo = appliedPromo ? TOOMYS_PROMO_CODES[appliedPromo] : null;
       const orderPayload = {
         code: generateOrderCode(),
         customerName: nameVal,
@@ -1662,8 +1807,11 @@ document.addEventListener("DOMContentLoaded", () => {
         payment: t("Cash", "كاش"),
         items: checkoutCart.map((item) => ({ ...item })),
         subtotal,
+        promoCode: appliedPromo || null,
+        promoLabel: appliedInfo ? (IS_AR ? appliedInfo.labelAr : appliedInfo.labelEn) : null,
+        discount,
         fee,
-        total: subtotal + fee,
+        total: Math.max(0, subtotal - discount + fee),
         createdAt: new Date().toLocaleString(IS_AR ? "ar-EG" : "en-US", {
           month: "short",
           day: "numeric",
@@ -1690,6 +1838,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Initial render on page load
+    syncSavedPromoPill();
     renderCheckoutSummary({ isInitial: true });
   }
 
@@ -1752,6 +1901,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const receiptMetaEl = document.getElementById("receiptMetaTag");
     const receiptItemsList = document.getElementById("receiptItemsList");
     const receiptSubtotalEl = document.getElementById("receiptSubtotal");
+    const receiptDiscountRowEl = document.getElementById("receiptDiscountRow");
+    const receiptDiscountLabelEl = document.getElementById("receiptDiscountLabel");
+    const receiptDiscountValEl = document.getElementById("receiptDiscountVal");
     const receiptFeeLabelEl = document.getElementById("receiptFeeLabel");
     const receiptFeeValEl = document.getElementById("receiptFeeVal");
     const receiptGrandTotalEl = document.getElementById("receiptGrandTotal");
@@ -1782,6 +1934,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (receiptSubtotalEl) {
       receiptSubtotalEl.textContent = formatPrice(orderData.subtotal);
+    }
+    if (receiptDiscountRowEl) {
+      if (orderData.promoCode) {
+        receiptDiscountRowEl.hidden = false;
+        const promoDef = TOOMYS_PROMO_CODES[orderData.promoCode];
+        if (receiptDiscountLabelEl) {
+          receiptDiscountLabelEl.textContent = `${t("Promo", "كود الخصم")} (${orderData.promoCode})`;
+        }
+        if (receiptDiscountValEl) {
+          const fallbackLabel = promoDef
+            ? (IS_AR ? promoDef.labelAr : promoDef.labelEn)
+            : t("Free", "مجانًا");
+          receiptDiscountValEl.textContent =
+            orderData.discount > 0 ? `-${formatPrice(orderData.discount)}` : (orderData.promoLabel || fallbackLabel);
+        }
+      } else {
+        receiptDiscountRowEl.hidden = true;
+      }
     }
     if (receiptFeeLabelEl) {
       receiptFeeLabelEl.textContent = isDeliveryOrder(orderData)
@@ -2376,6 +2546,88 @@ document.addEventListener("DOMContentLoaded", () => {
     const isAr = Boolean(window.TOOMYS_I18N && window.TOOMYS_I18N.isAr);
     const t = (en, ar) => (isAr ? ar : en);
 
+    /* ---------- Reviews data (edit here with real Google reviews) ---------- */
+    const GOOGLE_REVIEW_URL = "https://www.google.com/maps/search/?api=1&query=27.18261,31.18335";
+    const TABLET_REVIEWS = [
+      {
+        nameEn: "Karim Hassan",
+        nameAr: "كريم حسن",
+        stars: 5,
+        dateEn: "2 days ago",
+        dateAr: "من يومين",
+        textEn: "Best smash burger in Asyut hands down. Crispy lacy edges and the Toomy sauce hits different.",
+        textAr: "أجمد سماش برجر في أسيوط كلها بجد. الأطراف مقرمشة والصوص حكاية لوحدها."
+      },
+      {
+        nameEn: "Salma El-Masry",
+        nameAr: "سلمى المصري",
+        stars: 5,
+        dateEn: "5 days ago",
+        dateAr: "من 5 أيام",
+        textEn: "Popcorn chicken pizza arrived piping hot and loaded with mozzarella. Totally worth it.",
+        textAr: "بيتزا البوب كورن تشيكن وصلت سخنة نار ومليانة موتزاريلا بتشد.. تستاهل كل جنيه."
+      },
+      {
+        nameEn: "Omar Khaled",
+        nameAr: "عمر خالد",
+        stars: 5,
+        dateEn: "1 week ago",
+        dateAr: "من أسبوع",
+        textEn: "Tenders meal is huge and super crunchy, even after delivery to El Gomhoureya St.",
+        textAr: "وجبة التندرز كبيرة ومقرمشة جدًا حتى بعد ما وصلت دليفري، الشغل نضيف أوي."
+      },
+      {
+        nameEn: "Nourhan Adel",
+        nameAr: "نورهان عادل",
+        stars: 5,
+        dateEn: "2 weeks ago",
+        dateAr: "من أسبوعين",
+        textEn: "Cheesy Burger Boom is literally flooded with warm cheddar. Friendly crew at Abrag El Nasr.",
+        textAr: "التشيزي برجر بوم غرقان شيدر سخن، والتعامل في فرع أبراج النصر محترم وسريع."
+      },
+      {
+        nameEn: "Mostafa Gamal",
+        nameAr: "مصطفى جمال",
+        stars: 5,
+        dateEn: "3 weeks ago",
+        dateAr: "من 3 أسابيع",
+        textEn: "Basmati Chicken bowl + Garlic & Toomy sauce is my late-night go-to every weekend.",
+        textAr: "بولة البسمتي تشيكن مع التومية وصوص تومي ده عشاي المفضل كل ويك إند."
+      }
+    ];
+
+    /* ---------- Real food photos (assets/Toomy's/images) ---------- */
+    const GALLERY_PHOTOS = [
+      "527069758_122126197880875441_735373576061130978_n.webp",
+      "700641860_122170220090875441_6140530138794888347_n.webp",
+      "703665496_122170220192875441_5277967330441624194_n.webp",
+      "722223957_122173891394875441_8474957666186635188_n.webp",
+      "732152407_122174901338875441_8299308441862567738_n.webp",
+      "733832071_122175477944875441_1176622025684298745_n.webp",
+      "757596530_122178513536875441_3934693628064378486_n.webp",
+      "758252970_122178513560875441_8168361152005431301_n.webp",
+      "758964301_122178868928875441_6993247707368304347_n.webp",
+      "758964336_122178868904875441_8797335942860829148_n.webp",
+      "758964354_122178869012875441_3056657179883538300_n.webp",
+      "759446357_122178869066875441_4516403337306784274_n.webp",
+      "774105550_122180992118875441_8742329588433856476_n.webp",
+      "784233050_122181859046875441_529429058009069908_n.webp",
+      "811711223_122184457148875441_4520686450416769790_n.webp",
+      "825281831_122185942682875441_8052912206953711533_n.webp",
+      "825350938_122186959550875441_6129030293154257138_n.webp",
+      "825351263_122186959424875441_5688030746624403478_n.webp",
+      "833346720_122186960186875441_8340577585048214447_n.webp",
+      "886056986_122191061612875441_7090721438276183366_n.webp"
+    ];
+
+    /* ---------- Scratch & Win prizes ---------- */
+    const SCRATCH_PRIZES = [
+      { code: "TOOMY15", emoji: "🔥", en: "15% OFF your order", ar: "خصم 15% على أوردرك" },
+      { code: "FREEFRIES", emoji: "🍟", en: "Free Golden Fries", ar: "بطاطس دهبي ببلاش" },
+      { code: "TOOMY25", emoji: "🍔", en: "25 EGP OFF your order", ar: "خصم 25 جنيه على أوردرك" },
+      { code: "TOOMY10", emoji: "🍕", en: "10% OFF your order", ar: "خصم 10% على أوردرك" }
+    ];
+
     /* ---------- App switching ---------- */
     function setApp(name, originEl) {
       if (originEl) {
@@ -2408,6 +2660,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
+      if (name !== "photos") closePhotoLightbox();
+
       screen.dataset.activeApp = name;
       views.forEach((v) => {
         const on = v.dataset.view === name;
@@ -2416,6 +2670,9 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (name === "chat") onChatOpen();
+      if (name === "scratch") initScratchApp();
+      if (name === "photos") initPhotosApp();
+      if (name === "reviews") initReviewsApp();
     }
 
     /* ---------- WhatsApp-style chat ---------- */
@@ -2446,12 +2703,71 @@ document.addEventListener("DOMContentLoaded", () => {
       if (chatForm && chatInput) chatForm.classList.toggle("is-empty", !chatInput.value.trim());
     }
 
+    function getCartItemsSafe() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem("toomys_cart_v1"));
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function syncWhatsAppCartChip() {
+      if (!chipsEl) return;
+      const existing = chipsEl.querySelector("[data-wa-cart-chip]");
+      if (existing) existing.remove();
+
+      const items = getCartItemsSafe();
+      if (items.length === 0) return;
+
+      const totalQty = items.reduce((sum, i) => sum + (i.qty || 1), 0);
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "wa-chip wa-chip-cart";
+      chip.setAttribute("data-wa-chip", "");
+      chip.setAttribute("data-wa-cart-chip", "");
+      chip.textContent = isAr
+        ? `ابعت الأوردر اللي في السلة 🛒 (${totalQty})`
+        : `Send my cart order 🛒 (${totalQty})`;
+      chipsEl.prepend(chip);
+    }
+
+    function buildWhatsAppCartMessage() {
+      const items = getCartItemsSafe();
+      if (items.length === 0) return "";
+      const lines = items
+        .map((i) => `• ${i.qty || 1}× ${i.title}${i.sub ? ` (${i.sub})` : ""}`)
+        .join("\n");
+      const subtotal = items.reduce((sum, i) => sum + (i.price || 0) * (i.qty || 1), 0);
+      let reward = null;
+      try {
+        reward = JSON.parse(localStorage.getItem(SCRATCH_REWARD_KEY));
+      } catch {}
+
+      if (isAr) {
+        let msg = `عايز أطلب الأوردر ده:\n${lines}\nالمجموع: ${subtotal.toLocaleString("en-US")} جنيه`;
+        if (reward && reward.unlocked && reward.code) msg += `\nكود الخصم: ${reward.code}`;
+        msg += `\nالعنوان: `;
+        return msg;
+      }
+
+      let msg = `I'd like to order:\n${lines}\nSubtotal: ${subtotal.toLocaleString("en-US")} EGP`;
+      if (reward && reward.unlocked && reward.code) msg += `\nPromo code: ${reward.code}`;
+      msg += `\nAddress: `;
+      return msg;
+    }
+
     function onChatOpen() {
+      syncWhatsAppCartChip();
+
       // Desktop: put the cursor in the box. Phones: don't pop the keyboard uninvited.
       if (chatInput && window.matchMedia && window.matchMedia("(pointer: fine)").matches) {
         setTimeout(() => chatInput.focus({ preventScroll: true }), 420);
       }
-      if (chatGreeted || !greetingEl) return;
+      if (chatGreeted || !greetingEl) {
+        if (chipsEl && getCartItemsSafe().length > 0) chipsEl.hidden = false;
+        return;
+      }
       chatGreeted = true;
 
       const nowEl = greetingEl.querySelector("[data-wa-now]");
@@ -2472,6 +2788,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    window.addEventListener("toomys:cart-sync", syncWhatsAppCartChip);
+    window.addEventListener("storage", (e) => {
+      if (e.key === "toomys_cart_v1") syncWhatsAppCartChip();
+    });
+
     // Typing indicator is hidden until the chat is first opened
     if (typingEl) typingEl.hidden = true;
 
@@ -2484,9 +2805,15 @@ document.addEventListener("DOMContentLoaded", () => {
       chipsEl.addEventListener("click", (e) => {
         const chip = e.target.closest("[data-wa-chip]");
         if (!chip) return;
-        chatInput.value = chip.textContent.trim();
+        chatInput.value = chip.hasAttribute("data-wa-cart-chip")
+          ? buildWhatsAppCartMessage()
+          : chip.textContent.trim();
         syncSendState();
         chatInput.focus({ preventScroll: true });
+        if (typeof chatInput.setSelectionRange === "function") {
+          const len = chatInput.value.length;
+          chatInput.setSelectionRange(len, len);
+        }
       });
     }
 
@@ -2535,6 +2862,622 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
+    /* ---------- Scratch & Win app ---------- */
+    const scratchWrap = screen.querySelector("[data-scratch-wrap]");
+    const scratchCanvas = screen.querySelector("[data-scratch-canvas]");
+    const scratchEmoji = screen.querySelector("[data-scratch-emoji]");
+    const scratchHeadline = screen.querySelector("[data-scratch-headline]");
+    const scratchCodeEl = screen.querySelector("[data-scratch-code]");
+    const scratchHint = screen.querySelector("[data-scratch-hint]");
+    const scratchForm = screen.querySelector("[data-scratch-form]");
+    const scratchPhone = screen.querySelector("#scratchPhone");
+    const scratchError = screen.querySelector("[data-scratch-error]");
+    const scratchUnlocked = screen.querySelector("[data-scratch-unlocked]");
+    const scratchCopyBtn = screen.querySelector("[data-scratch-copy]");
+
+    let scratchReward = null;
+    let scratchScratched = false;
+    let scratchFoilDrawn = false;
+
+    function loadOrCreateScratchReward() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(SCRATCH_REWARD_KEY));
+        if (saved && saved.code && SCRATCH_PRIZES.some((p) => p.code === saved.code)) {
+          return saved;
+        }
+      } catch {}
+      const pick = SCRATCH_PRIZES[Math.floor(Math.random() * SCRATCH_PRIZES.length)];
+      const fresh = { code: pick.code, unlocked: false };
+      try {
+        localStorage.setItem(SCRATCH_REWARD_KEY, JSON.stringify(fresh));
+      } catch {}
+      return fresh;
+    }
+
+    function saveScratchReward(next) {
+      scratchReward = next;
+      try {
+        localStorage.setItem(SCRATCH_REWARD_KEY, JSON.stringify(next));
+      } catch {}
+    }
+
+    function renderScratchState() {
+      if (!scratchReward) scratchReward = loadOrCreateScratchReward();
+      const prize = SCRATCH_PRIZES.find((p) => p.code === scratchReward.code) || SCRATCH_PRIZES[0];
+
+      if (scratchEmoji) scratchEmoji.textContent = prize.emoji;
+      if (scratchHeadline) scratchHeadline.textContent = isAr ? prize.ar : prize.en;
+
+      if (scratchReward.unlocked) {
+        scratchScratched = true;
+        if (scratchCodeEl) {
+          scratchCodeEl.textContent = scratchReward.code;
+          scratchCodeEl.classList.remove("is-locked");
+        }
+        if (scratchCanvas) scratchCanvas.classList.add("is-revealed");
+        if (scratchHint) scratchHint.hidden = true;
+        if (scratchForm) scratchForm.hidden = true;
+        if (scratchUnlocked) scratchUnlocked.hidden = false;
+      } else if (scratchScratched) {
+        if (scratchCodeEl) {
+          scratchCodeEl.textContent = "••••••••";
+          scratchCodeEl.classList.add("is-locked");
+        }
+        if (scratchCanvas) scratchCanvas.classList.add("is-revealed");
+        if (scratchHint) scratchHint.hidden = true;
+        if (scratchForm) scratchForm.hidden = false;
+        if (scratchUnlocked) scratchUnlocked.hidden = true;
+      } else {
+        if (scratchCodeEl) {
+          scratchCodeEl.textContent = "••••••••";
+          scratchCodeEl.classList.add("is-locked");
+        }
+        if (scratchCanvas) scratchCanvas.classList.remove("is-revealed");
+        if (scratchHint) scratchHint.hidden = false;
+        if (scratchForm) scratchForm.hidden = true;
+        if (scratchUnlocked) scratchUnlocked.hidden = true;
+      }
+    }
+
+    function spawnScratchConfetti() {
+      if (!scratchWrap || reduceMotion) return;
+      const box = document.createElement("div");
+      box.className = "scratch-confetti";
+      const colors = ["#e3262e", "#f5b727", "#246b35", "#007aff", "#ff9f0a"];
+      for (let i = 0; i < 16; i++) {
+        const dot = document.createElement("span");
+        dot.className = "scratch-confetti-dot";
+        const angle = (Math.PI * 2 * i) / 16;
+        const dist = 48 + Math.random() * 68;
+        dot.style.left = "50%";
+        dot.style.top = "50%";
+        dot.style.backgroundColor = colors[i % colors.length];
+        dot.style.setProperty("--tx", `${Math.round(Math.cos(angle) * dist)}px`);
+        dot.style.setProperty("--ty", `${Math.round(Math.sin(angle) * dist)}px`);
+        box.appendChild(dot);
+      }
+      scratchWrap.appendChild(box);
+      setTimeout(() => box.remove(), 820);
+    }
+
+    function drawScratchFoil() {
+      if (!scratchCanvas || !scratchWrap || scratchFoilDrawn) return;
+      const rect = scratchWrap.getBoundingClientRect();
+      if (rect.width < 12 || rect.height < 12) return;
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = Math.round(rect.width);
+      const h = Math.round(rect.height);
+      scratchCanvas.width = Math.round(w * dpr);
+      scratchCanvas.height = Math.round(h * dpr);
+
+      const ctx = scratchCanvas.getContext("2d");
+      if (!ctx) return;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, "#f8d468");
+      grad.addColorStop(0.35, "#eab308");
+      grad.addColorStop(0.65, "#f5b727");
+      grad.addColorStop(1, "#d97706");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+      ctx.lineWidth = 6;
+      for (let x = -h; x < w + h; x += 22) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x + h, h);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = "#5c3900";
+      ctx.font = `800 ${Math.max(13, Math.round(w * 0.055))}px Cairo, "Plus Jakarta Sans", sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(t("Scratch here ✨", "اكشط هنا ✨"), w / 2, h / 2);
+      scratchFoilDrawn = true;
+    }
+
+    function initScratchApp() {
+      scratchReward = loadOrCreateScratchReward();
+      renderScratchState();
+      if (!scratchReward.unlocked && !scratchScratched && !scratchFoilDrawn) {
+        requestAnimationFrame(drawScratchFoil);
+      }
+    }
+
+    if (scratchCanvas) {
+      let isScratching = false;
+      let lastPt = null;
+      let moveCount = 0;
+
+      const eraseAt = (e) => {
+        const rect = scratchCanvas.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        const x = ((e.clientX - rect.left) / rect.width) * (scratchCanvas.width / Math.min(window.devicePixelRatio || 1, 2));
+        const y = ((e.clientY - rect.top) / rect.height) * (scratchCanvas.height / Math.min(window.devicePixelRatio || 1, 2));
+        const ctx = scratchCanvas.getContext("2d");
+        if (!ctx) return;
+
+        ctx.save();
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.fillStyle = "#000";
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 42;
+        ctx.lineCap = "round";
+
+        ctx.beginPath();
+        ctx.arc(x, y, 21, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (lastPt) {
+          ctx.beginPath();
+          ctx.moveTo(lastPt.x, lastPt.y);
+          ctx.lineTo(x, y);
+          ctx.stroke();
+        }
+        ctx.restore();
+        lastPt = { x, y };
+      };
+
+      const checkScratchProgress = () => {
+        if (scratchScratched) return;
+        const ctx = scratchCanvas.getContext("2d");
+        if (!ctx || !scratchCanvas.width || !scratchCanvas.height) return;
+        try {
+          const data = ctx.getImageData(0, 0, scratchCanvas.width, scratchCanvas.height).data;
+          let cleared = 0;
+          let total = 0;
+          for (let i = 3; i < data.length; i += 64) {
+            total += 1;
+            if (data[i] < 128) cleared += 1;
+          }
+          if (total > 0 && cleared / total >= 0.42) {
+            scratchScratched = true;
+            isScratching = false;
+            spawnScratchConfetti();
+            renderScratchState();
+          }
+        } catch {}
+      };
+
+      scratchCanvas.addEventListener("pointerdown", (e) => {
+        if (scratchScratched || (scratchReward && scratchReward.unlocked)) return;
+        isScratching = true;
+        lastPt = null;
+        moveCount = 0;
+        try {
+          scratchCanvas.setPointerCapture(e.pointerId);
+        } catch {}
+        eraseAt(e);
+      });
+
+      scratchCanvas.addEventListener("pointermove", (e) => {
+        if (!isScratching) return;
+        eraseAt(e);
+        moveCount += 1;
+        if (moveCount % 6 === 0) checkScratchProgress();
+      });
+
+      const stopScratch = () => {
+        if (!isScratching) return;
+        isScratching = false;
+        lastPt = null;
+        checkScratchProgress();
+      };
+
+      scratchCanvas.addEventListener("pointerup", stopScratch);
+      scratchCanvas.addEventListener("pointercancel", stopScratch);
+    }
+
+    if (scratchForm && scratchPhone) {
+      scratchForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const raw = scratchPhone.value.replace(/\s+/g, "");
+        const valid = /^(\+20|0)?1[0125][0-9]{8}$/.test(raw);
+        if (!valid) {
+          if (scratchError) {
+            scratchError.textContent = t(
+              "Enter a valid Egyptian number (e.g. 010XXXXXXXX).",
+              "اكتب رقم موبايل مصري مظبوط (مثلًا 010XXXXXXXX)."
+            );
+          }
+          scratchPhone.focus();
+          return;
+        }
+        if (scratchError) scratchError.textContent = "";
+
+        if (!scratchReward) scratchReward = loadOrCreateScratchReward();
+        try {
+          const leads = JSON.parse(localStorage.getItem(NEWSLETTER_LEADS_KEY)) || [];
+          if (!leads.some((l) => l.phone === raw)) {
+            leads.unshift({ phone: raw, source: "scratch", code: scratchReward.code, at: new Date().toISOString() });
+            localStorage.setItem(NEWSLETTER_LEADS_KEY, JSON.stringify(leads.slice(0, 50)));
+          }
+        } catch {}
+
+        saveScratchReward({ ...scratchReward, unlocked: true, phone: raw });
+        renderScratchState();
+      });
+    }
+
+    if (scratchCopyBtn) {
+      scratchCopyBtn.addEventListener("click", () => {
+        if (!scratchReward || !scratchReward.code) return;
+        const finishCopy = () => {
+          scratchCopyBtn.textContent = t("Copied ✓", "اتنسخ ✓");
+          clearTimeout(scratchCopyBtn._copyTimer);
+          scratchCopyBtn._copyTimer = setTimeout(() => {
+            scratchCopyBtn.textContent = t("Copy Code", "انسخ الكود");
+          }, 1600);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(scratchReward.code).then(finishCopy).catch(finishCopy);
+        } else {
+          finishCopy();
+        }
+      });
+    }
+
+    /* ---------- Photos gallery app ---------- */
+    const photosGrid = screen.querySelector("[data-photos-grid]");
+    const photosCountEl = screen.querySelector("[data-photos-count]");
+    const photosLightbox = screen.querySelector("[data-photos-lightbox]");
+    const photosLbStage = screen.querySelector("[data-photos-stage]");
+    const photosLbImg = screen.querySelector("[data-photos-img]");
+    const photosLbCounter = screen.querySelector("[data-photos-counter]");
+    const photosLbStrip = screen.querySelector("[data-photos-strip]");
+    const photosCloseBtn = screen.querySelector("[data-photos-close]");
+    const photosPrevBtn = screen.querySelector("[data-photos-prev]");
+    const photosNextBtn = screen.querySelector("[data-photos-next]");
+
+    let photosBuilt = false;
+    let activePhotoIdx = 0;
+
+    function openPhotoLightbox(idx) {
+      if (!photosLightbox || !photosLbImg) return;
+      const len = GALLERY_PHOTOS.length;
+      activePhotoIdx = ((idx % len) + len) % len;
+      photosLbImg.src = `assets/Toomy's/images/${GALLERY_PHOTOS[activePhotoIdx]}`;
+      photosLbImg.alt = t(`Toomy's food photo ${activePhotoIdx + 1}`, `صورة أكل توميز ${activePhotoIdx + 1}`);
+      if (photosLbCounter) photosLbCounter.textContent = `${activePhotoIdx + 1} / ${len}`;
+
+      if (photosLbStrip) {
+        photosLbStrip.querySelectorAll(".photos-strip-thumb").forEach((btn, i) => {
+          const active = i === activePhotoIdx;
+          btn.classList.toggle("is-active", active);
+          if (active) {
+            btn.scrollIntoView({ inline: "center", block: "nearest", behavior: reduceMotion ? "auto" : "smooth" });
+          }
+        });
+      }
+
+      photosLightbox.hidden = false;
+      photosLightbox.setAttribute("aria-hidden", "false");
+      screen.classList.add("is-lightbox-open");
+    }
+
+    function closePhotoLightbox() {
+      if (!photosLightbox || photosLightbox.hidden) return;
+      photosLightbox.hidden = true;
+      photosLightbox.setAttribute("aria-hidden", "true");
+      screen.classList.remove("is-lightbox-open");
+    }
+
+    function initPhotosApp() {
+      if (photosBuilt || !photosGrid) return;
+      photosBuilt = true;
+      if (photosCountEl) photosCountEl.textContent = String(GALLERY_PHOTOS.length);
+
+      photosGrid.innerHTML = GALLERY_PHOTOS.map(
+        (file, i) => `
+          <button type="button" class="photos-thumb-btn" data-photo-idx="${i}" aria-label="${t(`Open photo ${i + 1}`, `افتح صورة ${i + 1}`)}">
+            <img src="assets/Toomy's/images/${file}" alt="${t(`Toomy's food ${i + 1}`, `أكل توميز ${i + 1}`)}" loading="lazy" decoding="async" draggable="false" />
+          </button>
+        `
+      ).join("");
+
+      if (photosLbStrip) {
+        photosLbStrip.innerHTML = GALLERY_PHOTOS.map(
+          (file, i) => `
+            <button type="button" class="photos-strip-thumb" data-photo-idx="${i}" aria-label="${t(`Photo ${i + 1}`, `صورة ${i + 1}`)}">
+              <img src="assets/Toomy's/images/${file}" alt="" loading="lazy" decoding="async" draggable="false" />
+            </button>
+          `
+        ).join("");
+      }
+    }
+
+    if (photosGrid) {
+      photosGrid.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-photo-idx]");
+        if (btn) openPhotoLightbox(Number(btn.dataset.photoIdx));
+      });
+    }
+
+    if (photosLbStrip) {
+      photosLbStrip.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-photo-idx]");
+        if (btn) openPhotoLightbox(Number(btn.dataset.photoIdx));
+      });
+    }
+
+    if (photosCloseBtn) photosCloseBtn.addEventListener("click", closePhotoLightbox);
+    if (photosPrevBtn) photosPrevBtn.addEventListener("click", () => openPhotoLightbox(activePhotoIdx - 1));
+    if (photosNextBtn) photosNextBtn.addEventListener("click", () => openPhotoLightbox(activePhotoIdx + 1));
+
+    if (photosLbStage) {
+      let swipeStartX = null;
+      photosLbStage.addEventListener("pointerdown", (e) => {
+        if (e.target.closest(".photos-lb-nav")) return;
+        swipeStartX = e.clientX;
+      });
+      photosLbStage.addEventListener("pointerup", (e) => {
+        if (swipeStartX === null) return;
+        const dx = e.clientX - swipeStartX;
+        swipeStartX = null;
+        if (Math.abs(dx) < 35) return;
+        const goNext = isAr ? dx > 0 : dx < 0;
+        openPhotoLightbox(activePhotoIdx + (goNext ? 1 : -1));
+      });
+      photosLbStage.addEventListener("pointercancel", () => {
+        swipeStartX = null;
+      });
+    }
+
+    /* ---------- Google Reviews app ---------- */
+    const reviewsListEl = screen.querySelector("[data-reviews-list]");
+    const reviewsGoogleBtn = screen.querySelector("[data-reviews-google-btn]");
+    let reviewsBuilt = false;
+
+    function initReviewsApp() {
+      if (reviewsBuilt || !reviewsListEl) return;
+      reviewsBuilt = true;
+      if (reviewsGoogleBtn) reviewsGoogleBtn.href = GOOGLE_REVIEW_URL;
+
+      reviewsListEl.innerHTML = TABLET_REVIEWS.map(
+        (rev) => `
+          <article class="review-card">
+            <div class="review-card-top">
+              <strong class="review-author">${isAr ? rev.nameAr : rev.nameEn}</strong>
+              <span class="review-date">${isAr ? rev.dateAr : rev.dateEn}</span>
+            </div>
+            <div class="review-stars-row">
+              <span class="review-stars" aria-label="${rev.stars} / 5">${"★".repeat(rev.stars)}</span>
+              <span class="review-source-pill">Google</span>
+            </div>
+            <p class="review-quote">${isAr ? rev.textAr : rev.textEn}</p>
+          </article>
+        `
+      ).join("");
+    }
+
+    /* ---------- iOS Home Screen drag & rearrange (jiggle mode) ---------- */
+    const APP_ORDER_KEY = "toomys_tablet_apps_v1";
+    const iosHome = screen.querySelector(".ios-home");
+    const iosGrid = screen.querySelector("[data-ios-grid]");
+    const jiggleDoneBtn = screen.querySelector("[data-jiggle-done]");
+    let isJiggling = false;
+    let suppressNextAppClick = false;
+    let dragState = null;
+    let lastSwapTime = 0;
+
+    function restoreAppOrder() {
+      if (!iosGrid) return;
+      try {
+        const saved = JSON.parse(localStorage.getItem(APP_ORDER_KEY));
+        if (!Array.isArray(saved) || saved.length === 0) return;
+        const map = new Map();
+        iosGrid.querySelectorAll(".ios-app[data-app-id]").forEach((el) => {
+          map.set(el.dataset.appId, el);
+        });
+        saved.forEach((id) => {
+          const el = map.get(id);
+          if (el) {
+            iosGrid.appendChild(el);
+            map.delete(id);
+          }
+        });
+        map.forEach((el) => iosGrid.appendChild(el));
+      } catch {}
+    }
+
+    function saveAppOrder() {
+      if (!iosGrid) return;
+      const order = Array.from(iosGrid.querySelectorAll(".ios-app[data-app-id]")).map(
+        (el) => el.dataset.appId
+      );
+      try {
+        localStorage.setItem(APP_ORDER_KEY, JSON.stringify(order));
+      } catch {}
+    }
+
+    function setJiggleMode(enabled) {
+      isJiggling = enabled;
+      screen.classList.toggle("is-jiggling", enabled);
+      if (jiggleDoneBtn) jiggleDoneBtn.hidden = !enabled;
+    }
+
+    function flipMoveApp(movingEl, targetEl, insertAfter) {
+      if (!iosGrid || !movingEl || !targetEl || movingEl === targetEl) return;
+      const siblings = Array.from(iosGrid.children);
+      const firstRects = new Map();
+      siblings.forEach((el) => firstRects.set(el, el.getBoundingClientRect()));
+
+      if (insertAfter) targetEl.after(movingEl);
+      else targetEl.before(movingEl);
+
+      siblings.forEach((el) => {
+        if (el === movingEl) return;
+        const first = firstRects.get(el);
+        const last = el.getBoundingClientRect();
+        const dx = first.left - last.left;
+        const dy = first.top - last.top;
+        if (dx || dy) {
+          el.style.transition = "none";
+          el.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
+          requestAnimationFrame(() => {
+            el.style.transition = "transform 240ms cubic-bezier(0.22, 1, 0.36, 1)";
+            el.style.transform = "";
+          });
+        }
+      });
+    }
+
+    if (iosGrid && iosHome) {
+      restoreAppOrder();
+
+      iosGrid.addEventListener("dragstart", (e) => e.preventDefault());
+
+      const positionGhost = (state, clientX, clientY) => {
+        if (!state.ghost || !state.homeRect) return;
+        const x = clientX - state.homeRect.left - state.offsetX;
+        const y = clientY - state.homeRect.top - state.offsetY;
+        state.ghost.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      };
+
+      const startDrag = (state, clientX, clientY) => {
+        if (state.active) return;
+        state.active = true;
+        const appRect = state.app.getBoundingClientRect();
+        state.homeRect = iosHome.getBoundingClientRect();
+        state.offsetX = clientX - appRect.left;
+        state.offsetY = clientY - appRect.top;
+
+        const ghost = state.app.cloneNode(true);
+        ghost.classList.add("ios-drag-ghost");
+        ghost.style.width = `${appRect.width}px`;
+        iosHome.appendChild(ghost);
+        state.ghost = ghost;
+
+        state.app.classList.add("is-drag-source");
+        positionGhost(state, clientX, clientY);
+      };
+
+      iosGrid.addEventListener("pointerdown", (e) => {
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+        const app = e.target.closest(".ios-app[data-app-id]");
+        if (!app) return;
+
+        dragState = {
+          app,
+          pointerId: e.pointerId,
+          pointerType: e.pointerType,
+          startX: e.clientX,
+          startY: e.clientY,
+          lastX: e.clientX,
+          lastY: e.clientY,
+          active: false,
+          ghost: null,
+          homeRect: null,
+          offsetX: 0,
+          offsetY: 0,
+          timer: null
+        };
+
+        dragState.timer = setTimeout(() => {
+          if (!dragState) return;
+          setJiggleMode(true);
+          startDrag(dragState, dragState.lastX, dragState.lastY);
+        }, 380);
+      });
+
+      window.addEventListener("pointermove", (e) => {
+        if (!dragState || e.pointerId !== dragState.pointerId) return;
+        dragState.lastX = e.clientX;
+        dragState.lastY = e.clientY;
+        const dist = Math.hypot(e.clientX - dragState.startX, e.clientY - dragState.startY);
+
+        if (!dragState.active) {
+          if ((isJiggling && dist > 4) || (dragState.pointerType === "mouse" && dist > 10)) {
+            clearTimeout(dragState.timer);
+            setJiggleMode(true);
+            startDrag(dragState, e.clientX, e.clientY);
+          } else if (dist > 12) {
+            clearTimeout(dragState.timer);
+            dragState = null;
+          }
+          return;
+        }
+
+        positionGhost(dragState, e.clientX, e.clientY);
+
+        const now = performance.now();
+        if (now - lastSwapTime < 85) return;
+
+        const children = Array.from(iosGrid.children);
+        const draggedIdx = children.indexOf(dragState.app);
+        for (let i = 0; i < children.length; i++) {
+          const sibling = children[i];
+          if (sibling === dragState.app) continue;
+          const r = sibling.getBoundingClientRect();
+          if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) {
+            lastSwapTime = now;
+            flipMoveApp(dragState.app, sibling, draggedIdx < i);
+            break;
+          }
+        }
+      });
+
+      const endAppDrag = (e) => {
+        if (!dragState || e.pointerId !== dragState.pointerId) return;
+        clearTimeout(dragState.timer);
+        if (dragState.active) {
+          if (dragState.ghost) dragState.ghost.remove();
+          dragState.app.classList.remove("is-drag-source");
+          saveAppOrder();
+          suppressNextAppClick = true;
+          setTimeout(() => {
+            suppressNextAppClick = false;
+          }, 180);
+        }
+        dragState = null;
+      };
+
+      window.addEventListener("pointerup", endAppDrag);
+      window.addEventListener("pointercancel", endAppDrag);
+
+      iosGrid.addEventListener(
+        "click",
+        (e) => {
+          if (suppressNextAppClick || isJiggling) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        },
+        true
+      );
+    }
+
+    if (jiggleDoneBtn) {
+      jiggleDoneBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        setJiggleMode(false);
+      });
+    }
+
     // The WhatsApp icon under the tablet opens the chat inside the tablet
     document.querySelectorAll("[data-open-tablet-chat]").forEach((link) => {
       link.addEventListener("click", (e) => {
@@ -2552,13 +3495,30 @@ document.addEventListener("DOMContentLoaded", () => {
     screen.addEventListener("click", (e) => {
       const opener = e.target.closest("[data-open-app]");
       if (opener) {
+        if (isJiggling && opener.closest("[data-ios-grid]")) {
+          e.preventDefault();
+          return;
+        }
         e.preventDefault();
         setApp(opener.dataset.openApp, opener);
         return;
       }
 
       if (e.target.closest("[data-go-home]")) {
+        if (screen.dataset.activeApp === "home" && isJiggling) {
+          setJiggleMode(false);
+          return;
+        }
         setApp("home");
+        return;
+      }
+
+      if (
+        isJiggling &&
+        screen.dataset.activeApp === "home" &&
+        !e.target.closest(".ios-app, .ios-widget, .ios-jiggle-done")
+      ) {
+        setJiggleMode(false);
         return;
       }
 
@@ -2575,7 +3535,29 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     tablet.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && screen.dataset.activeApp !== "home") setApp("home");
+      if (photosLightbox && !photosLightbox.hidden) {
+        if (e.key === "Escape") {
+          closePhotoLightbox();
+          return;
+        }
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          openPhotoLightbox(activePhotoIdx + (isAr ? 1 : -1));
+          return;
+        }
+        if (e.key === "ArrowRight") {
+          e.preventDefault();
+          openPhotoLightbox(activePhotoIdx + (isAr ? -1 : 1));
+          return;
+        }
+      }
+      if (e.key === "Escape") {
+        if (screen.dataset.activeApp !== "home") {
+          setApp("home");
+        } else if (isJiggling) {
+          setJiggleMode(false);
+        }
+      }
     });
 
     /* ---------- Live clock + open status (Cairo time) ---------- */

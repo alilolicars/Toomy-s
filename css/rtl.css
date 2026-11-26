@@ -685,3 +685,43 @@
 [dir="rtl"] .pdp-add-btn {
   padding: 8px 24px 8px 8px;
 }
+
+/* =========================================================
+   12. TABLET NEW APPS & CHECKOUT PROMO RTL POLISH
+   ========================================================= */
+[dir="rtl"] .ios-app-bar-title,
+[dir="rtl"] .ios-jiggle-done,
+[dir="rtl"] .scratch-scroll,
+[dir="rtl"] .scratch-title,
+[dir="rtl"] .scratch-eyebrow,
+[dir="rtl"] .scratch-prize-headline,
+[dir="rtl"] .scratch-claim-label,
+[dir="rtl"] .scratch-unlock-btn,
+[dir="rtl"] .scratch-copy-btn,
+[dir="rtl"] .scratch-use-btn,
+[dir="rtl"] .reviews-scroll,
+[dir="rtl"] .reviews-google-cta,
+[dir="rtl"] .review-author,
+[dir="rtl"] .review-quote,
+[dir="rtl"] .checkout-promo-input,
+[dir="rtl"] .checkout-promo-btn,
+[dir="rtl"] .checkout-promo-saved-pill,
+[dir="rtl"] .checkout-promo-msg {
+  font-family: var(--font-body);
+  letter-spacing: 0 !important;
+}
+
+[dir="rtl"] .photos-lb-close svg,
+[dir="rtl"] .photos-lb-prev,
+[dir="rtl"] .photos-lb-next {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .photos-lb-prev,
+[dir="rtl"] .photos-lb-next {
+  transform: translateY(-50%) scaleX(-1);
+}
+
+[dir="rtl"] .checkout-promo-input {
+  text-align: right;
+}

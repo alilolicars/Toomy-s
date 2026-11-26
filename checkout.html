@@ -227,9 +227,32 @@
             <div class="checkout-items-wrap" id="checkoutItemsContainer"></div>
 
             <div class="checkout-totals-footer" id="checkoutTotalsFooter">
+              <!-- Promo Code Box (Works with Scratch & Win codes) -->
+              <div class="checkout-promo-wrap" id="checkoutPromoWrap">
+                <div class="checkout-promo-row">
+                  <input
+                    type="text"
+                    id="checkoutPromoInput"
+                    class="checkout-promo-input"
+                    placeholder="Promo code"
+                    autocomplete="off"
+                    dir="ltr"
+                    aria-label="Promo code"
+                  />
+                  <button type="button" class="checkout-promo-btn" id="checkoutPromoApplyBtn">Apply</button>
+                </div>
+                <button type="button" class="checkout-promo-saved-pill" id="checkoutPromoSavedPill" hidden></button>
+                <p class="checkout-promo-msg" id="checkoutPromoMsg" role="status" aria-live="polite"></p>
+              </div>
+
               <div class="checkout-summary-line">
                 <span>Subtotal</span>
                 <span class="checkout-num" id="checkoutSubtotalVal">0 EGP</span>
+              </div>
+
+              <div class="checkout-summary-line checkout-discount-line" id="checkoutDiscountRow" hidden>
+                <span id="checkoutDiscountLabel">Discount</span>
+                <span class="checkout-num checkout-discount-val" id="checkoutDiscountVal">-0 EGP</span>
               </div>
 
               <div class="checkout-summary-line">

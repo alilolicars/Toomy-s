@@ -8438,3 +8438,933 @@ body.is-leaving {
 .ios-mini-pin {
   top: 20%;
 }
+
+/* =========================================================
+   TABLET MARKETING APPS, JIGGLE REORDER & CHECKOUT PROMO
+   ========================================================= */
+
+/* 1. App open/close zoom transitions for Scratch, Photos & Reviews */
+.ios-scratch,
+.ios-photos,
+.ios-reviews {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.82);
+  transform-origin: var(--ox, 50%) var(--oy, 60%);
+  border-radius: calc(30 * var(--px));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition:
+    opacity 380ms var(--ease-soft),
+    transform 520ms var(--ease-soft),
+    border-radius 520ms var(--ease-soft),
+    visibility 0s linear 520ms;
+}
+
+.tablet-screen[data-active-app="scratch"] .ios-scratch,
+.tablet-screen[data-active-app="photos"] .ios-photos,
+.tablet-screen[data-active-app="reviews"] .ios-reviews {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  border-radius: 0;
+  transition:
+    opacity 380ms var(--ease-soft),
+    transform 560ms var(--ease-soft),
+    border-radius 560ms var(--ease-soft),
+    visibility 0s linear 0s;
+}
+
+.tablet-screen.is-lightbox-open .ios-statusbar {
+  color: #fff;
+}
+
+.tablet-screen.is-lightbox-open .ios-home-bar span {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* 2. New App Icons */
+.ios-icon-scratch {
+  background: linear-gradient(145deg, #ffd147 0%, #f59e0b 48%, #e3262e 100%);
+  color: #fff;
+}
+
+.ios-icon-photos {
+  background: #ffffff;
+}
+
+.ios-icon-reviews {
+  background: linear-gradient(180deg, #38bdf8 0%, #007aff 100%);
+  color: #fff;
+}
+
+/* 3-row Grid Fit (10 icons cleanly above dock) */
+@container (orientation: landscape) {
+  .ios-app-grid {
+    row-gap: calc(11 * var(--px));
+  }
+
+  .ios-icon {
+    width: calc(50 * var(--px));
+    height: calc(50 * var(--px));
+    border-radius: calc(12 * var(--px));
+  }
+}
+
+@container (orientation: portrait) {
+  .ios-app-grid {
+    row-gap: calc(12 * var(--px));
+  }
+
+  .ios-icon {
+    width: calc(52 * var(--px));
+    height: calc(52 * var(--px));
+    border-radius: calc(12 * var(--px));
+  }
+}
+
+/* 3. Jiggle & Drag-Reorder Mode */
+.ios-app-grid .ios-app {
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.tablet-screen.is-jiggling .ios-app-grid .ios-app {
+  touch-action: none;
+  animation: iosJiggle 260ms ease-in-out infinite alternate;
+}
+
+.tablet-screen.is-jiggling .ios-app-grid .ios-app:nth-child(even) {
+  animation-delay: -130ms;
+  animation-direction: alternate-reverse;
+}
+
+@keyframes iosJiggle {
+  0%   { transform: rotate(-1.8deg); }
+  100% { transform: rotate(1.8deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tablet-screen.is-jiggling .ios-app-grid .ios-app {
+    animation: none !important;
+  }
+}
+
+.ios-app.is-drag-source {
+  opacity: 0.16;
+  animation: none !important;
+}
+
+.ios-drag-ghost {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  pointer-events: none;
+  margin: 0;
+  transform-origin: center;
+  filter: drop-shadow(0 calc(12 * var(--px)) calc(18 * var(--px)) rgba(0, 0, 0, 0.35));
+  will-change: transform;
+}
+
+.ios-drag-ghost .ios-icon {
+  transform: scale(1.12);
+}
+
+.ios-jiggle-done {
+  position: absolute;
+  top: calc(36 * var(--px));
+  inset-inline-end: calc(18 * var(--px));
+  z-index: 25;
+  padding: calc(5 * var(--px)) calc(14 * var(--px));
+  border-radius: 99px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #fff;
+  font-size: calc(12 * var(--px));
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 calc(4 * var(--px)) calc(12 * var(--px)) rgba(0, 0, 0, 0.16);
+  transition: transform 200ms var(--ease-soft), background-color 200ms ease;
+}
+
+.ios-jiggle-done:hover {
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.ios-jiggle-done:active {
+  transform: scale(0.95);
+}
+
+.ios-jiggle-done[hidden] {
+  display: none;
+}
+
+@container (orientation: portrait) {
+  .ios-jiggle-done {
+    top: calc(34 * var(--px));
+  }
+}
+
+/* 4. WhatsApp Cart Chip */
+.ios .wa-chip.wa-chip-cart {
+  background: #e7fce8;
+  border-color: #25d366;
+  color: #006c58;
+  font-weight: 700;
+}
+
+.ios .wa-chip.wa-chip-cart:hover {
+  background: #d5f9d8;
+}
+
+/* 5. Shared App Top Bar */
+.ios-app-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: calc(68 * var(--px));
+  padding: calc(28 * var(--px)) calc(14 * var(--px)) 0;
+  background: rgba(249, 249, 251, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  color: #000;
+}
+
+.ios-app-bar-title {
+  font-size: calc(15 * var(--px));
+  font-weight: 700;
+  color: #000;
+}
+
+.ios-app-bar-spacer {
+  width: calc(48 * var(--px));
+}
+
+.ios-photos-count {
+  min-width: calc(48 * var(--px));
+  text-align: end;
+  font-size: calc(12 * var(--px));
+  font-weight: 600;
+  color: var(--ios-gray);
+}
+
+/* 6. Scratch & Win App */
+.ios-scratch {
+  background: #f7f1e7;
+  color: #1e1815;
+}
+
+.scratch-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(12 * var(--px));
+  padding: calc(14 * var(--px)) calc(20 * var(--px)) calc(34 * var(--px));
+  text-align: center;
+}
+
+.scratch-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.scratch-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(3 * var(--px));
+}
+
+.scratch-eyebrow {
+  font-size: calc(10.5 * var(--px));
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e3262e;
+}
+
+.scratch-title {
+  font-size: calc(20 * var(--px));
+  font-weight: 800;
+  line-height: 1.2;
+  color: #1e1815;
+}
+
+.scratch-card-wrap {
+  position: relative;
+  width: min(100%, calc(320 * var(--px)));
+  height: calc(136 * var(--px));
+  border-radius: calc(18 * var(--px));
+  overflow: hidden;
+  background: #ffffff;
+  border: calc(2 * var(--px)) dashed #e3262e;
+  box-shadow: 0 calc(10 * var(--px)) calc(24 * var(--px)) rgba(30, 24, 21, 0.12);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.scratch-prize-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(4 * var(--px));
+  padding: calc(10 * var(--px));
+  background: radial-gradient(circle at 50% 0%, #fff8e6 0%, #ffffff 72%);
+}
+
+.scratch-prize-emoji {
+  font-size: calc(26 * var(--px));
+  line-height: 1;
+}
+
+.scratch-prize-headline {
+  font-size: calc(16 * var(--px));
+  font-weight: 800;
+  color: #1e1815;
+}
+
+.scratch-prize-code {
+  margin-top: calc(2 * var(--px));
+  padding: calc(4 * var(--px)) calc(14 * var(--px));
+  border-radius: 99px;
+  background: #fdecec;
+  border: 1px solid rgba(227, 38, 46, 0.25);
+  color: #e3262e;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: calc(14 * var(--px));
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  transition: filter 280ms ease;
+}
+
+.scratch-prize-code.is-locked {
+  filter: blur(5px);
+}
+
+.scratch-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: crosshair;
+  transition: opacity 420ms ease;
+}
+
+.scratch-canvas.is-revealed {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.scratch-confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 4;
+}
+
+.scratch-confetti-dot {
+  position: absolute;
+  width: calc(7 * var(--px));
+  height: calc(7 * var(--px));
+  border-radius: 2px;
+  animation: scratchPop 760ms var(--ease-soft) forwards;
+}
+
+@keyframes scratchPop {
+  0%   { opacity: 1; transform: translate(0, 0) scale(0.6) rotate(0deg); }
+  100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(1) rotate(220deg); }
+}
+
+.scratch-hint {
+  font-size: calc(12 * var(--px));
+  font-weight: 600;
+  color: #6e655f;
+}
+
+.scratch-claim-form {
+  width: min(100%, calc(320 * var(--px)));
+  display: flex;
+  flex-direction: column;
+  gap: calc(6 * var(--px));
+}
+
+.scratch-claim-form[hidden],
+.scratch-unlocked[hidden] {
+  display: none;
+}
+
+.scratch-claim-label {
+  font-size: calc(12 * var(--px));
+  font-weight: 700;
+  color: #1e1815;
+}
+
+.scratch-claim-row {
+  display: flex;
+  gap: calc(6 * var(--px));
+}
+
+.scratch-phone-input {
+  flex: 1;
+  min-width: 0;
+  height: calc(36 * var(--px));
+  padding: 0 calc(12 * var(--px));
+  border-radius: 99px;
+  border: 1.5px solid rgba(30, 24, 21, 0.16);
+  background: #ffffff;
+  color: #1e1815;
+  font-size: max(14px, calc(13 * var(--px)));
+  outline: none;
+}
+
+.scratch-phone-input:focus {
+  border-color: #e3262e;
+}
+
+.scratch-unlock-btn {
+  flex-shrink: 0;
+  height: calc(36 * var(--px));
+  padding: 0 calc(16 * var(--px));
+  border-radius: 99px;
+  background: #e3262e;
+  color: #ffffff;
+  font-size: calc(12.5 * var(--px));
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.scratch-claim-error {
+  min-height: calc(14 * var(--px));
+  font-size: calc(11.5 * var(--px));
+  font-weight: 600;
+  color: #e3262e;
+}
+
+.scratch-unlocked {
+  width: min(100%, calc(320 * var(--px)));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(8 * var(--px));
+}
+
+.scratch-code-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(8 * var(--px));
+  flex-wrap: wrap;
+}
+
+.scratch-copy-btn,
+.scratch-use-btn {
+  height: calc(34 * var(--px));
+  padding: 0 calc(14 * var(--px));
+  border-radius: 99px;
+  font-size: calc(12 * var(--px));
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 200ms var(--ease-soft);
+}
+
+.scratch-copy-btn {
+  background: #1e1815;
+  color: #ffffff;
+}
+
+.scratch-use-btn {
+  background: #e3262e;
+  color: #ffffff;
+}
+
+.scratch-copy-btn:active,
+.scratch-use-btn:active {
+  transform: scale(0.95);
+}
+
+.scratch-saved-note {
+  font-size: calc(11.5 * var(--px));
+  font-weight: 600;
+  color: #246b35;
+}
+
+/* 7. Photos App */
+.ios-photos {
+  background: #ffffff;
+}
+
+.photos-grid-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-content: start;
+  gap: calc(2 * var(--px));
+  padding: calc(2 * var(--px)) 0 calc(26 * var(--px));
+}
+
+.photos-grid-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+@container (orientation: portrait) {
+  .photos-grid-scroll {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.photos-thumb-btn {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #f3ece1;
+  padding: 0;
+  cursor: pointer;
+}
+
+.photos-thumb-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 280ms var(--ease-soft);
+}
+
+.photos-thumb-btn:hover img {
+  transform: scale(1.06);
+}
+
+.photos-thumb-btn:active img {
+  transform: scale(0.96);
+}
+
+.photos-lightbox {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: #000000;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+.photos-lightbox[hidden] {
+  display: none;
+}
+
+.photos-lb-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(30 * var(--px)) calc(14 * var(--px)) calc(8 * var(--px));
+}
+
+.photos-lb-close {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(5 * var(--px));
+  color: #0a84ff;
+  font-size: calc(14 * var(--px));
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.photos-lb-close svg {
+  width: calc(9 * var(--px));
+  height: calc(15 * var(--px));
+}
+
+.photos-lb-counter {
+  font-size: calc(12.5 * var(--px));
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.photos-lb-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(6 * var(--px)) calc(12 * var(--px));
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.photos-lb-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: calc(8 * var(--px));
+}
+
+.photos-lb-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: calc(32 * var(--px));
+  height: calc(32 * var(--px));
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: calc(20 * var(--px));
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.photos-lb-prev {
+  inset-inline-start: calc(10 * var(--px));
+}
+
+.photos-lb-next {
+  inset-inline-end: calc(10 * var(--px));
+}
+
+.photos-lb-strip {
+  flex-shrink: 0;
+  display: flex;
+  gap: calc(4 * var(--px));
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: calc(6 * var(--px)) calc(12 * var(--px)) calc(24 * var(--px));
+}
+
+.photos-lb-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.photos-strip-thumb {
+  flex-shrink: 0;
+  width: calc(34 * var(--px));
+  height: calc(34 * var(--px));
+  border-radius: calc(4 * var(--px));
+  overflow: hidden;
+  opacity: 0.45;
+  border: calc(2 * var(--px)) solid transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity 200ms ease, border-color 200ms ease;
+}
+
+.photos-strip-thumb.is-active {
+  opacity: 1;
+  border-color: #ffffff;
+}
+
+.photos-strip-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 8. Reviews App */
+.ios-reviews {
+  background: #f2f2f7;
+  color: #1e1815;
+}
+
+.reviews-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  gap: calc(12 * var(--px));
+  padding: calc(12 * var(--px)) calc(16 * var(--px)) calc(34 * var(--px));
+}
+
+.reviews-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.reviews-summary-card {
+  display: flex;
+  align-items: center;
+  gap: calc(16 * var(--px));
+  padding: calc(14 * var(--px)) calc(16 * var(--px));
+  border-radius: calc(16 * var(--px));
+  background: #ffffff;
+  box-shadow: 0 calc(2 * var(--px)) calc(10 * var(--px)) rgba(0, 0, 0, 0.05);
+}
+
+.reviews-score-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: calc(68 * var(--px));
+}
+
+.reviews-score-big {
+  font-size: calc(40 * var(--px));
+  font-weight: 800;
+  line-height: 1;
+  color: #1e1815;
+}
+
+.reviews-score-out {
+  margin-top: calc(3 * var(--px));
+  font-size: calc(11 * var(--px));
+  font-weight: 700;
+  color: var(--ios-gray);
+}
+
+.reviews-bars-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: calc(3 * var(--px));
+}
+
+.reviews-bar-row {
+  display: flex;
+  align-items: center;
+  gap: calc(6 * var(--px));
+}
+
+.rb-stars {
+  width: calc(46 * var(--px));
+  text-align: end;
+  font-size: calc(8.5 * var(--px));
+  color: #8e8e93;
+  letter-spacing: 0.02em;
+}
+
+.rb-track {
+  flex: 1;
+  height: calc(4.5 * var(--px));
+  border-radius: 99px;
+  background: #e5e5ea;
+  overflow: hidden;
+}
+
+.rb-fill {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: #f5b727;
+}
+
+.reviews-google-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(7 * var(--px));
+  padding: calc(10 * var(--px)) calc(16 * var(--px));
+  border-radius: 99px;
+  background: #e3262e;
+  color: #ffffff;
+  font-size: calc(13 * var(--px));
+  font-weight: 700;
+  box-shadow: 0 calc(6 * var(--px)) calc(16 * var(--px)) rgba(227, 38, 46, 0.26);
+  transition: transform 200ms var(--ease-soft);
+}
+
+.reviews-google-cta:active {
+  transform: scale(0.97);
+}
+
+.reviews-g-star {
+  width: calc(15 * var(--px));
+  height: calc(15 * var(--px));
+  color: #f5b727;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: calc(9 * var(--px));
+}
+
+.review-card {
+  background: #ffffff;
+  border-radius: calc(14 * var(--px));
+  padding: calc(12 * var(--px)) calc(14 * var(--px));
+  display: flex;
+  flex-direction: column;
+  gap: calc(5 * var(--px));
+  box-shadow: 0 calc(2 * var(--px)) calc(8 * var(--px)) rgba(0, 0, 0, 0.04);
+}
+
+.review-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(8 * var(--px));
+}
+
+.review-author {
+  font-size: calc(13 * var(--px));
+  font-weight: 700;
+  color: #1e1815;
+}
+
+.review-date {
+  font-size: calc(11 * var(--px));
+  color: var(--ios-gray);
+}
+
+.review-stars-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(6 * var(--px));
+}
+
+.review-stars {
+  font-size: calc(12 * var(--px));
+  color: #f59e0b;
+  line-height: 1;
+}
+
+.review-source-pill {
+  font-size: calc(10 * var(--px));
+  font-weight: 700;
+  padding: calc(2 * var(--px)) calc(7 * var(--px));
+  border-radius: 99px;
+  background: #f2f2f7;
+  color: #6c6c70;
+}
+
+.review-quote {
+  font-size: calc(12.5 * var(--px));
+  line-height: 1.45;
+  color: #3a322d;
+}
+
+/* 9. Checkout Promo Code Box & Receipt Discount Row */
+.checkout-promo-wrap {
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.checkout-promo-row {
+  display: flex;
+  gap: 8px;
+}
+
+.checkout-promo-input {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 9999px;
+  border: 1px solid rgba(30, 24, 21, 0.14);
+  background-color: #f6efe6;
+  color: #1e1815;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  outline: none;
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.checkout-promo-input::placeholder {
+  text-transform: none;
+  font-weight: 500;
+  color: #8c827a;
+}
+
+.checkout-promo-input:focus {
+  border-color: #1e1815;
+  background-color: #ffffff;
+}
+
+.checkout-promo-btn {
+  flex-shrink: 0;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 9999px;
+  border: none;
+  background-color: #1e1815;
+  color: #ffffff;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 180ms ease, transform 180ms ease;
+}
+
+.checkout-promo-btn:hover {
+  background-color: #e3262e;
+}
+
+.checkout-promo-btn.is-applied {
+  background-color: #246b35;
+}
+
+.checkout-promo-saved-pill {
+  align-self: flex-start;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  border: 1px dashed #e3262e;
+  background-color: #fff8e6;
+  color: #1e1815;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 180ms ease;
+}
+
+.checkout-promo-saved-pill:hover {
+  background-color: #fdecc4;
+}
+
+.checkout-promo-saved-pill[hidden],
+.checkout-discount-line[hidden],
+.receipt-discount-line[hidden] {
+  display: none !important;
+}
+
+.checkout-promo-msg {
+  font-size: 12.5px;
+  font-weight: 600;
+  min-height: 0;
+}
+
+.checkout-promo-msg.is-success {
+  color: #246b35;
+}
+
+.checkout-promo-msg.is-error {
+  color: #e3262e;
+}
+
+.checkout-discount-val,
+.receipt-discount-val {
+  color: #246b35;
+  font-weight: 700;
+}

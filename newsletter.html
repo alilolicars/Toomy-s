@@ -126,54 +126,86 @@
                       </button>
                     </div>
 
-                    <div class="ios-app-grid">
-                      <button type="button" class="ios-app" data-open-app="maps">
+                    <button type="button" class="ios-jiggle-done" data-jiggle-done hidden>Done</button>
+
+                    <div class="ios-app-grid" data-ios-grid>
+                      <button type="button" class="ios-app" data-app-id="maps" data-open-app="maps">
                         <span class="ios-icon ios-icon-maps" aria-hidden="true">
                           <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" fill="currentColor"/></svg>
                         </span>
                         <span class="ios-app-label">Maps</span>
                       </button>
 
-                      <button type="button" class="ios-app" data-open-app="contact">
+                      <button type="button" class="ios-app" data-app-id="contact" data-open-app="contact">
                         <span class="ios-icon ios-icon-contacts" aria-hidden="true">
                           <svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4" fill="currentColor"/><path d="M4 20.5c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" fill="currentColor"/></svg>
                         </span>
                         <span class="ios-app-label">Contacts</span>
                       </button>
 
-                      <a href="tel:+201040078750" class="ios-app">
+                      <a href="tel:+201040078750" class="ios-app" data-app-id="call">
                         <span class="ios-icon ios-icon-phone" aria-hidden="true">
                           <svg viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" fill="currentColor"/></svg>
                         </span>
                         <span class="ios-app-label">Call</span>
                       </a>
 
-                      <a href="https://wa.me/201040078750" target="_blank" rel="noopener" data-open-app="chat" class="ios-app">
+                      <a href="https://wa.me/201040078750" target="_blank" rel="noopener" data-app-id="whatsapp" data-open-app="chat" class="ios-app">
                         <span class="ios-icon ios-icon-whatsapp" aria-hidden="true">
                           <svg viewBox="0 0 24 24"><path d="M12 2.5a9.4 9.4 0 0 0-8.1 14.2L2.6 21.4l4.8-1.3A9.4 9.4 0 1 0 12 2.5zm5.4 13.2c-.2.6-1.3 1.2-1.8 1.3-.5 0-1 .3-3.4-.7-2.9-1.2-4.7-4.1-4.8-4.3-.1-.2-1.2-1.6-1.2-3s.8-2.2 1-2.5c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.3.5-.4.5c-.2.2-.3.3-.1.6.2.3.8 1.4 1.8 2.2 1.2 1.1 2.2 1.4 2.5 1.6.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.3z" fill="currentColor"/></svg>
                         </span>
                         <span class="ios-app-label">WhatsApp</span>
                       </a>
 
-                      <a href="https://www.instagram.com/toomyseg" target="_blank" rel="noopener" class="ios-app">
+                      <button type="button" class="ios-app" data-app-id="scratch" data-open-app="scratch">
+                        <span class="ios-icon ios-icon-scratch" aria-hidden="true">
+                          <svg viewBox="0 0 24 24"><path d="M12 2l2.4 5.8L20.5 9l-4.7 4 1.4 6.1L12 15.9 6.8 19.1 8.2 13 3.5 9l6.1-1.2L12 2z" fill="currentColor"/></svg>
+                        </span>
+                        <span class="ios-app-label">Scratch &amp; Win</span>
+                      </button>
+
+                      <button type="button" class="ios-app" data-app-id="photos" data-open-app="photos">
+                        <span class="ios-icon ios-icon-photos" aria-hidden="true">
+                          <svg viewBox="0 0 24 24">
+                            <ellipse cx="12" cy="6.2" rx="2.5" ry="4.1" fill="#ff9f0a"/>
+                            <ellipse cx="16.1" cy="7.9" rx="2.5" ry="4.1" transform="rotate(45 16.1 7.9)" fill="#ffd60a"/>
+                            <ellipse cx="17.8" cy="12" rx="4.1" ry="2.5" fill="#30d158"/>
+                            <ellipse cx="16.1" cy="16.1" rx="2.5" ry="4.1" transform="rotate(135 16.1 16.1)" fill="#32ade6"/>
+                            <ellipse cx="12" cy="17.8" rx="2.5" ry="4.1" fill="#007aff"/>
+                            <ellipse cx="7.9" cy="16.1" rx="2.5" ry="4.1" transform="rotate(45 7.9 16.1)" fill="#af52de"/>
+                            <ellipse cx="6.2" cy="12" rx="4.1" ry="2.5" fill="#ff2d55"/>
+                            <ellipse cx="7.9" cy="7.9" rx="2.5" ry="4.1" transform="rotate(135 7.9 7.9)" fill="#ff3b30"/>
+                          </svg>
+                        </span>
+                        <span class="ios-app-label">Photos</span>
+                      </button>
+
+                      <button type="button" class="ios-app" data-app-id="reviews" data-open-app="reviews">
+                        <span class="ios-icon ios-icon-reviews" aria-hidden="true">
+                          <svg viewBox="0 0 24 24"><path d="M12 3.2l2.6 5.4 5.9.8-4.3 4.2 1 5.9L12 16.7l-5.2 2.8 1-5.9-4.3-4.2 5.9-.8L12 3.2z" fill="currentColor"/></svg>
+                        </span>
+                        <span class="ios-app-label">Reviews</span>
+                      </button>
+
+                      <a href="menu.html" class="ios-app" data-app-id="menu">
+                        <span class="ios-icon ios-icon-menu" aria-hidden="true">
+                          <img src="assets/logo-small.webp" alt="" loading="lazy" decoding="async" />
+                        </span>
+                        <span class="ios-app-label">Menu</span>
+                      </a>
+
+                      <a href="https://www.instagram.com/toomyseg" target="_blank" rel="noopener" class="ios-app" data-app-id="instagram">
                         <span class="ios-icon ios-icon-instagram" aria-hidden="true">
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
                         </span>
                         <span class="ios-app-label">Instagram</span>
                       </a>
 
-                      <a href="https://www.facebook.com/toomyseg" target="_blank" rel="noopener" class="ios-app">
+                      <a href="https://www.facebook.com/toomyseg" target="_blank" rel="noopener" class="ios-app" data-app-id="facebook">
                         <span class="ios-icon ios-icon-facebook" aria-hidden="true">
                           <svg viewBox="0 0 24 24"><path d="M13.5 21v-7.5H16l.4-3h-2.9V8.6c0-.9.3-1.4 1.5-1.4h1.5V4.5c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2.3H8v3h2.6V21h2.9z" fill="currentColor"/></svg>
                         </span>
                         <span class="ios-app-label">Facebook</span>
-                      </a>
-
-                      <a href="menu.html" class="ios-app">
-                        <span class="ios-icon ios-icon-menu" aria-hidden="true">
-                          <img src="assets/logo-small.webp" alt="" loading="lazy" decoding="async" />
-                        </span>
-                        <span class="ios-app-label">Menu</span>
                       </a>
                     </div>
 
@@ -365,6 +397,137 @@
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.4 20.4 21 12 3.4 3.6 3.4 10.2 15 12 3.4 13.8z" fill="currentColor"/></svg>
                       </button>
                     </form>
+                  </section>
+
+                  <!-- ========== SCRATCH & WIN APP ========== -->
+                  <section class="ios-view ios-scratch" data-view="scratch" aria-label="Scratch and Win" inert>
+                    <div class="ios-app-bar">
+                      <button type="button" class="ios-back" data-go-home>
+                        <svg viewBox="0 0 12 20" aria-hidden="true"><path d="M10 2L2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span class="ios-back-label">Home</span>
+                      </button>
+                      <span class="ios-app-bar-title ios-scratch-bar-title">Scratch &amp; Win</span>
+                      <span class="ios-app-bar-spacer" aria-hidden="true"></span>
+                    </div>
+
+                    <div class="scratch-scroll">
+                      <div class="scratch-hero">
+                        <span class="scratch-eyebrow">TOOMY'S VIP DROP</span>
+                        <h3 class="scratch-title">Scratch to reveal your prize!</h3>
+                      </div>
+
+                      <div class="scratch-card-wrap" data-scratch-wrap>
+                        <div class="scratch-prize-layer" data-scratch-prize>
+                          <span class="scratch-prize-emoji" data-scratch-emoji aria-hidden="true">🍟</span>
+                          <strong class="scratch-prize-headline" data-scratch-headline>15% OFF your order</strong>
+                          <span class="scratch-prize-code is-locked" data-scratch-code dir="ltr">••••••••</span>
+                        </div>
+                        <canvas class="scratch-canvas" data-scratch-canvas aria-label="Scratch card surface"></canvas>
+                      </div>
+
+                      <p class="scratch-hint" data-scratch-hint>Rub the golden card with your finger or mouse</p>
+
+                      <!-- Lead capture form (shown after scratching) -->
+                      <form class="scratch-claim-form" data-scratch-form hidden novalidate>
+                        <label for="scratchPhone" class="scratch-claim-label">Drop your phone number to unlock your code:</label>
+                        <div class="scratch-claim-row">
+                          <input
+                            type="tel"
+                            id="scratchPhone"
+                            class="scratch-phone-input"
+                            placeholder="010XXXXXXXX"
+                            autocomplete="tel"
+                            dir="ltr"
+                            required
+                          />
+                          <button type="submit" class="scratch-unlock-btn">Unlock</button>
+                        </div>
+                        <p class="scratch-claim-error" data-scratch-error role="alert"></p>
+                      </form>
+
+                      <!-- Unlocked code actions (shown after phone submitted) -->
+                      <div class="scratch-unlocked" data-scratch-unlocked hidden>
+                        <div class="scratch-code-actions">
+                          <button type="button" class="scratch-copy-btn" data-scratch-copy>Copy Code</button>
+                          <a href="checkout.html" class="scratch-use-btn" data-scratch-use>Use at Checkout &rarr;</a>
+                        </div>
+                        <p class="scratch-saved-note" data-scratch-note>Code saved! You can apply it at checkout anytime.</p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <!-- ========== PHOTOS GALLERY APP ========== -->
+                  <section class="ios-view ios-photos" data-view="photos" aria-label="Toomy's Photos" inert>
+                    <div class="ios-app-bar">
+                      <button type="button" class="ios-back" data-go-home>
+                        <svg viewBox="0 0 12 20" aria-hidden="true"><path d="M10 2L2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span class="ios-back-label">Home</span>
+                      </button>
+                      <span class="ios-app-bar-title ios-photos-bar-title">Photos</span>
+                      <span class="ios-photos-count" data-photos-count>20</span>
+                    </div>
+
+                    <div class="photos-grid-scroll" data-photos-grid></div>
+
+                    <!-- Fullscreen Photo Viewer inside Tablet -->
+                    <div class="photos-lightbox" data-photos-lightbox hidden aria-hidden="true">
+                      <div class="photos-lb-bar">
+                        <button type="button" class="photos-lb-close" data-photos-close aria-label="Back to gallery">
+                          <svg viewBox="0 0 12 20" aria-hidden="true"><path d="M10 2L2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                          <span class="photos-lb-back-label">All Photos</span>
+                        </button>
+                        <span class="photos-lb-counter" data-photos-counter dir="ltr">1 / 20</span>
+                      </div>
+
+                      <div class="photos-lb-stage" data-photos-stage>
+                        <button type="button" class="photos-lb-nav photos-lb-prev" data-photos-prev aria-label="Previous photo">&#8249;</button>
+                        <img src="" alt="Toomy's food" class="photos-lb-img" data-photos-img draggable="false" />
+                        <button type="button" class="photos-lb-nav photos-lb-next" data-photos-next aria-label="Next photo">&#8250;</button>
+                      </div>
+
+                      <div class="photos-lb-strip" data-photos-strip></div>
+                    </div>
+                  </section>
+
+                  <!-- ========== REVIEWS APP (APP STORE STYLE) ========== -->
+                  <section class="ios-view ios-reviews" data-view="reviews" aria-label="Google Reviews" inert>
+                    <div class="ios-app-bar">
+                      <button type="button" class="ios-back" data-go-home>
+                        <svg viewBox="0 0 12 20" aria-hidden="true"><path d="M10 2L2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span class="ios-back-label">Home</span>
+                      </button>
+                      <span class="ios-app-bar-title ios-reviews-bar-title">Reviews</span>
+                      <span class="ios-app-bar-spacer" aria-hidden="true"></span>
+                    </div>
+
+                    <div class="reviews-scroll">
+                      <div class="reviews-summary-card">
+                        <div class="reviews-score-col">
+                          <span class="reviews-score-big" dir="ltr">4.9</span>
+                          <span class="reviews-score-out">out of 5</span>
+                        </div>
+                        <div class="reviews-bars-col" aria-hidden="true">
+                          <div class="reviews-bar-row"><span class="rb-stars">★★★★★</span><span class="rb-track"><span class="rb-fill" style="width:91%"></span></span></div>
+                          <div class="reviews-bar-row"><span class="rb-stars">★★★★</span><span class="rb-track"><span class="rb-fill" style="width:7%"></span></span></div>
+                          <div class="reviews-bar-row"><span class="rb-stars">★★★</span><span class="rb-track"><span class="rb-fill" style="width:2%"></span></span></div>
+                          <div class="reviews-bar-row"><span class="rb-stars">★★</span><span class="rb-track"><span class="rb-fill" style="width:0%"></span></span></div>
+                          <div class="reviews-bar-row"><span class="rb-stars">★</span><span class="rb-track"><span class="rb-fill" style="width:0%"></span></span></div>
+                        </div>
+                      </div>
+
+                      <a
+                        href="https://www.google.com/maps/search/?api=1&amp;query=27.18261,31.18335"
+                        target="_blank"
+                        rel="noopener"
+                        class="reviews-google-cta"
+                        data-reviews-google-btn
+                      >
+                        <svg viewBox="0 0 24 24" class="reviews-g-star" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5-4.8-4.6 6.6-.9L12 2.5z" fill="currentColor"/></svg>
+                        <span class="reviews-google-cta-label">Rate us on Google Maps</span>
+                      </a>
+
+                      <div class="reviews-list" data-reviews-list></div>
+                    </div>
                   </section>
 
                   <button type="button" class="ios-home-bar" data-go-home aria-label="Go to home screen"><span></span></button>
@@ -614,6 +777,14 @@
           newsletterPhone.focus();
           return;
         }
+
+        try {
+          const leads = JSON.parse(localStorage.getItem("toomys_newsletter_leads_v1")) || [];
+          if (!leads.some((l) => l.phone === raw)) {
+            leads.unshift({ phone: raw, source: "newsletter", at: new Date().toISOString() });
+            localStorage.setItem("toomys_newsletter_leads_v1", JSON.stringify(leads.slice(0, 50)));
+          }
+        } catch {}
 
         newsletterFeedback.textContent = isAr
           ? "نوّرت قايمة الـ VIP! خلّي موبايلك جنبك عشان عروض توميز هتنزلك أول بأول."
